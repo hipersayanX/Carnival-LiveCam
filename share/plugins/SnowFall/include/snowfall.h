@@ -24,6 +24,9 @@
 #ifndef SNOWFALL_H
 #define SNOWFALL_H
 
+#include <QVariant>
+
+#include "config.h"
 #include "plugin.h"
 #include "snow.h"
 
@@ -50,10 +53,14 @@ class SnowFall: public QObject, public Plugin
         void resize(int width, int height);
         QImage render(const QImage &image);
         void end();
+
         void configure();
+        QVariant configs();
+        void setConfigs(QVariant configs);
 
     private:
         Snow *snow;
+        Config config;
 };
 
 #endif // SNOWFALL_H

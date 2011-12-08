@@ -37,9 +37,9 @@ class PluginManager: public QObject
 
     public:
         explicit PluginManager(QObject *parent = 0);
-        QImage getFrame(const QImage &image);
-        void resize(QSize size);
-        QList<QVariant> pluginsToQml();
+        Q_INVOKABLE QImage getFrame(const QImage &image);
+        Q_INVOKABLE void resize(QSize size);
+        Q_INVOKABLE QList<QVariant> pluginsToQml();
 
     public slots:
         bool disablePlugin(QString id);
@@ -54,6 +54,7 @@ class PluginManager: public QObject
         QPluginLoader pluginLoader;
         QList<Plugin *> activePlugins;
         QHash<QString, PluginInfo> pluginsInfo;
+        QHash<QString, QVariant> pluginConfigs;
 };
 
 #endif // PLUGINMANAGER_H

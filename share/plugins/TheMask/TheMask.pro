@@ -51,6 +51,8 @@ OTHER_FILES += \
 
 QT += core gui
 
+RCC_DIR += $$PWD/build
+
 SOURCES += \
     src/themask.cpp \
     src/mask.cpp

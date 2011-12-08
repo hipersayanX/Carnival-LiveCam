@@ -23,6 +23,20 @@
 
 #include "../../include/core/core.h"
 
+/*!
+  \class Core
+
+  \brief Main core class.
+
+  This class manages and initialice the DeviceManager, ShellManager,
+  PluginManager and MediaStreaming modules.
+*/
+
+/*!
+  \fn Core::Core(QObject *parent)
+
+  \param parent Parent widget.
+ */
 Core::Core(QObject *parent): QObject(parent)
 {
     this->shellManager.setShell();
@@ -55,17 +69,40 @@ Core::Core(QObject *parent): QObject(parent)
     connect(&this->mediaStreaming, SIGNAL(captureFrame()), this, SLOT(captureFrame()));
 }
 
+/*!
+  \internal
+
+  \fn void Core::devicesModified()
+
+  This slot is called when a device is added or removed.
+ */
 void Core::devicesModified()
 {
     this->shellManager.updateDevices(this->deviceManager.devicesToQml());
 }
 
+/*!
+  \internal
+
+  \fn void Core::deviceSelected(QString deviceId)
+
+  \param deviceId The unique device identifier.
+
+  This slot is called when the user select a device to be used to capture from.
+ */
 void Core::deviceSelected(QString deviceId)
 {
     this->deviceManager.setDevice(deviceId);
     this->pluginManager.resize(this->deviceManager.frameSize());
 }
 
+/*!
+  \internal
+
+  \fn void Core::captureFrame()
+
+  This slot is called when a frame is captured.
+ */
 void Core::captureFrame()
 {
     QImage frame = this->pluginManager.getFrame(this->deviceManager.captureFrame());

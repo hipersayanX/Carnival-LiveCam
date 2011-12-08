@@ -29,6 +29,12 @@
 #include "../include/webcamlinux.h"
 #include "../include/sleep.h"
 
+/*!
+  \class WebcamLinux
+
+  \brief This drive captures from webcam devices using OpenCV.
+ */
+
 QString WebcamLinux::id()
 {
     return "driver.WebcamLinux";
@@ -136,9 +142,13 @@ QImage WebcamLinux::captureFrame(QString id)
 {
     if (this->activeWebcams.contains(id))
     {
-        IplImage *iplImage = cvQueryFrame(this->activeWebcams[id]);
+        cv::Mat matFrame;
 
-        return QImage((uchar *) iplImage->imageData, iplImage->width, iplImage->height, 3 * iplImage->width, QImage::Format_RGB888).rgbSwapped();
+        this->activeWebcams[id] >> matFrame;
+
+        QImage qtFrame((const uchar *)matFrame.data, matFrame.cols, matFrame.rows, QImage::Format_RGB888);
+
+        return qtFrame.rgbSwapped();
     }
     else
     {
@@ -153,12 +163,7 @@ QImage WebcamLinux::captureFrame(QString id)
 QSize WebcamLinux::frameSize(QString id)
 {
     if (this->activeWebcams.contains(id))
-    {
-        int width = (int) cvGetCaptureProperty(this->activeWebcams[id], CV_CAP_PROP_FRAME_WIDTH);
-        int height = (int) cvGetCaptureProperty(this->activeWebcams[id], CV_CAP_PROP_FRAME_HEIGHT);
-
-        return QSize(width, height);
-    }
+        return QSize(this->activeWebcams[id].get(CV_CAP_PROP_FRAME_WIDTH), this->activeWebcams[id].get(CV_CAP_PROP_FRAME_HEIGHT));
     else
         return QSize(0, 0);
 }
@@ -184,7 +189,6 @@ bool WebcamLinux::disableDevice(QString id)
     if (!this->activeWebcams.contains(id))
         return false;
 
-    cvReleaseCapture(&this->activeWebcams[id]);
     this->activeWebcams.remove(id);
 
     return true;
@@ -192,9 +196,9 @@ bool WebcamLinux::disableDevice(QString id)
 
 bool WebcamLinux::enableDevice(QString id)
 {
-    CvCapture *webcam = cvCreateCameraCapture(QString(id).remove("/dev/video").toInt());
+    cv::VideoCapture webcam;
 
-    if (webcam == NULL)
+    if (!webcam.open(QString(id).remove("/dev/video").toInt()))
         return false;
 
     this->activeWebcams[id] = webcam;
@@ -224,6 +228,15 @@ void WebcamLinux::setConfigs(QVariant configs)
     Q_UNUSED(configs)
 }
 
+/*!
+  \internal
+
+  fn void WebcamLinux::modified(QString id)
+
+  \param Unique device identifier.
+
+  \brief This slot is called when a webcam is added or removed.
+ */
 void WebcamLinux::modified(QString id)
 {
     Q_UNUSED(id)

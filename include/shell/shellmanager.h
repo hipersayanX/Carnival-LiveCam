@@ -35,14 +35,15 @@ class ShellManager: public QObject
     public:
         explicit ShellManager(QObject *parent = 0);
         ~ShellManager();
-        QList<QVariant> shellsToQml();
-        QWidget *widget(QString id = "");
+        Q_INVOKABLE QList<QVariant> shellsToQml();
+        Q_INVOKABLE QWidget *widget(QString id = "");
 
     private:
         QPluginLoader shellLoader;
         QString activeShellId;
         Shell *activeShell;
         QHash<QString, ShellInfo> shellsInfo;
+        QHash<QString, QVariant> shellConfigs;
 
     public slots:
         bool setShell();
@@ -66,14 +67,80 @@ class ShellManager: public QObject
         void onClosed();
 
     signals:
+        /*!
+          \fn void ShellManager::takePicture()
+
+          \brief This signal is emited when the user presses the "take picture" button.
+         */
         void takePicture();
+
+        /*!
+          \fn void ShellManager::startStopRecord()
+
+          \brief This signal is emited when the user presses the "start/stop video record" button.
+         */
         void startStopRecord();
+
+        /*!
+          \fn void ShellManager::deviceSelected(QString deviceId)
+
+          \param deviceId Unique device identifier.
+
+          \brief This signal is emited when the user select a new device.
+         */
         void deviceSelected(QString deviceId);
+
+        /*!
+          \fn void ShellManager::pluginActivated(QString pluginId)
+
+          \param pluginId Unique plugin identifier.
+
+          \brief This signal is emited when the user activate a plugin.
+         */
         void pluginActivated(QString pluginId);
+
+        /*!
+          \fn void ShellManager::pluginDeactivated(QString pluginId)
+
+          \param pluginId Unique plugin identifier.
+
+          \brief This signal is emited when the user deactivate a plugin.
+         */
         void pluginDeactivated(QString pluginId);
+
+        /*!
+          \fn void ShellManager::pluginMoved(int from, int to)
+
+          \param from The old index position of the plugin.
+          \param to The new index position of the plugin.
+
+          \brief This signal is emited when the user changes the index of a plugin.
+         */
         void pluginMoved(int from, int to);
+
+        /*!
+          \fn void ShellManager::pluginConfigureClicked(QString pluginId)
+
+          \param pluginId The plugin to configure.
+
+          \brief This signal is emited when the user wants to configure a plugin.
+         */
         void pluginConfigureClicked(QString pluginId);
+
+        /*!
+          \fn void ShellManager::deviceConfigureClicked(QString deviceId)
+
+          \param deviceId The device to configure.
+
+          \brief This signal is emited when the user wants to configure a device.
+         */
         void deviceConfigureClicked(QString deviceId);
+
+        /*!
+          \fn void ShellManager::closed()
+
+          \brief This signal is emited when the shell is closed.
+         */
         void closed();
 };
 

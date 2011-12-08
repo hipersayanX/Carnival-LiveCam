@@ -1,0 +1,19 @@
+Requirements
+============
+
+- Qt >= 4.7.x
+- OpenSceneGraph >= 3.0.x
+- OpenCV >= 2.3.x
+- FFmpeg
+- ffmpegthumbnailer >= 2.x.x
+- Doxygen >= 1.7.5.x
+- Graphviz >= 2.28.x
+- Texlive-bin >= 2011.x
+
+Build and Install
+=================
+
+**Carnival LiveCam** is in a very early stage of development and is not recommended for installation, and it works only in *GNU/Linux*.
+To build **Carnival LiveCam** and their plugins, follow the instructions below:
+
+    ./build_all.sh

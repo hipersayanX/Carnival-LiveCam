@@ -26,6 +26,14 @@
 
 #include "../include/imagedriver.h"
 
+/*!
+  \class ImageDriver
+
+  \brief This drive captures from image files.
+
+  This driver convert the images selected by the user in capture devices.
+ */
+
 QString ImageDriver::id()
 {
     return "driver.ImageDriver";
@@ -169,7 +177,7 @@ void ImageDriver::configureDevice(QString id)
 {
     Q_UNUSED(id)
 
-    config.exec();
+    this->config.exec();
     emit devicesModified();
 }
 

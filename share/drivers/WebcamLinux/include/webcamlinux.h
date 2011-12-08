@@ -65,7 +65,7 @@ class WebcamLinux: public Driver
 
     private:
         QFileSystemWatcher *fs_watcher;
-        QHash<QString, CvCapture *> activeWebcams;
+        QHash<QString, cv::VideoCapture> activeWebcams;
 
     private slots:
         void modified(QString id);

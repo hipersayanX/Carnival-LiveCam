@@ -27,7 +27,8 @@ HEADERS += \
     include/plugin.h \
     include/snowfall.h \
     include/snowflake.h \
-    include/snow.h
+    include/snow.h \
+    include/config.h
 
 MOC_DIR += $$PWD/build
 
@@ -38,11 +39,17 @@ OTHER_FILES += \
 
 QT += core gui
 
+RCC_DIR += $$PWD/build
+
 SOURCES += \
     src/snowfall.cpp \
     src/snowflake.cpp \
-    src/snow.cpp
+    src/snow.cpp \
+    src/config.cpp
 
 TEMPLATE = lib
 
 UI_DIR += $$PWD/build
+
+FORMS += \
+    share/ui/config.ui

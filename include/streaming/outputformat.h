@@ -29,24 +29,54 @@ class OutputFormat: public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString suffix READ suffix WRITE setSuffix RESET resetSuffix)
+    Q_PROPERTY(QString vcodec READ vcodec WRITE setVcodec RESET resetVcodec)
+    Q_PROPERTY(int vbitrate READ vbitrate WRITE setVbitrate RESET resetVbitrate)
+    Q_PROPERTY(QString acodec READ acodec WRITE setAcodec RESET resetAcodec)
+    Q_PROPERTY(int abitrate READ abitrate WRITE setAbitrate RESET resetAbitrate)
+    Q_PROPERTY(QString oformat READ oformat WRITE setOformat RESET resetOformat)
+    Q_PROPERTY(bool sameq READ sameq WRITE setSameq RESET resetSameq)
+
     public:
-        QString suffix;
-
-        QString vcodec;
-        int vbitrate;
-
-        QString acodec;
-        int abitrate;
-
-        QString oformat;
-        bool sameq;
-
         explicit OutputFormat(QObject *parent = 0);
         explicit OutputFormat(const OutputFormat &object);
         OutputFormat(QString suffix, QString vcodec, int vbitrate, QString acodec, int abitrate, QString oformat, bool sameq);
         OutputFormat& operator =(const OutputFormat &other);
 
-        QStringList toStringList(int fps, int width, int height);
+        Q_INVOKABLE QStringList toStringList(int fps, int width, int height);
+
+        QString suffix();
+        QString vcodec();
+        int vbitrate();
+        QString acodec();
+        int abitrate();
+        QString oformat();
+        bool sameq();
+
+    private:
+        QString m_suffix;
+        QString m_vcodec;
+        int m_vbitrate;
+        QString m_acodec;
+        int m_abitrate;
+        QString m_oformat;
+        bool m_sameq;
+
+    public slots:
+        void setSuffix(QString value);
+        void setVcodec(QString value);
+        void setVbitrate(int value);
+        void setAcodec(QString value);
+        void setAbitrate(int value);
+        void setOformat(QString value);
+        void setSameq(bool value);
+        void resetSuffix();
+        void resetVcodec();
+        void resetVbitrate();
+        void resetAcodec();
+        void resetAbitrate();
+        void resetOformat();
+        void resetSameq();
 };
 
 #endif // OUTPUTFORMAT_H

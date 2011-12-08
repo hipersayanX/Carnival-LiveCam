@@ -231,6 +231,7 @@ float SnowFlake::randPercent()
 void SnowFlake::reset()
 {
     this->x0 = (float) rand() * (this->m_maxX - this->m_minX) / (float) RAND_MAX + this->m_minX;
+    this->y0 = this->m_minY;
     this->m_x = this->x0;
     this->m_y = this->m_minY;
     this->m_z = (float) rand() * (this->m_maxZ - this->m_minZ) / (float) RAND_MAX + this->m_minZ;
@@ -244,7 +245,7 @@ void SnowFlake::step()
     float angle = M_PI * this->m_direction / 180.0;
 
     this->m_x = this->x0 + this->randPercent() * this->m_z * this->m_acceleration * this->m_t * this->m_t * sin(angle) / 2;
-    this->m_y = this->m_z * this->m_acceleration * this->m_t * this->m_t * cos(angle) / 2;
+    this->m_y = this->y0 + this->m_z * this->m_acceleration * this->m_t * this->m_t * cos(angle) / 2;
     this->m_t++;
 }
 

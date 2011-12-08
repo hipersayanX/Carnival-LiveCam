@@ -27,7 +27,6 @@
 #include <QThread>
 
 class Sleep: public QThread
-
 {
     public:
         static void usleep(unsigned long usecs);

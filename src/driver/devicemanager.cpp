@@ -23,22 +23,48 @@
 
 #include "../../include/driver/devicemanager.h"
 
+/*!
+  \class DeviceManager
+
+  \brief High level device manager class.
+
+  This class works on top of DriverManager, managin the devices provided by the
+  drivers. The devices are any kind of source from were is possible to obtain a
+  image frame.
+  DeviceManager allow capture from one or many devices at same time.
+ */
+
+/*!
+  \fn DeviceManager::DeviceManager(QObject *parent)
+
+  \param parent Parent widget.
+ */
 DeviceManager::DeviceManager(QObject *parent): QObject(parent)
 {
     updateDevices();
 }
 
+/*!
+  \fn DeviceManager::~DeviceManager()
+ */
 DeviceManager::~DeviceManager()
 {
     if (this->activeDevice != "")
         this->disableDevice(this->activeDevice);
 }
 
+/*!
+  \fn QImage DeviceManager::captureFrame()
+
+  \return The captured frame.
+
+  \brief Capture a frame from active device.
+ */
 QImage DeviceManager::captureFrame()
 {
     if (this->activeDevice != "")
     {
-        Driver *driver = this->driverManager.driver(this->devicesInfo[this->activeDevice].driverId);
+        Driver *driver = this->driverManager.driver(this->devicesInfo[this->activeDevice].driverId());
 
         if (driver)
             return driver->captureFrame(this->activeDevice);
@@ -51,11 +77,18 @@ QImage DeviceManager::captureFrame()
     return frame;
 }
 
+/*!
+  \fn QSize DeviceManager::frameSize()
+
+  \return The size of the captured frame.
+
+  \brief Returns the size of the captured frame from active device.
+ */
 QSize DeviceManager::frameSize()
 {
     if (this->activeDevice != "")
     {
-        Driver *driver = this->driverManager.driver(this->devicesInfo[this->activeDevice].driverId);
+        Driver *driver = this->driverManager.driver(this->devicesInfo[this->activeDevice].driverId());
 
         if (!driver)
             return QSize(1, 1);
@@ -66,6 +99,13 @@ QSize DeviceManager::frameSize()
         return QSize(1, 1);
 }
 
+/*!
+  \fn QList<QVariant> DeviceManager::devicesToQml()
+
+  \return The list of devices information in standard format.
+
+  \brief Returns the list of devices information in standard format.
+ */
 QList<QVariant> DeviceManager::devicesToQml()
 {
     QList<QVariant> deviceList;
@@ -74,12 +114,12 @@ QList<QVariant> DeviceManager::devicesToQml()
     {
         QMap<QString, QVariant> deviceInfoMap;
 
-        deviceInfoMap["deviceId"] = QVariant(device.id);
-        deviceInfoMap["driverId"] = QVariant(device.driverId);
-        deviceInfoMap["isEnabled"] = QVariant(device.isEnabled);
-        deviceInfoMap["summary"] = QVariant(device.summary);
-        deviceInfoMap["icon"] = QVariant(device.icon);
-        deviceInfoMap["isConfigurable"] = QVariant(device.isConfigurable);
+        deviceInfoMap["deviceId"] = QVariant(device.id());
+        deviceInfoMap["driverId"] = QVariant(device.driverId());
+        deviceInfoMap["isEnabled"] = QVariant(device.isEnabled());
+        deviceInfoMap["summary"] = QVariant(device.summary());
+        deviceInfoMap["icon"] = QVariant(device.icon());
+        deviceInfoMap["isConfigurable"] = QVariant(device.isConfigurable());
 
         deviceList << deviceInfoMap;
     }
@@ -87,24 +127,42 @@ QList<QVariant> DeviceManager::devicesToQml()
     return deviceList;
 }
 
+/*!
+  \fn bool DeviceManager::setDevice()
+
+  \retval true if the device is active.
+  \retval false if the device is inactive.
+
+  \brief Try to activate the default device (/dev/video0).
+ */
 bool DeviceManager::setDevice()
 {
     return this->setDevice("/dev/video0");
 }
 
+/*!
+  \fn bool DeviceManager::setDevice(QString id)
+
+  \param id Unique device identifier.
+
+  \retval true if the device is active.
+  \retval false if the device is inactive.
+
+  \brief Try to activate the device id.
+ */
 bool DeviceManager::setDevice(QString id)
 {
     if (this->activeDevice == "")
         this->enableDevice(id);
     else
-        if (this->devicesInfo[this->activeDevice].driverId != this->devicesInfo[id].driverId)
+        if (this->devicesInfo[this->activeDevice].driverId() != this->devicesInfo[id].driverId())
         {
             this->disableDevice(this->activeDevice);
             this->enableDevice(id);
         }
         else
         {
-            Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId);
+            Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
 
             if (driver)
             {
@@ -118,21 +176,36 @@ bool DeviceManager::setDevice(QString id)
     return true;
 }
 
+/*!
+  \fn void DeviceManager::configure(QString id)
+
+  \param id Unique device identifier.
+
+  \brief Calls the configuration dialog for the device id.
+         the device must be active.
+ */
 void DeviceManager::configure(QString id)
 {
     if (this->activeDevice != id)
         return;
 
-    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId);
+    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
     driver->configureDevice(id);
 }
 
+/*!
+  \internal
+
+  \fn void DeviceManager::updateDevices()
+
+  \brief Update the devices list.
+ */
 void DeviceManager::updateDevices()
 {
     QHash<QString, bool> devicesPreStatus;
 
     foreach(DeviceInfo device, this->devicesInfo)
-        devicesPreStatus[device.id] = this->devicesInfo[device.id].isEnabled;
+        devicesPreStatus[device.id()] = this->devicesInfo[device.id()].isEnabled();
 
     this->devicesInfo.clear();
 
@@ -156,6 +229,13 @@ void DeviceManager::updateDevices()
     }
 }
 
+/*!
+  \internal
+
+  \fn void DeviceManager::onDevicesModified()
+
+  \brief This slot is called when device is added os removed.
+ */
 void DeviceManager::onDevicesModified()
 {
     this->disableDevice(this->activeDevice);
@@ -172,16 +252,26 @@ void DeviceManager::onDevicesModified()
     emit devicesModified();
 }
 
+/*!
+  \fn bool DeviceManager::enableDevice(QString id)
+
+  \param id Unique device identifier.
+
+  \retval true if the device is active.
+  \retval false if the device is inactive.
+
+  \brief Try to activate the device id.
+ */
 bool DeviceManager::enableDevice(QString id)
 {
     if (!this->devicesInfo.contains(id))
         return false;
 
-    this->driverManager.load(this->devicesInfo[id].driverId);
-    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId);
+    this->driverManager.load(this->devicesInfo[id].driverId());
+    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
 
-    if (this->driverConfigs.contains(this->devicesInfo[id].driverId))
-        driver->setConfigs(this->driverConfigs[this->devicesInfo[id].driverId]);
+    if (this->driverConfigs.contains(this->devicesInfo[id].driverId()))
+        driver->setConfigs(this->driverConfigs[this->devicesInfo[id].driverId()]);
 
     driver->begin();
     driver->enableDevice(id);
@@ -190,21 +280,31 @@ bool DeviceManager::enableDevice(QString id)
     return true;
 }
 
+/*!
+  \fn bool DeviceManager::disableDevice(QString id)
+
+  \param id Unique device identifier.
+
+  \retval true if the device is inactive.
+  \retval false if the device is active.
+
+  \brief Try to desactivate the device id.
+ */
 bool DeviceManager::disableDevice(QString id)
 {
     if (!this->devicesInfo.contains(id))
         return false;
 
-    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId);
+    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
 
     if (!driver)
         return false;
 
-    this->driverConfigs[this->devicesInfo[id].driverId] = driver->configs();
+    this->driverConfigs[this->devicesInfo[id].driverId()] = driver->configs();
     disconnect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
     driver->disableDevice(id);
     driver->end();
-    this->driverManager.unload(this->devicesInfo[id].driverId);
+    this->driverManager.unload(this->devicesInfo[id].driverId());
 
     return true;
 }

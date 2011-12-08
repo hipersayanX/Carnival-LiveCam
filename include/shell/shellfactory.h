@@ -26,9 +26,21 @@
 
 #include "shell.h"
 
+/*!
+  \class ShellFactory
+
+  \brief ShellFactory template.
+ */
 class ShellFactory
 {
     public:
+        /*!
+          \fn Shell *ShellFactory::shell()
+
+          \return Shell pointer.
+
+          \brief Returns a shell pointer.
+         */
         virtual Shell *shell() = 0;
 };
 

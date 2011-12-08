@@ -36,6 +36,8 @@ OBJECTS_DIR += $$PWD/build
 
 QT += core gui
 
+RCC_DIR += $$PWD/build
+
 SOURCES += \
     src/imagedriverfactory.cpp \
     src/imagedriver.cpp \

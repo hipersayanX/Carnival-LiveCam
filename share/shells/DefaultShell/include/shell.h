@@ -17,8 +17,6 @@
  *
  * Email   : hipersayan DOT x AT gmail DOT com
  * Web-Site: http://hipersayanx.blogspot.com/
- *
- * QML shell plugin
  */
 
 #ifndef SHELL_H
@@ -45,7 +43,11 @@ class Shell: public QObject
 
         virtual void begin() = 0;
         virtual void end() = 0;
+
         virtual void configure() = 0;
+        virtual QVariant configs() = 0;
+        virtual void setConfigs(QVariant configs) = 0;
+
         virtual QWidget *widget() = 0;
 
     public slots:

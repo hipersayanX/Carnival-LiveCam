@@ -43,11 +43,11 @@ QImage Mask::render(const QImage &frame)
 {
     float scale = 4;
     QImage smallFrame(frame.scaled(frame.width() / scale, frame.height() / scale));
-    Mat matFrame = Mat(smallFrame.height(), smallFrame.width(), CV_8UC3, (uchar *) smallFrame.bits(), smallFrame.bytesPerLine());
-    vector<Rect> vecFaces;
+    cv::Mat matFrame = cv::Mat(smallFrame.height(), smallFrame.width(), CV_8UC3, (uchar *) smallFrame.bits(), smallFrame.bytesPerLine());
+    std::vector<cv::Rect> vecFaces;
 
-    cvtColor(matFrame, matFrame, CV_BGR2GRAY);
-    equalizeHist(matFrame, matFrame);
+    cv::cvtColor(matFrame, matFrame, CV_BGR2GRAY);
+    cv::equalizeHist(matFrame, matFrame);
     this->cascadeClassifier.detectMultiScale(matFrame, vecFaces);
 
     if (vecFaces.size() < 1)
@@ -58,7 +58,7 @@ QImage Mask::render(const QImage &frame)
 
     painter.begin(&tmpFrame);
 
-    for (vector<Rect>::const_iterator face = vecFaces.begin(); face != vecFaces.end(); face++)
+    for (std::vector<cv::Rect>::const_iterator face = vecFaces.begin(); face != vecFaces.end(); face++)
         painter.drawImage(QRect(face->x * scale,
                                 face->y * scale,
                                 face->width * scale,

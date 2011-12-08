@@ -91,6 +91,7 @@ class SnowFlake: public QObject
 
     private:
         int x0;
+        int y0;
         int m_x;
         int m_y;
         float m_z;

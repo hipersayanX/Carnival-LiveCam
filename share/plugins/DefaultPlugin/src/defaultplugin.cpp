@@ -109,4 +109,14 @@ void DefaultPlugin::configure()
 {
 }
 
+QVariant DefaultPlugin::configs()
+{
+    return QVariant();
+}
+
+void DefaultPlugin::setConfigs(QVariant configs)
+{
+    Q_UNUSED(configs)
+}
+
 Q_EXPORT_PLUGIN2(DefaultPlugin, DefaultPlugin)

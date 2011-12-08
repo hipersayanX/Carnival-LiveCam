@@ -17,8 +17,6 @@
  *
  * Email   : hipersayan DOT x AT gmail DOT com
  * Web-Site: http://hipersayanx.blogspot.com/
- *
- * Webcam driver for linux
  */
 
 #ifndef DRIVERFACTORY_H
@@ -28,9 +26,21 @@
 
 #include "driver.h"
 
+/*!
+  \class DriverFactory
+
+  \brief DriverFactory template.
+ */
 class DriverFactory
 {
     public:
+        /*!
+          \fn Driver *DriverFactory::driver()
+
+          \return Driver pointer.
+
+          \brief Returns a driver pointer.
+         */
         virtual Driver *driver() = 0;
 };
 

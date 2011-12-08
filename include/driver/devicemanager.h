@@ -38,9 +38,9 @@ class DeviceManager: public QObject
     public:
         explicit DeviceManager(QObject *parent = 0);
         ~DeviceManager();
-        QImage captureFrame();
-        QSize frameSize();
-        QList<QVariant> devicesToQml();
+        Q_INVOKABLE QImage captureFrame();
+        Q_INVOKABLE QSize frameSize();
+        Q_INVOKABLE QList<QVariant> devicesToQml();
 
     public slots:
         bool setDevice();
@@ -50,6 +50,11 @@ class DeviceManager: public QObject
         void configure(QString id);
 
     signals:
+        /*!
+          \fn void DeviceManager::devicesModified()
+
+          \brief This signal is emited when a device is added or removed.
+         */
         void devicesModified();
 
     private:

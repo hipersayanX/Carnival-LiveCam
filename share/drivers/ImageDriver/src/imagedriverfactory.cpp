@@ -24,6 +24,12 @@
 #include "../include/imagedriver.h"
 #include "../include/imagedriverfactory.h"
 
+/*!
+  \class ImageDriverFactory
+
+  \brief ImageDriver factory.
+ */
+
 Driver* ImageDriverFactory::driver()
 {
     return new ImageDriver();

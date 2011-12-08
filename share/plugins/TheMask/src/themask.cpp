@@ -109,4 +109,14 @@ void TheMask::configure()
 {
 }
 
+QVariant TheMask::configs()
+{
+    return QVariant();
+}
+
+void TheMask::setConfigs(QVariant configs)
+{
+    Q_UNUSED(configs)
+}
+
 Q_EXPORT_PLUGIN2(TheMask, TheMask)

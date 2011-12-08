@@ -38,6 +38,8 @@ OBJECTS_DIR += $$PWD/build
 
 QT += core gui opengl
 
+RCC_DIR += $$PWD/build
+
 SOURCES += \
     src/defaultplugin.cpp \
     src/qosgwidget.cpp

@@ -21,6 +21,8 @@
  * Snow fall plugin
  */
 
+#include <QtDebug>
+
 #include "../include/snowfall.h"
 
 QString SnowFall::author()
@@ -80,22 +82,24 @@ QString SnowFall::version()
 
 bool SnowFall::isConfigurable()
 {
-    return false;
+    return true;
 }
 
 void SnowFall::begin()
 {
     this->snow = new Snow(640, // width
                           480, // height
-                          75,  // nFlakes
-                          0.12,   // acceleration
-                          10,  // direction
-                          0.1, // randFactor
-                          100,  // border
-                          0.25, // minZ
-                          1,   // maxZ
-                          0.1, // minScale
-                          0.2);
+                          this->config.spbNFlakes->value(),
+                          this->config.spbAcceleration->value(),
+                          this->config.spbDirection->value(),
+                          this->config.spbRandFactor->value(),
+                          this->config.spbBorder->value(),
+                          this->config.spbMinZ->value(),
+                          this->config.spbMaxZ->value(),
+                          this->config.spbMinScale->value(),
+                          this->config.spbMaxScale->value());
+
+    this->config.setSnow(this->snow);
 }
 
 void SnowFall::resize(int width, int height)
@@ -119,6 +123,39 @@ void SnowFall::end()
 
 void SnowFall::configure()
 {
+    this->config.exec();
+}
+
+QVariant SnowFall::configs()
+{
+    QList<QVariant> snowConfigs;
+
+    snowConfigs << QVariant(this->snow->nFlakes())
+                << QVariant(this->snow->acceleration())
+                << QVariant(this->snow->direction())
+                << QVariant(this->snow->randFactor())
+                << QVariant(this->snow->border())
+                << QVariant(this->snow->minZ())
+                << QVariant(this->snow->maxZ())
+                << QVariant(this->snow->minScale())
+                << QVariant(this->snow->maxScale());
+
+    return QVariant(snowConfigs);
+}
+
+void SnowFall::setConfigs(QVariant configs)
+{
+    QList<QVariant> snowConfigs = configs.toList();
+
+    this->config.spbNFlakes->setValue(snowConfigs[0].toInt());
+    this->config.spbAcceleration->setValue(snowConfigs[1].toFloat());
+    this->config.spbDirection->setValue(snowConfigs[2].toInt());
+    this->config.spbRandFactor->setValue(snowConfigs[3].toFloat());
+    this->config.spbBorder->setValue(snowConfigs[4].toInt());
+    this->config.spbMinZ->setValue(snowConfigs[5].toFloat());
+    this->config.spbMaxZ->setValue(snowConfigs[6].toFloat());
+    this->config.spbMinScale->setValue(snowConfigs[7].toFloat());
+    this->config.spbMaxScale->setValue(snowConfigs[8].toFloat());
 }
 
 Q_EXPORT_PLUGIN2(SnowFall, SnowFall)

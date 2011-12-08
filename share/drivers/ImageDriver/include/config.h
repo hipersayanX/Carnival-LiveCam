@@ -17,6 +17,8 @@ class Config: public QDialog, private Ui::Config
     private:
         QStringList *m_imageDevices;
 
+        void setFiles(QStringList files);
+
     public slots:
         void setImageDevices(QStringList *imageDevices);
         void resetImageDevices();

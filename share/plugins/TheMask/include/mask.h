@@ -27,8 +27,6 @@
 #include <QImage>
 #include <opencv2/opencv.hpp>
 
-using namespace cv;
-
 class Mask: public QObject
 {
     Q_OBJECT
@@ -39,7 +37,7 @@ class Mask: public QObject
 
     private:
         QImage mask;
-        CascadeClassifier cascadeClassifier;
+        cv::CascadeClassifier cascadeClassifier;
 };
 
 #endif // MASK_H

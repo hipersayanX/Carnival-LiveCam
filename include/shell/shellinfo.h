@@ -28,21 +28,21 @@ class ShellInfo: public QObject
 {
     Q_OBJECT
 
-    public:
-        QString fileName;
-        bool isEnabled;
-        QString id;
-        QString name;
-        QString version;
-        QString summary;
-        QString type;
-        QString thumbnail;
-        QString license;
-        QString author;
-        QString website;
-        QString mail;
-        bool isConfigurable;
+    Q_PROPERTY(QString fileName READ fileName WRITE setFileName RESET resetFileName)
+    Q_PROPERTY(bool isEnabled READ isEnabled WRITE setIsEnabled RESET resetIsEnabled)
+    Q_PROPERTY(QString id READ id WRITE setId RESET resetId)
+    Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
+    Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
+    Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
+    Q_PROPERTY(QString type READ type WRITE setType RESET resetType)
+    Q_PROPERTY(QString thumbnail READ thumbnail WRITE setThumbnail RESET resetThumbnail)
+    Q_PROPERTY(QString license READ license WRITE setLicense RESET resetLicense)
+    Q_PROPERTY(QString author READ author WRITE setAuthor RESET resetAuthor)
+    Q_PROPERTY(QString website READ website WRITE setWebsite RESET resetWebsite)
+    Q_PROPERTY(QString mail READ mail WRITE setMail RESET resetMail)
+    Q_PROPERTY(bool isConfigurable READ isConfigurable WRITE setIsConfigurable RESET resetIsConfigurable)
 
+    public:
         explicit ShellInfo(QObject *parent = 0);
         ShellInfo(const ShellInfo &object);
 
@@ -61,6 +61,63 @@ class ShellInfo: public QObject
                   bool isConfigurable);
 
         ShellInfo& operator =(const ShellInfo &other);
+
+        QString fileName();
+        bool isEnabled();
+        QString id();
+        QString name();
+        QString version();
+        QString summary();
+        QString type();
+        QString thumbnail();
+        QString license();
+        QString author();
+        QString website();
+        QString mail();
+        bool isConfigurable();
+
+    private:
+        QString m_fileName;
+        bool m_isEnabled;
+        QString m_id;
+        QString m_name;
+        QString m_version;
+        QString m_summary;
+        QString m_type;
+        QString m_thumbnail;
+        QString m_license;
+        QString m_author;
+        QString m_website;
+        QString m_mail;
+        bool m_isConfigurable;
+
+    public slots:
+        void setFileName(QString value);
+        void setIsEnabled(bool value);
+        void setId(QString value);
+        void setName(QString value);
+        void setVersion(QString value);
+        void setSummary(QString value);
+        void setType(QString value);
+        void setThumbnail(QString value);
+        void setLicense(QString value);
+        void setAuthor(QString value);
+        void setWebsite(QString value);
+        void setMail(QString value);
+        void setIsConfigurable(bool value);
+        void resetFileName();
+        void resetIsEnabled();
+        void resetId();
+        void resetName();
+        void resetVersion();
+        void resetSummary();
+        void resetType();
+        void resetThumbnail();
+        void resetLicense();
+        void resetAuthor();
+        void resetWebsite();
+        void resetMail();
+        void resetIsConfigurable();
 };
 
 #endif // SHELLINFO_H

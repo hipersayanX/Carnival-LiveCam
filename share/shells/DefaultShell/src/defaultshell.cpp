@@ -103,6 +103,16 @@ void DefaultShell::configure()
 {
 }
 
+QVariant DefaultShell::configs()
+{
+    return QVariant();
+}
+
+void DefaultShell::setConfigs(QVariant configs)
+{
+    Q_UNUSED(configs)
+}
+
 QWidget *DefaultShell::widget()
 {
     return this->gui;

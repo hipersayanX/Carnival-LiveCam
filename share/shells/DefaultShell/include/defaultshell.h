@@ -46,7 +46,11 @@ class DefaultShell: public Shell
 
         void begin();
         void end();
+
         void configure();
+        QVariant configs();
+        void setConfigs(QVariant configs);
+
         QWidget *widget();
 
     public slots:

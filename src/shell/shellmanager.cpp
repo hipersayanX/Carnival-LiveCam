@@ -25,6 +25,17 @@
 #include "../../include/shell/shellmanager.h"
 #include "../../include/shell/shellfactory.h"
 
+/*!
+  \class ShellManager
+
+  \brief This class is used for manage shells.
+ */
+
+/*!
+  \fn ShellManager::ShellManager(QObject *parent)
+
+  \param parent Parent widget.
+ */
 ShellManager::ShellManager(QObject *parent): QObject(parent)
 {
     QDir shellDir("share/shells");
@@ -66,6 +77,9 @@ ShellManager::ShellManager(QObject *parent): QObject(parent)
             if (!shell)
                 continue;
 
+            if (this->shellConfigs.contains(shell->id()))
+                shell->setConfigs(this->shellConfigs[shell->id()]);
+
             this->shellsInfo[shell->id()] = ShellInfo(fileName,
                                                       false,
                                                       shell->id(),
@@ -88,12 +102,22 @@ ShellManager::ShellManager(QObject *parent): QObject(parent)
     }
 }
 
+/*!
+  \fn ShellManager::~ShellManager()
+ */
 ShellManager::~ShellManager()
 {
     if (this->activeShellId != "")
         disableShell(this->activeShellId);
 }
 
+/*!
+  \fn QList<QVariant> ShellManager::shellsToQml()
+
+  \return The list of shells information in standard format.
+
+  \brief Returns the list of shells information in standard format.
+ */
 QList<QVariant> ShellManager::shellsToQml()
 {
     QList<QVariant> shellList;
@@ -102,18 +126,18 @@ QList<QVariant> ShellManager::shellsToQml()
     {
         QMap<QString, QVariant> shellInfoMap;
 
-        shellInfoMap["shellId"] = QVariant(shell.id);
-        shellInfoMap["isEnabled"] = QVariant(shell.isEnabled);
-        shellInfoMap["name"] = QVariant(shell.name);
-        shellInfoMap["version"] = QVariant(shell.version);
-        shellInfoMap["summary"] = QVariant(shell.summary);
-        shellInfoMap["type"] = QVariant(shell.type);
-        shellInfoMap["thumbnail"] = QVariant(shell.thumbnail);
-        shellInfoMap["license"] = QVariant(shell.license);
-        shellInfoMap["author"] = QVariant(shell.author);
-        shellInfoMap["website"] = QVariant(shell.website);
-        shellInfoMap["mail"] = QVariant(shell.mail);
-        shellInfoMap["isConfigurable"] = QVariant(shell.isConfigurable);
+        shellInfoMap["shellId"] = QVariant(shell.id());
+        shellInfoMap["isEnabled"] = QVariant(shell.isEnabled());
+        shellInfoMap["name"] = QVariant(shell.name());
+        shellInfoMap["version"] = QVariant(shell.version());
+        shellInfoMap["summary"] = QVariant(shell.summary());
+        shellInfoMap["type"] = QVariant(shell.type());
+        shellInfoMap["thumbnail"] = QVariant(shell.thumbnail());
+        shellInfoMap["license"] = QVariant(shell.license());
+        shellInfoMap["author"] = QVariant(shell.author());
+        shellInfoMap["website"] = QVariant(shell.website());
+        shellInfoMap["mail"] = QVariant(shell.mail());
+        shellInfoMap["isConfigurable"] = QVariant(shell.isConfigurable());
 
         shellList << shellInfoMap;
     }
@@ -121,6 +145,15 @@ QList<QVariant> ShellManager::shellsToQml()
     return shellList;
 }
 
+/*!
+  \fn QWidget *ShellManager::widget(QString id)
+
+  \param id Unique shell identifier.
+
+  \return A pointer to the widget object.
+
+  \brief Returns a pointer to the shell widget object if active else returns NULL.
+ */
 QWidget *ShellManager::widget(QString id)
 {
     if (this->activeShellId == id || id == "")
@@ -129,11 +162,29 @@ QWidget *ShellManager::widget(QString id)
     return NULL;
 }
 
+/*!
+  \fn bool ShellManager::setShell()
+
+  \retval true if the shell is active.
+  \retval false if the shell is inactive.
+
+  \brief Try to activate the default shell (shell.DefaultShell).
+ */
 bool ShellManager::setShell()
 {
     return setShell("shell.DefaultShell");
 }
 
+/*!
+  \fn bool ShellManager::setShell(QString id)
+
+  \param id Unique shell identifier.
+
+  \retval true if the shell is active.
+  \retval false if the shell is inactive.
+
+  \brief Try to activate the shell id.
+ */
 bool ShellManager::setShell(QString id)
 {
     if (this->activeShellId != "")
@@ -145,12 +196,22 @@ bool ShellManager::setShell(QString id)
     return true;
 }
 
+/*!
+  \fn bool ShellManager::enableShell(QString id)
+
+  \param id Unique shell identifier.
+
+  \retval true if the shell is active.
+  \retval false if the shell is inactive.
+
+  \brief Try to activate the shell id.
+ */
 bool ShellManager::enableShell(QString id)
 {
     if (!this->shellsInfo.contains(id))
         return false;
 
-    this->shellLoader.setFileName(this->shellsInfo[id].fileName);
+    this->shellLoader.setFileName(this->shellsInfo[id].fileName());
 
     if (!this->shellLoader.load())
         return false;
@@ -170,7 +231,10 @@ bool ShellManager::enableShell(QString id)
     if (!shell)
         return false;
 
-    this->shellsInfo[id].isEnabled = true;
+    if (this->shellConfigs.contains(id))
+        shell->setConfigs(this->shellConfigs[id]);
+
+    this->shellsInfo[id].setIsEnabled(true);
     this->activeShell = shell;
     this->activeShell->begin();
 
@@ -187,10 +251,22 @@ bool ShellManager::enableShell(QString id)
     return true;
 }
 
+/*!
+  \fn bool ShellManager::disableShell(QString id)
+
+  \param id Unique shell identifier.
+
+  \retval true if the shell is inactive.
+  \retval false if the shell is active.
+
+  \brief Try to desactivate the shell id.
+ */
 bool ShellManager::disableShell(QString id)
 {
     if (!this->shellsInfo.contains(id) || this->activeShellId != id)
         return false;
+
+    this->shellConfigs[id] = this->activeShell->configs();
 
     disconnect(this->activeShell, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     disconnect(this->activeShell, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
@@ -205,75 +281,179 @@ bool ShellManager::disableShell(QString id)
     this->activeShell->end();
     delete this->activeShell;
     this->activeShell = NULL;
-    this->shellLoader.setFileName(this->shellsInfo[id].fileName);
+    this->shellLoader.setFileName(this->shellsInfo[id].fileName());
     this->shellLoader.unload();
-    this->shellsInfo[id].isEnabled = false;
+    this->shellsInfo[id].setIsEnabled(false);
     this->activeShellId = "";
 
     return true;
 }
 
+/*!
+  \fn void ShellManager::configureShell(QString id)
+
+  \param id Unique shell identifier.
+
+  \brief Calls the configuration dialog of the shell id.
+ */
 void ShellManager::configureShell(QString id)
 {
     if (this->activeShellId == id)
         this->activeShell->configure();
 }
 
+/*!
+  \fn void ShellManager::setFrame(const QImage &frame)
+
+  \param frame The frame to send.
+
+  \brief Send a frame to the current shell.
+ */
 void ShellManager::setFrame(const QImage &frame)
 {
     this->activeShell->setFrame(frame);
 }
 
+/*!
+  \fn void ShellManager::updateDevices(const QList<QVariant> &devices)
+
+  \param devices List of devices id.
+
+  \brief Updates the devices list.
+ */
 void ShellManager::updateDevices(const QList<QVariant> &devices)
 {
     this->activeShell->updateDevices(devices);
 }
 
+/*!
+  \fn void ShellManager::updatePlugins(const QList<QVariant> &plugins)
+
+  \param plugins List of plugins id.
+
+  \brief Updates the plugins list.
+ */
 void ShellManager::updatePlugins(const QList<QVariant> &plugins)
 {
     this->activeShell->updatePlugins(plugins);
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onTakePicture()
+
+  \brief This slot is called when the user presses the "take picture" button.
+ */
 void ShellManager::onTakePicture()
 {
     emit takePicture();
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onStartStopRecord()
+
+  \brief This slot is called when the user presses the "start/stop video record" button.
+ */
 void ShellManager::onStartStopRecord()
 {
     emit startStopRecord();
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onDeviceSelected(QString deviceId)
+
+  \param deviceId Unique device identifier.
+
+  \brief This slot is called when the user select a new device.
+ */
 void ShellManager::onDeviceSelected(QString deviceId)
 {
     emit deviceSelected(deviceId);
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onPluginActivated(QString pluginId)
+
+  \param pluginId Unique plugin identifier.
+
+  \brief This slot is called when the user activate a plugin.
+ */
 void ShellManager::onPluginActivated(QString pluginId)
 {
     emit pluginActivated(pluginId);
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onPluginDeactivated(QString pluginId)
+
+  \param pluginId Unique plugin identifier.
+
+  \brief This slot is called when the user deactivate a plugin.
+ */
 void ShellManager::onPluginDeactivated(QString pluginId)
 {
     emit pluginDeactivated(pluginId);
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onPluginMoved(int from, int to)
+
+  \param from The old index position of the plugin.
+  \param to The new index position of the plugin.
+
+  \brief This slot is called when the user changes the index of a plugin.
+ */
 void ShellManager::onPluginMoved(int from, int to)
 {
     emit pluginMoved(from, to);
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onPluginConfigureClicked(QString pluginId)
+
+  \param pluginId The plugin to configure.
+
+  \brief This slot is called when the user wants to configure a plugin.
+ */
 void ShellManager::onPluginConfigureClicked(QString pluginId)
 {
     emit pluginConfigureClicked(pluginId);
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onDeviceConfigureClicked(QString deviceId)
+
+  \param deviceId The device to configure.
+
+  \brief This slot is called when the user wants to configure a device.
+ */
 void ShellManager::onDeviceConfigureClicked(QString deviceId)
 {
     emit deviceConfigureClicked(deviceId);
 }
 
+/*!
+  \internal
+
+  \fn void ShellManager::onClosed()
+
+  \brief This slot is called when the shell is closed.
+ */
 void ShellManager::onClosed()
 {
     emit closed();

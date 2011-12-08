@@ -81,6 +81,8 @@ OTHER_FILES += \
 
 QT += core gui declarative
 
+RCC_DIR += $$PWD/build
+
 SOURCES += \
     src/defaultshell.cpp \
     src/defaultshellfactory.cpp \
@@ -90,6 +92,3 @@ SOURCES += \
 TEMPLATE = lib
 
 UI_DIR += $$PWD/build
-
-
-

@@ -28,16 +28,15 @@ class DeviceInfo: public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString id READ id WRITE setId RESET resetId)
+    Q_PROPERTY(QString driverId READ driverId WRITE setDriverId RESET resetDriverId)
+    Q_PROPERTY(bool isEnabled READ isEnabled WRITE setIsEnabled RESET resetIsEnabled)
+    Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
+    Q_PROPERTY(QString icon READ icon WRITE setIcon RESET resetIcon)
+    Q_PROPERTY(bool isConfigurable READ isConfigurable WRITE setIsConfigurable RESET resetIsConfigurable)
+
     public:
-        QString id;
-        QString driverId;
-        bool isEnabled;
-        QString summary;
-        QString icon;
-        bool isConfigurable;
-
         explicit DeviceInfo(QObject *parent = 0);
-
         DeviceInfo(const DeviceInfo &object);
 
         DeviceInfo(QString id,
@@ -48,6 +47,35 @@ class DeviceInfo: public QObject
                    bool isConfigurable);
 
         DeviceInfo& operator =(const DeviceInfo &other);
+
+        QString id();
+        QString driverId();
+        bool isEnabled();
+        QString summary();
+        QString icon();
+        bool isConfigurable();
+
+    private:
+        QString m_id;
+        QString m_driverId;
+        bool m_isEnabled;
+        QString m_summary;
+        QString m_icon;
+        bool m_isConfigurable;
+
+    public slots:
+        void setId(QString value);
+        void setDriverId(QString value);
+        void setIsEnabled(bool value);
+        void setSummary(QString value);
+        void setIcon(QString value);
+        void setIsConfigurable(bool value);
+        void resetId();
+        void resetDriverId();
+        void resetIsEnabled();
+        void resetSummary();
+        void resetIcon();
+        void resetIsConfigurable();
 };
 
 #endif // DEVICEINFO_H

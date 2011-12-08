@@ -38,12 +38,19 @@ class MediaStreaming: public QObject
     public:
         explicit MediaStreaming(QObject *parent = 0);
 
-        void setFPS(int fps);
-        void addOutputFormat(const OutputFormat &outputformat);
-        QStringList supportedSuffix();
-        bool isRecording();
+        Q_INVOKABLE void setFPS(int fps);
+        Q_INVOKABLE void addOutputFormat(const OutputFormat &outputformat);
+        Q_INVOKABLE QStringList supportedSuffix();
+        Q_INVOKABLE bool isRecording();
 
     signals:
+        /*!
+          \fn void MediaStreaming::captureFrame()
+
+          \brief This signal is emited when the internal timer reach the timeout state.
+
+          This signal indicates that a new frame must be captured.
+         */
         void captureFrame();
 
     public slots:

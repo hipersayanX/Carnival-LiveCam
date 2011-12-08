@@ -24,6 +24,12 @@
 #include "../include/webcamlinux.h"
 #include "../include/webcamlinuxfactory.h"
 
+/*!
+  \class WebcamLinuxFactory
+
+  \brief WebcamLinux factory.
+ */
+
 Driver* WebcamLinuxFactory::driver()
 {
     return new WebcamLinux();

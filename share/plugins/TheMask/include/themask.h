@@ -24,6 +24,8 @@
 #ifndef DEFAULTPLUGIN_H
 #define DEFAULTPLUGIN_H
 
+#include <QVariant>
+
 #include "plugin.h"
 #include "mask.h"
 
@@ -50,7 +52,10 @@ class TheMask: public QObject, public Plugin
         void resize(int width, int height);
         QImage render(const QImage &image);
         void end();
+
         void configure();
+        QVariant configs();
+        void setConfigs(QVariant configs);
 
     private:
         Mask *mask;

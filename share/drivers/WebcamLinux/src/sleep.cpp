@@ -23,16 +23,43 @@
 
 #include "../include/sleep.h"
 
+/*!
+  \class Sleep
+
+  \brief This class stop the program execution by a desired amount of time.
+ */
+
+/*!
+  \fn void Sleep::usleep(unsigned long usecs)
+
+  \param usecs Micro seconds.
+
+  \brief Causes the program to sleep for \i usecs milliseconds.
+ */
 void Sleep::usleep(unsigned long usecs)
 {
     QThread::usleep(usecs);
 }
 
+/*!
+  \fn void Sleep::msleep(unsigned long msecs)
+
+  \param msecs Mili seconds.
+
+  \brief Causes the program to sleep for \i msecs milliseconds.
+ */
 void Sleep::msleep(unsigned long msecs)
 {
     QThread::msleep(msecs);
 }
 
+/*!
+  \fn void Sleep::sleep(unsigned long secs)
+
+  \param secs Seconds.
+
+  \brief Causes the program to sleep for \i secs milliseconds.
+ */
 void Sleep::sleep(unsigned long secs)
 {
     QThread::sleep(secs);
