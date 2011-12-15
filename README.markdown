@@ -1,6 +1,6 @@
 # Carnival LiveCam, augmented reality made easy #
 
-![Example of the snow plugin](share/screenshots/snowexample.png)
+![Example of the snow plugin](/raw/master/share/screenshots/snowexample.png)
 
 ## Intro ##
 
@@ -28,7 +28,7 @@ At the bottom center of [Carnival LiveCam](https://github.com/hipersayanX/Carniv
 * Set the window to full screen.
 * Information about the program.
 
-![Controls Bar](share/screenshots/controlsbar.png)
+![Controls Bar](/raw/master/share/screenshots/controlsbar.png)
 
 On the right side of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can see the Candy Bar, here we can turn on the effects we want to apply to the video. The effects are activated or deactivated by simply clicking on the preview, the deactivated effects has a red box around, the activated has a green box. Each candy has 3 controls:
 
@@ -38,15 +38,15 @@ On the right side of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-
 
 We can also filter by the type of candy using the combobox at the top.
 
-![The Candy Bar](share/screenshots/cadybar.png)
+![The Candy Bar](/raw/master/share/screenshots/cadybar.png)
 
 Inside the candy bar we also have the _Candy Stack_, here we can change the order in which each effect is applied.
 
-![The Candy Stack](share/screenshots/stackbar.png)
+![The Candy Stack](/raw/master/share/screenshots/stackbar.png)
 
 Here we see one of the configuration dialogs of a driver in this case the driver of images. With a simple design intended for an _point&click_ experience.
 
-![This is the configuration dialog for the image driver](share/screenshots/imageselect.png)
+![This is the configuration dialog for the image driver](/raw/master/share/screenshots/imageselect.png)
 
 ## Obtain and test Carnival LiveCam ##
 
