@@ -50,6 +50,8 @@
   - <a target="_bank" href="http://www.stack.nl/~dimitri/doxygen/">Doxygen</a> >= 1.7.5.x
   - <a target="_bank" href="http://www.graphviz.org/">Graphviz</a> >= 2.28.x
   - <a target="_bank" href="http://www.tug.org/texlive/">Texlive-bin</a> >= 2011.x
+  - <a target="_bank" href="http://git-scm.com/">Git</a>
+  - <a target="_bank" href="http://www.mcternan.me.uk/mscgen/">Mscgen</a>
 
   \section buildinstall Build and Install
 

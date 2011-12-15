@@ -9,6 +9,8 @@ Requirements
 - Doxygen >= 1.7.5.x
 - Graphviz >= 2.28.x
 - Texlive-bin >= 2011.x
+- Git >= 1.7.x
+- Mscgen >= 0.22
 
 Build and Install
 =================
