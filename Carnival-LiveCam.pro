@@ -37,7 +37,10 @@ HEADERS += \
     include/shell/shellfactory.h \
     include/shell/shellmanager.h \
     include/shell/shellinfo.h \
-    include/core/core.h
+    include/core/core.h \
+    include/space/space.h \
+    include/space/spacemodel.h \
+    include/space/spaceview.h
 
 target.path += /usr/bin
 
@@ -66,7 +69,10 @@ SOURCES += src/main.cpp \
     src/driver/devicemanager.cpp \
     src/shell/shellmanager.cpp \
     src/shell/shellinfo.cpp \
-    src/core/core.cpp
+    src/core/core.cpp \
+    src/space/space.cpp \
+    src/space/spacemodel.cpp \
+    src/space/spaceview.cpp
 
 TEMPLATE += app
 

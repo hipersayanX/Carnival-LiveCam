@@ -260,7 +260,7 @@ void MediaStreaming::setFPS(int fps)
 {
     this->fps = fps;
 
-    this->timerRecord.setInterval((int)round(1000.0f / (float)fps));
+    this->timerRecord.setInterval((int)round(1000.0f / (qreal)fps));
 }
 
 /*!

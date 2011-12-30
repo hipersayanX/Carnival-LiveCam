@@ -64,7 +64,7 @@ To compile and run [Carnival LiveCam](https://github.com/hipersayanX/Carnival-Li
 
 * [Qt](http://qt.nokia.com/) >= 4.7.x
 * [OpenSceneGraph](http://www.openscenegraph.org/projects/osg) >= 3.0.x
-* [OpenCV](http://opencv.willowgarage.com/) >= 2.3.x</li>
+* [OpenCV](http://opencv.willowgarage.com/) >= 2.3.x
 * [FFmpeg](http://ffmpeg.org/)
 * [ffmpegthumbnailer](http://code.google.com/p/ffmpegthumbnailer/) >= 2.xx
 * [Doxygen](http://www.doxygen.org/) >= 1.7.5.x
