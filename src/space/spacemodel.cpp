@@ -158,6 +158,15 @@ void SpaceModel::toggleMaximizedSpace()
         }
 }
 
+bool SpaceModel::isMaximized(QString spaceId)
+{
+    for (int space = 0; space < this->m_spaces.count(); space++)
+        if (this->m_spaces[space].spaceId() == this->m_spaceIdRef)
+            return this->m_spaces[space].maximized();
+
+    return false;
+}
+
 qreal SpaceModel::calculateAngle(QPointF point)
 {
     qreal angle = atan2(point.y(), point.x());
@@ -190,11 +199,6 @@ void SpaceModel::scaleSpace(QPointF to)
 
 void SpaceModel::rotateSpace(QPointF to)
 {
-    QList<qreal> hLines, vLines;
-
-    if (!this->snapLines(hLines, vLines))
-        return;
-
     for (int space = 0; space < this->m_spaces.count(); space++)
         if (this->m_spaces[space].spaceId() == this->m_spaceIdRef)
         {

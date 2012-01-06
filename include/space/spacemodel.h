@@ -25,6 +25,7 @@ class SpaceModel: public QObject
         Q_INVOKABLE void selectSpace(QString spaceId);
         Q_INVOKABLE void selectSpace(QPointF point);
         Q_INVOKABLE void toggleMaximizedSpace();
+        Q_INVOKABLE bool isMaximized(QString spaceId);
 
         QSizeF size();
         QList<Space> spaces();
