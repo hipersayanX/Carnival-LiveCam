@@ -13,10 +13,8 @@ class SpaceView: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QImage scaleAndRotateIcon READ scaleAndRotateIcon WRITE setScaleAndRotateIcon RESET resetScaleAndRotateIcon)
-    Q_PROPERTY(QImage toggleMaximizeIcon READ toggleMaximizeIcon WRITE setToggleMaximizeIcon RESET resetToggleMaximizeIcon)
     Q_PROPERTY(QSize viewPortSize READ viewPortSize WRITE setViewPortSize RESET resetViewPortSize)
-    Q_PROPERTY(QPoint mousePosition READ mousePosition WRITE setMousePosition RESET resetMousePosition)
+    Q_PROPERTY(bool editMode READ editMode WRITE setEditMode RESET resetEditMode)
 
     public:
         explicit SpaceView(QObject *parent = 0);
@@ -27,36 +25,35 @@ class SpaceView: public QObject
         Q_INVOKABLE void setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT);
         Q_INVOKABLE QPoint mapToMainSpace(const QPoint &pos, const QSize &viewportSize);
 
-        QImage scaleAndRotateIcon();
-        QImage toggleMaximizeIcon();
+        Q_INVOKABLE void setControlButtons(QPushButton *toggleMaximizedButton = NULL,
+                                           QPushButton *scaleAndRotateButton = NULL);
+
         QSize viewPortSize();
-        QPoint mousePosition();
+        bool editMode();
 
     private:
-        QImage m_scaleAndRotateIcon;
-        QImage m_toggleMaximizeIcon;
+        bool move;
+        bool scaleAndRotate;
         QSize m_viewPortSize;
-        QPoint m_mousePosition;
         SpaceModel spaceModel;
         QGraphicsScene mainSpace;
         QHash<QString, SpaceWidget *> spacesWidgets;
         QHash<QString, QGraphicsProxyWidget *> proxySpacesWidgets;
+        QPushButton *m_toggleMaximizedButton;
+        QPushButton *m_scaleAndRotateButton;
+        bool m_editMode;
 
-        void sendMouseEvent(QEvent::Type type,
-                            const QPoint &position,
-                            Qt::MouseButton button,
-                            Qt::MouseButtons buttons,
-                            Qt::KeyboardModifiers modifiers);
+        QWidget *sendMouseEvent(QEvent::Type type,
+                                const QPoint &position,
+                                Qt::MouseButton button,
+                                Qt::MouseButtons buttons,
+                                Qt::KeyboardModifiers modifiers);
 
     public slots:
-        void setScaleAndRotateIcon(const QImage &icon);
-        void setToggleMaximizeIcon(const QImage &icon);
         void setViewPortSize(QSize size);
-        void setMousePosition(QPoint mousePos);
-        void resetScaleAndRotateIcon();
-        void resetToggleMaximizeIcon();
+        void setEditMode(bool value);
         void resetViewPortSize();
-        void resetMousePosition();
+        void resetEditMode();
         void selectSpace(QString spaceId);
         void mouseDoubleClickEvent(QMouseEvent *event);
         void mouseMoveEvent(QMouseEvent *event);
