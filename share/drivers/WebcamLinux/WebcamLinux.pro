@@ -30,19 +30,11 @@ HEADERS += \
     include/webcamlinuxfactory.h \
     include/sleep.h
 
-LIBS += \
-    -lopencv_calib3d \
-    -lopencv_contrib \
-    -lopencv_core \
-    -lopencv_features2d \
-    -lopencv_flann \
-    -lopencv_gpu \
-    -lopencv_highgui \
-    -lopencv_imgproc \
-    -lopencv_legacy \
-    -lopencv_ml \
-    -lopencv_objdetect \
-    -lopencv_video
+unix
+{
+    CONFIG += link_pkgconfig
+    PKGCONFIG += opencv
+}
 
 MOC_DIR += $$PWD/build
 

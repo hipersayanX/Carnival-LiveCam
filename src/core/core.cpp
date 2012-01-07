@@ -105,8 +105,13 @@ void Core::deviceSelected(QString deviceId)
  */
 void Core::captureFrame()
 {
+    // Capture a frame from DeviceManager, send it to PluginManager to apply the effects,
+    // and return the frame whit the effects applied.
     QImage frame = this->pluginManager.getFrame(this->deviceManager.captureFrame());
 
+    // Send the frame to MediaStreamming for save it to a video or image file.
     this->mediaStreaming.setFrame(frame);
+
+    // And send it to the current shell.
     this->shellManager.setFrame(frame);
 }

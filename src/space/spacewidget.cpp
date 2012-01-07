@@ -1,3 +1,24 @@
+/*
+ * Carnival LiveCam, Augmented reality made easy.
+ * Copyright (C) 2011  Gonzalo Exequiel Pedone
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with This program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Email   : hipersayan DOT x AT gmail DOT com
+ * Web-Site: http://hipersayanx.blogspot.com/
+ */
+
 #include "../../include/space/spacewidget.h"
 
 SpaceWidget::SpaceWidget(QWidget *parent): QWidget(parent)
@@ -5,14 +26,15 @@ SpaceWidget::SpaceWidget(QWidget *parent): QWidget(parent)
     this->m_editMode = false;
 
     this->setObjectName("wdgSpaceWidget");
-    this->setGeometry(0, 0, frame.width(), frame.height());
+    this->setGeometry(0, 0, 0, 0);
 
-    this->spacePixmap.setGeometry(0, 0, frame.width(), frame.height());
+    this->spacePixmap.setGeometry(0, 0, 0, 0);
     this->spacePixmap.setScaledContents(true);
     this->spacePixmap.setParent(this);
 
-    this->spaceControls.setGeometry(0, 0, frame.width(), frame.height());
+    this->spaceControls.setGeometry(0, 0, 0, 0);
     this->spaceControls.setParent(this);
+    this->spaceControls.hide();
 }
 
 SpaceWidget::SpaceWidget(const QImage &frame)
@@ -29,6 +51,15 @@ SpaceWidget::SpaceWidget(const QImage &frame)
 
     this->spaceControls.setGeometry(0, 0, frame.width(), frame.height());
     this->spaceControls.setParent(this);
+    this->spaceControls.hide();
+}
+
+void SpaceWidget::setFrame(const QImage &frame)
+{
+    this->setGeometry(0, 0, frame.width(), frame.height());
+    this->spacePixmap.setGeometry(0, 0, frame.width(), frame.height());
+    this->spacePixmap.setPixmap(QPixmap::fromImage(frame));
+    this->spaceControls.setGeometry(0, 0, frame.width(), frame.height());
 }
 
 bool SpaceWidget::editMode()
@@ -39,11 +70,27 @@ bool SpaceWidget::editMode()
 void SpaceWidget::setEditMode(bool value)
 {
     this->m_editMode = value;
+
+    if (this->m_editMode)
+        this->spaceControls.show();
+    else
+        this->spaceControls.hide();
 }
 
 void SpaceWidget::resetEditMode()
 {
     this->m_editMode = false;
+    this->spaceControls.hide();
+}
+
+void SpaceWidget::toggleEditMode()
+{
+    this->m_editMode = !this->m_editMode;
+
+    if (this->m_editMode)
+        this->spaceControls.show();
+    else
+        this->spaceControls.hide();
 }
 
 void SpaceWidget::setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton)

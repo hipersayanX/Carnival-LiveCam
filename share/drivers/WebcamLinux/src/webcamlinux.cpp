@@ -144,14 +144,17 @@ QImage WebcamLinux::captureFrame(QString id)
     {
         cv::Mat matFrame;
 
+        // Capture a frame in cvMat format...
         this->activeWebcams[id] >> matFrame;
 
+        // and convert it to QImage.
         QImage qtFrame((const uchar *)matFrame.data, matFrame.cols, matFrame.rows, QImage::Format_RGB888);
 
         return qtFrame.rgbSwapped();
     }
     else
     {
+        // Else return a 1x1 black image.
         QImage frame(1, 1, QImage::Format_RGB888);
 
         frame.fill(0);
@@ -198,9 +201,11 @@ bool WebcamLinux::enableDevice(QString id)
 {
     cv::VideoCapture webcam;
 
+    // Try to open webcam device,
     if (!webcam.open(QString(id).remove("/dev/video").toInt()))
         return false;
 
+    // and append it to activeWebcams.
     this->activeWebcams[id] = webcam;
 
     return true;

@@ -64,12 +64,15 @@ QImage DeviceManager::captureFrame()
 {
     if (this->activeDevice != "")
     {
+        // Get a reference to the current loaded driver.
         Driver *driver = this->driverManager.driver(this->devicesInfo[this->activeDevice].driverId());
 
         if (driver)
+            // Capture a frame from the current device.
             return driver->captureFrame(this->activeDevice);
     }
 
+    // Else return a 1x1 black image.
     QImage frame(1, 1, QImage::Format_RGB888);
 
     frame.fill(0);
@@ -157,16 +160,25 @@ bool DeviceManager::setDevice(QString id)
     else
         if (this->devicesInfo[this->activeDevice].driverId() != this->devicesInfo[id].driverId())
         {
+            // If the current device and the new selected device uses a diferent driver,
+            // disable the current device and unload the driver (unload the QtPlugin from memory).
             this->disableDevice(this->activeDevice);
+
+            // and load the new driver and setup the new device.
             this->enableDevice(id);
         }
         else
         {
+            // Both, the current device and the new selected device uses the same driver,
+            // Just get a reference to the current loaded driver.
             Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
 
             if (driver)
             {
+                // Disable the current device,
                 driver->disableDevice(this->activeDevice);
+
+                // and load the new device.
                 driver->enableDevice(id);
             }
         }

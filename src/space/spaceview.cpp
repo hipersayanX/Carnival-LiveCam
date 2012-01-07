@@ -1,3 +1,24 @@
+/*
+ * Carnival LiveCam, Augmented reality made easy.
+ * Copyright (C) 2011  Gonzalo Exequiel Pedone
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with This program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Email   : hipersayan DOT x AT gmail DOT com
+ * Web-Site: http://hipersayanx.blogspot.com/
+ */
+
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QGraphicsProxyWidget>
@@ -36,18 +57,16 @@ QImage SpaceView::render()
 
     QPainter mainPainter(&mainFrame);
 
-    foreach (Space space, this->spaceModel.spaces())
-    {/*
-        spacePainter.scale(space.scale() * space.size().width(), space.scale() * space.size().height());
-        spacePainter.rotate(space.rotation());
+    for (int space = 0; space < this->spaceModel.spaces().count(); space++)
+    {
+        Space spaceItem = this->spaceModel.spaces()[space];
+        this->proxySpacesWidgets[spaceItem.spaceId()]->setZValue(space);
 
-        this->proxySpacesWidgets[space.spaceId()]->setTransform(QTransform()
-                                                       .translate(r.width() / 2, r.height() / 2)
-                                                       .rotate(step * 30, Qt::XAxis)
-                                                       .rotate(step * 10, Qt::YAxis)
-                                                       .rotate(step * 5, Qt::ZAxis)
-                                                       .scale(0.8, 0.8)
-                                                       .translate(-r.width() / 2, -r.height() / 2));*/
+        this->proxySpacesWidgets[spaceItem.spaceId()]->setTransform(QTransform()
+                                                       .translate(spaceItem.size().width() / 2, spaceItem.size().height() / 2)
+                                                       .rotate(-spaceItem.rotation(), Qt::ZAxis)
+                                                       .scale(spaceItem.scale(), spaceItem.scale())
+                                                       .translate(-spaceItem.size().width() / 2, -spaceItem.size().height() / 2));
     }
 
     this->mainSpace.render(&mainPainter);
@@ -110,13 +129,15 @@ QWidget *SpaceView::sendMouseEvent(QEvent::Type type,
 void SpaceView::setSpace(QString spaceId, const QImage &frame)
 {
     if (this->spacesWidgets.contains(spaceId))
-        this->spacesWidgets[spaceId]->spacePixmap.setPixmap(QPixmap::fromImage(frame));
+        this->spacesWidgets[spaceId]->setFrame(frame);
     else
     {
         this->spaceModel.addSpace(spaceId, frame.size());
         this->spacesWidgets[spaceId] = new SpaceWidget(frame);
         this->spacesWidgets[spaceId]->setControlButtons(this->m_toggleMaximizedButton, this->m_scaleAndRotateButton);
         this->proxySpacesWidgets[spaceId] = this->mainSpace.addWidget(this->spacesWidgets[spaceId]);
+        this->proxySpacesWidgets[spaceId]->setTransformOriginPoint(this->spacesWidgets[spaceId]->width() / 2,
+                                                                               this->spacesWidgets[spaceId]->height() / 2);
     }
 }
 
@@ -155,6 +176,9 @@ void SpaceView::setViewPortSize(QSize size)
 void SpaceView::setEditMode(bool value)
 {
     this->m_editMode = value;
+
+    foreach (SpaceWidget *spaceWidget, this->spacesWidgets)
+        spaceWidget->setEditMode(value);
 }
 
 void SpaceView::resetViewPortSize()
@@ -165,6 +189,17 @@ void SpaceView::resetViewPortSize()
 void SpaceView::resetEditMode()
 {
     this->m_editMode = false;
+
+    foreach (SpaceWidget *spaceWidget, this->spacesWidgets)
+        spaceWidget->resetEditMode();
+}
+
+void SpaceView::toggleEditMode()
+{
+    this->m_editMode = !this->m_editMode;
+
+    foreach (SpaceWidget *spaceWidget, this->spacesWidgets)
+        spaceWidget->toggleEditMode();
 }
 
 void SpaceView::selectSpace(QString spaceId)
@@ -174,6 +209,9 @@ void SpaceView::selectSpace(QString spaceId)
 
 void SpaceView::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    if (!this->m_editMode)
+        return;
+
     this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
 
     this->sendMouseEvent(QEvent::MouseButtonDblClick,
@@ -185,6 +223,9 @@ void SpaceView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void SpaceView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (!this->m_editMode)
+        return;
+
     this->sendMouseEvent(QEvent::MouseMove,
                          this->mapToMainSpace(event->pos(), this->m_viewPortSize),
                          event->button(),
@@ -200,6 +241,9 @@ void SpaceView::mouseMoveEvent(QMouseEvent *event)
 
 void SpaceView::mousePressEvent(QMouseEvent *event)
 {
+    if (!this->m_editMode)
+        return;
+
     this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
 
     QWidget *widget = this->sendMouseEvent(QEvent::MouseButtonPress,
@@ -220,6 +264,9 @@ void SpaceView::mousePressEvent(QMouseEvent *event)
 
 void SpaceView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (!this->m_editMode)
+        return;
+
     this->sendMouseEvent(QEvent::MouseButtonRelease,
                          this->mapToMainSpace(event->pos(), this->m_viewPortSize),
                          event->button(),

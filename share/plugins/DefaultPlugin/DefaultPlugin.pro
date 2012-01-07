@@ -28,9 +28,11 @@ HEADERS += \
     include/defaultplugin.h \
     include/qosgwidget.h
 
-LIBS += \
-     -losg \
-     -losgViewer
+unix
+{
+    CONFIG += link_pkgconfig
+    PKGCONFIG += openscenegraph openscenegraph-osgViewer
+}
 
 MOC_DIR += $$PWD/build
 
