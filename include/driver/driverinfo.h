@@ -29,7 +29,7 @@ class DriverInfo: public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString fileName READ fileName WRITE setFileName RESET resetFileName)
-    Q_PROPERTY(QString id READ id WRITE setId RESET resetId)
+    Q_PROPERTY(QString driverId READ driverId WRITE setDriverId RESET resetDriverId)
     Q_PROPERTY(bool isEnabled READ isEnabled WRITE setIsEnabled RESET resetIsEnabled)
     Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
     Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
@@ -47,7 +47,7 @@ class DriverInfo: public QObject
         DriverInfo(const DriverInfo &object);
 
         DriverInfo(QString fileName,
-                   QString id,
+                   QString driverId,
                    bool isEnabled,
                    QString name,
                    QString version,
@@ -63,7 +63,7 @@ class DriverInfo: public QObject
         DriverInfo& operator =(const DriverInfo &other);
 
         QString fileName();
-        QString id();
+        QString driverId();
         bool isEnabled();
         QString name();
         QString version();
@@ -78,7 +78,7 @@ class DriverInfo: public QObject
 
     private:
         QString m_fileName;
-        QString m_id;
+        QString m_driverId;
         bool m_isEnabled;
         QString m_name;
         QString m_version;
@@ -93,7 +93,7 @@ class DriverInfo: public QObject
 
     public slots:
         void setFileName(QString value);
-        void setId(QString value);
+        void setDriverId(QString value);
         void setIsEnabled(bool value);
         void setName(QString value);
         void setVersion(QString value);
@@ -106,7 +106,7 @@ class DriverInfo: public QObject
         void setMail(QString value);
         void setIsConfigurable(bool value);
         void resetFileName();
-        void resetId();
+        void resetDriverId();
         void resetIsEnabled();
         void resetName();
         void resetVersion();

@@ -27,6 +27,7 @@
 #include "../driver/devicemanager.h"
 #include "../shell/shellmanager.h"
 #include "../plugin/pluginmanager.h"
+#include "../space/spacemanager.h"
 #include "../streaming/mediastreaming.h"
 
 class Core: public QObject
@@ -41,10 +42,12 @@ class Core: public QObject
         ShellManager shellManager;
         PluginManager pluginManager;
         MediaStreaming mediaStreaming;
+        SpaceManager spaceManager;
 
     private slots:
         void devicesModified();
-        void deviceSelected(QString deviceId);
+        void deviceEnable(QString deviceId);
+        void deviceDisable(QString deviceId);
         void captureFrame();
 };
 

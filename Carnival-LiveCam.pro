@@ -40,9 +40,9 @@ HEADERS += \
     include/core/core.h \
     include/space/space.h \
     include/space/spacemodel.h \
-    include/space/spaceview.h \
     include/space/spacewidget.h \
-    include/space/spacecontrols.h
+    include/space/spacecontrols.h \
+    include/space/spacemanager.h
 
 target.path += /usr/bin
 
@@ -74,9 +74,9 @@ SOURCES += src/main.cpp \
     src/core/core.cpp \
     src/space/space.cpp \
     src/space/spacemodel.cpp \
-    src/space/spaceview.cpp \
     src/space/spacewidget.cpp \
-    src/space/spacecontrols.cpp
+    src/space/spacecontrols.cpp \
+    src/space/spacemanager.cpp
 
 TEMPLATE += app
 

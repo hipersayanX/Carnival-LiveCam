@@ -31,21 +31,18 @@ Rectangle
     height: 128
 
     property real markSize: 8
-    signal deviceSelected(string deviceId)
+    signal deviceEnable(string deviceId)
+    signal deviceDisable(string deviceId)
     signal configureDevice(string deviceId)
     signal escapePressed
 
     function updateDevices(devices)
     {
         lsmDevices.clear()
-        var index = 0
 
         for (var device in devices)
         {
             var newDevice = {}
-
-            if (devices[device].isEnabled)
-                index = device
 
             for (var prop in devices[device])
                 newDevice["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = devices[device][prop]
@@ -53,12 +50,6 @@ Rectangle
             lsmDevices.append(newDevice)
         }
 
-        lsvDevices.currentIndex = index
-        recButtonBox.updateHeight()
-    }
-
-    function updateHeight()
-    {
         recButtonBox.height = 1.1 * lsvDevices.currentItem.children[0].height * lsvDevices.count
     }
 
@@ -106,49 +97,11 @@ Rectangle
             anchors.fill: parent
             focus: true
             interactive: false
-            Keys.onDownPressed: incrementCurrentIndex()
-            Keys.onUpPressed: decrementCurrentIndex()
-            Keys.onEnterPressed: recButtonBox.deviceSelected(lsvDevices.currentItem.children[0].deviceId)
-            Keys.onReturnPressed: recButtonBox.deviceSelected(lsvDevices.currentItem.children[0].deviceId)
             Keys.onEscapePressed: recButtonBox.escapePressed()
 
             model: ListModel
             {
                 id: lsmDevices
-            }
-
-            highlight: Component
-            {
-                Rectangle
-                {
-                    radius: 10
-                    width: recButtonBoxContainer.width
-                    height: recButtonBoxContainer.height / lsmDevices.count
-
-                    Behavior on y
-                    {
-                        SpringAnimation
-                        {
-                            spring: 0
-                            damping: 0
-                        }
-                    }
-
-                    gradient: Gradient
-                    {
-                        GradientStop
-                        {
-                            position: 0
-                            color: "#007fff"
-                        }
-
-                        GradientStop
-                        {
-                            position: 1
-                            color: "#000000"
-                        }
-                    }
-                }
             }
 
             delegate: Component
@@ -168,15 +121,20 @@ Rectangle
 
                     onClicked:
                     {
-                        lsvDevices.currentItem.isEnabled = false
+                        dvcDevice.isEnabled = !dvcDevice.isEnabled
 
-                        for (var index = 0; index < lsmDevices.count; index++)
-                            if (lsmDevices.get(index).propDeviceId == dvcDevice.deviceId)
+                        for (var i = 0; i < lsmDevices.count; i++)
+                            if (lsmDevices.get(i).propDeviceId == dvcDevice.deviceId)
+                            {
+                                lsmDevices.get(i).propIdEnabled = dvcDevice.isEnabled
+
                                 break
+                            }
 
-                        lsvDevices.currentIndex = index
-                        lsvDevices.currentItem.isEnabled = true
-                        recButtonBox.deviceSelected(dvcDevice.deviceId)
+                        if (dvcDevice.isEnabled)
+                            recButtonBox.deviceEnable(dvcDevice.deviceId)
+                        else
+                            recButtonBox.deviceDisable(dvcDevice.deviceId)
                     }
                 }
             }

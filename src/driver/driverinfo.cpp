@@ -37,7 +37,7 @@
 DriverInfo::DriverInfo(QObject *parent): QObject(parent)
 {
     this->m_fileName = "";
-    this->m_id = "";
+    this->m_driverId = "";
     this->m_isEnabled = false;
     this->m_name = "";
     this->m_version = "";
@@ -59,7 +59,7 @@ DriverInfo::DriverInfo(QObject *parent): QObject(parent)
 DriverInfo::DriverInfo(const DriverInfo &object):
     QObject(object.parent()),
     m_fileName(object.m_fileName),
-    m_id(object.m_id),
+    m_driverId(object.m_driverId),
     m_isEnabled(object.m_isEnabled),
     m_name(object.m_name),
     m_version(object.m_version),
@@ -117,7 +117,7 @@ DriverInfo::DriverInfo(QString fileName,
                        QString mail,
                        bool isConfigurable):
     m_fileName(fileName),
-    m_id(id),
+    m_driverId(id),
     m_isEnabled(isEnabled),
     m_name(name),
     m_version(version),
@@ -142,7 +142,7 @@ DriverInfo& DriverInfo::operator =(const DriverInfo &other)
     if (this != &other)
     {
         this->m_fileName = other.m_fileName;
-        this->m_id = other.m_id;
+        this->m_driverId = other.m_driverId;
         this->m_isEnabled = other.m_isEnabled;
         this->m_name = other.m_name;
         this->m_version = other.m_version;
@@ -174,9 +174,9 @@ QString DriverInfo::fileName()
 
   \brief The unique driver identifier.
  */
-QString DriverInfo::id()
+QString DriverInfo::driverId()
 {
-    return this->m_id;
+    return this->m_driverId;
 }
 
 /*!
@@ -308,9 +308,9 @@ void DriverInfo::setFileName(QString value)
 
   \brief Set the unique driver identifier.
  */
-void DriverInfo::setId(QString value)
+void DriverInfo::setDriverId(QString value)
 {
-    this->m_id = value;
+    this->m_driverId = value;
 }
 
 /*!
@@ -460,9 +460,9 @@ void DriverInfo::resetFileName()
 
   \brief Reset DriverInfo::resetId to "".
  */
-void DriverInfo::resetId()
+void DriverInfo::resetDriverId()
 {
-    this->m_id = "";
+    this->m_driverId = "";
 }
 
 /*!

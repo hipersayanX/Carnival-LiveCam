@@ -61,6 +61,11 @@ Gui::Gui(QWidget *parent): QDeclarativeView(parent)
     connect(this->windowControls, SIGNAL(maximize()), this, SLOT(onMaximize()));
     connect(this->windowControls, SIGNAL(close()), this, SLOT(onClose()));
 
+    connect(this->root, SIGNAL(mouseDoubleClicked(qreal, qreal, QVariant)), this, SLOT(onMouseDoubleClicked(qreal, qreal, QVariant)));
+    connect(this->root, SIGNAL(mousePositionChanged(qreal, qreal, QVariant)), this, SLOT(onMousePositionChanged(qreal, qreal, QVariant)));
+    connect(this->root, SIGNAL(mousePressed(qreal, qreal, QVariant)), this, SLOT(onMousePressed(qreal, qreal, QVariant)));
+    connect(this->root, SIGNAL(mouseReleased(qreal, qreal, QVariant)), this, SLOT(onMouseReleased(qreal, qreal, QVariant)));
+
     connect(this->root, SIGNAL(enteredResizeTopLeft()), this, SLOT(onEnteredResizeTopLeft()));
     connect(this->root, SIGNAL(beginResizeTopLeft()), this, SLOT(onBeginResizeTopLeft()));
     connect(this->root, SIGNAL(resizeTopLeft()), this, SLOT(onResizeTopLeft()));
@@ -100,7 +105,9 @@ Gui::Gui(QWidget *parent): QDeclarativeView(parent)
     connect(this->iconBar, SIGNAL(clicked(int)), this, SLOT(iconClicked(int)));
 
     this->bbxWebcams = this->root->findChild<QDeclarativeItem *>("bbxWebcams");
-    connect(bbxWebcams, SIGNAL(deviceSelected(QString)), this, SLOT(onDeviceSelected(QString)));
+
+    connect(bbxWebcams, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
+    connect(bbxWebcams, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     connect(bbxWebcams, SIGNAL(configureDevice(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
 
     this->candyBar = this->root->findChild<QDeclarativeItem *>("CandyBar");
@@ -119,27 +126,33 @@ void Gui::iconClicked(int index)
     {
         case 1:
             emit takePicture();
-
-            break;
+        break;
 
         case 2:
             emit startStopRecord();
-
-            break;
+        break;
 
         case 4:
+            emit toggleEditMode();
+        break;
+
+        case 5:
             if (this->isFullScreen())
                 this->showNormal();
             else
                 this->showFullScreen();
-
-            break;
+        break;
     }
 }
 
-void Gui::onDeviceSelected(QString deviceId)
+void Gui::onDeviceEnable(QString deviceId)
 {
-    emit deviceSelected(deviceId);
+    emit deviceEnable(deviceId);
+}
+
+void Gui::onDeviceDisable(QString deviceId)
+{
+    emit deviceDisable(deviceId);
 }
 
 void Gui::onPluginActivated(QString pluginId)
@@ -182,6 +195,57 @@ void Gui::setFrame(const QImage &frame)
     this->webcamImageProvider->setFrame(frame);
     this->windowBackground->setProperty("source", "image://webcam/" + QString(this->currentFrame));;
     this->currentFrame++;
+}
+
+void Gui::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event)
+
+    emit viewPortSizeChanged(this->windowBackground->childrenRect().size().toSize());
+}
+
+void Gui::onMouseDoubleClicked(qreal mouseX, qreal mouseY, QVariant pressedButtons)
+{
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonDblClick,
+                                         QPoint(mouseX, mouseY),
+                                         (Qt::MouseButton) pressedButtons.toInt(),
+                                         (Qt::MouseButtons) pressedButtons.toInt(),
+                                         Qt::NoModifier);
+
+    emit mouseDoubleClicked(event);
+}
+
+void Gui::onMousePositionChanged(qreal mouseX, qreal mouseY, QVariant pressedButtons)
+{
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseMove,
+                                         QPoint(mouseX, mouseY),
+                                         (Qt::MouseButton) pressedButtons.toInt(),
+                                         (Qt::MouseButtons) pressedButtons.toInt(),
+                                         Qt::NoModifier);
+
+    emit mousePositionChanged(event);
+}
+
+void Gui::onMousePressed(qreal mouseX, qreal mouseY, QVariant pressedButtons)
+{
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress,
+                                         QPoint(mouseX, mouseY),
+                                         (Qt::MouseButton) pressedButtons.toInt(),
+                                         (Qt::MouseButtons) pressedButtons.toInt(),
+                                         Qt::NoModifier);
+
+    emit mousePressed(event);
+}
+
+void Gui::onMouseReleased(qreal mouseX, qreal mouseY, QVariant pressedButtons)
+{
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonRelease,
+                                         QPoint(mouseX, mouseY),
+                                         (Qt::MouseButton) pressedButtons.toInt(),
+                                         (Qt::MouseButtons) pressedButtons.toInt(),
+                                         Qt::NoModifier);
+
+    emit mouseReleased(event);
 }
 
 void Gui::onEnteredMove()

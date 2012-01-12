@@ -37,7 +37,7 @@
 PluginInfo::PluginInfo(QObject *parent): QObject(parent)
 {
     this->m_fileName = "";
-    this->m_id = "";
+    this->m_pluginId = "";
     this->m_isEnabled = false;
     this->m_name = "";
     this->m_version = "";
@@ -50,6 +50,7 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
     this->m_mail = "";
     this->m_is3D = false;
     this->m_isConfigurable = false;
+    this->m_applyTo = QStringList();
 }
 
 /*!
@@ -60,7 +61,7 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
 PluginInfo::PluginInfo(const PluginInfo &object):
     QObject(object.parent()),
     m_fileName(object.m_fileName),
-    m_id(object.m_id),
+    m_pluginId(object.m_pluginId),
     m_isEnabled(object.m_isEnabled),
     m_name(object.m_name),
     m_version(object.m_version),
@@ -72,7 +73,8 @@ PluginInfo::PluginInfo(const PluginInfo &object):
     m_website(object.m_website),
     m_mail(object.m_mail),
     m_is3D(object.m_is3D),
-    m_isConfigurable(object.m_isConfigurable)
+    m_isConfigurable(object.m_isConfigurable),
+    m_applyTo(object.m_applyTo)
 {
 }
 
@@ -120,9 +122,10 @@ PluginInfo::PluginInfo(QString fileName,
                        QString website,
                        QString mail,
                        bool is3D,
-                       bool isConfigurable):
+                       bool isConfigurable,
+                       QStringList applyTo):
     m_fileName(fileName),
-    m_id(id),
+    m_pluginId(id),
     m_isEnabled(isEnabled),
     m_name(name),
     m_version(version),
@@ -134,7 +137,8 @@ PluginInfo::PluginInfo(QString fileName,
     m_website(website),
     m_mail(mail),
     m_is3D(is3D),
-    m_isConfigurable(isConfigurable)
+    m_isConfigurable(isConfigurable),
+    m_applyTo(applyTo)
 {
 }
 
@@ -148,7 +152,7 @@ PluginInfo& PluginInfo::operator =(const PluginInfo &other)
     if (this != &other)
     {
         this->m_fileName = other.m_fileName;
-        this->m_id = other.m_id;
+        this->m_pluginId = other.m_pluginId;
         this->m_isEnabled = other.m_isEnabled;
         this->m_name = other.m_name;
         this->m_version = other.m_version;
@@ -161,6 +165,7 @@ PluginInfo& PluginInfo::operator =(const PluginInfo &other)
         this->m_mail = other.m_mail;
         this->m_is3D = other.m_is3D;
         this->m_isConfigurable = other.m_isConfigurable;
+        this->m_applyTo = other.m_applyTo;
     }
 
     return *this;
@@ -181,9 +186,9 @@ QString PluginInfo::fileName()
 
   \brief The unique plugin identifier.
  */
-QString PluginInfo::id()
+QString PluginInfo::pluginId()
 {
-    return this->m_id;
+    return this->m_pluginId;
 }
 
 /*!
@@ -306,6 +311,11 @@ bool PluginInfo::isConfigurable()
     return this->m_isConfigurable;
 }
 
+QStringList PluginInfo::applyTo()
+{
+    return this->m_applyTo;
+}
+
 /*!
   \fn void PluginInfo::setFileName(QString value)
 
@@ -325,9 +335,9 @@ void PluginInfo::setFileName(QString value)
 
   \brief Set the unique plugin identifier.
  */
-void PluginInfo::setId(QString value)
+void PluginInfo::setPluginId(QString value)
 {
-    this->m_id = value;
+    this->m_pluginId = value;
 }
 
 /*!
@@ -474,6 +484,11 @@ void PluginInfo::setIsConfigurable(bool value)
     this->m_isConfigurable = value;
 }
 
+void PluginInfo::setApplyTo(QStringList value)
+{
+    this->m_applyTo = value;
+}
+
 /*!
   \fn void PluginInfo::resetFileName()
 
@@ -489,9 +504,9 @@ void PluginInfo::resetFileName()
 
   \brief Reset PluginInfo::id to "".
  */
-void PluginInfo::resetId()
+void PluginInfo::resetPluginId()
 {
-    this->m_id = "";
+    this->m_pluginId = "";
 }
 
 /*!
@@ -612,4 +627,9 @@ void PluginInfo::resetIs3D()
 void PluginInfo::resetIsConfigurable()
 {
     this->m_isConfigurable = false;
+}
+
+void PluginInfo::resetApplyTo()
+{
+    this->m_applyTo = QStringList();
 }

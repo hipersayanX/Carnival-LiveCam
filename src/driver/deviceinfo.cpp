@@ -36,7 +36,7 @@
  */
 DeviceInfo::DeviceInfo(QObject *parent): QObject(parent)
 {
-    this->m_id = "";
+    this->m_deviceId = "";
     this->m_driverId = "";
     this->m_isEnabled = false;
     this->m_summary = "";
@@ -51,7 +51,7 @@ DeviceInfo::DeviceInfo(QObject *parent): QObject(parent)
  */
 DeviceInfo::DeviceInfo(const DeviceInfo &object):
     QObject(object.parent()),
-    m_id(object.m_id),
+    m_deviceId(object.m_deviceId),
     m_driverId(object.m_driverId),
     m_isEnabled(object.m_isEnabled),
     m_summary(object.m_summary),
@@ -76,7 +76,7 @@ DeviceInfo::DeviceInfo(QString id,
                        QString summary,
                        QString icon,
                        bool isConfigurable):
-    m_id(id),
+    m_deviceId(id),
     m_driverId(driverId),
     m_isEnabled(isEnabled),
     m_summary(summary),
@@ -94,7 +94,7 @@ DeviceInfo& DeviceInfo::operator =(const DeviceInfo &other)
 {
     if (this != &other)
     {
-        this->m_id = other.m_id;
+        this->m_deviceId = other.m_deviceId;
         this->m_driverId = other.m_driverId;
         this->m_isEnabled = other.m_isEnabled;
         this->m_summary = other.m_summary;
@@ -110,9 +110,9 @@ DeviceInfo& DeviceInfo::operator =(const DeviceInfo &other)
 
   \brief Unique device identifier.
  */
-QString DeviceInfo::id()
+QString DeviceInfo::deviceId()
 {
-    return this->m_id;
+    return this->m_deviceId;
 }
 
 /*!
@@ -175,9 +175,9 @@ bool DeviceInfo::isConfigurable()
 
   \brief Set the unique device identifier.
  */
-void DeviceInfo::setId(QString value)
+void DeviceInfo::setDeviceId(QString value)
 {
-    this->m_id = value;
+    this->m_deviceId = value;
 }
 
 /*!
@@ -245,9 +245,9 @@ void DeviceInfo::setIsConfigurable(bool value)
 
   \brief Reset DeviceInfo::id to "".
  */
-void DeviceInfo::resetId()
+void DeviceInfo::resetDeviceId()
 {
-    this->m_id = "";
+    this->m_deviceId = "";
 }
 
 /*!

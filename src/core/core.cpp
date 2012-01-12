@@ -40,17 +40,22 @@
 Core::Core(QObject *parent): QObject(parent)
 {
     this->shellManager.setShell();
-    this->deviceManager.setDevice();
-    this->pluginManager.resize(this->deviceManager.frameSize());
+    this->deviceManager.deviceEnable("/dev/video0");
+//    this->pluginManager.resize(this->deviceManager.frameSize('/dev/video0'));
+    this->spaceManager.setSpace("/dev/video0", QImage());
+    this->spaceManager.setSnapping(true, 24, 5, 3);
+
+//    this->spaceManager.setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);
 
     connect(&this->deviceManager, SIGNAL(devicesModified()), this, SLOT(devicesModified()));
 
     this->shellManager.widget()->show();
 
-    this->shellManager.updateDevices(this->deviceManager.devicesToQml());
-    this->shellManager.updatePlugins(this->pluginManager.pluginsToQml());
+    this->shellManager.updateDevices(this->deviceManager.devicesInfoList());
+    this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
 
-    connect(&this->shellManager, SIGNAL(deviceSelected(QString)), this, SLOT(deviceSelected(QString)));
+    connect(&this->shellManager, SIGNAL(deviceEnable(QString)), this, SLOT(deviceEnable(QString)));
+    connect(&this->shellManager, SIGNAL(deviceDisable(QString)), this, SLOT(deviceDisable(QString)));
 
     this->mediaStreaming.setFPS(10);
     this->mediaStreaming.addOutputFormat(OutputFormat("ogv", "libtheora", 500000, "libvorbis", 128000, "ogg", false));
@@ -66,6 +71,13 @@ Core::Core(QObject *parent): QObject(parent)
 
     connect(&this->shellManager, SIGNAL(deviceConfigureClicked(QString)), &this->deviceManager, SLOT(configure(QString)));
 
+    connect(&this->shellManager, SIGNAL(viewPortSizeChanged(QSize)), &this->spaceManager, SLOT(setViewPortSize(QSize)));
+    connect(&this->shellManager, SIGNAL(toggleEditMode()), &this->spaceManager, SLOT(toggleEditMode()));
+    connect(&this->shellManager, SIGNAL(mouseDoubleClicked(QMouseEvent *)), &this->spaceManager, SLOT(mouseDoubleClickEvent(QMouseEvent *)));
+    connect(&this->shellManager, SIGNAL(mousePositionChanged(QMouseEvent *)), &this->spaceManager, SLOT(mouseMoveEvent(QMouseEvent *)));
+    connect(&this->shellManager, SIGNAL(mousePressed(QMouseEvent *)), &this->spaceManager, SLOT(mousePressEvent(QMouseEvent *)));
+    connect(&this->shellManager, SIGNAL(mouseReleased(QMouseEvent *)), &this->spaceManager, SLOT(mouseReleaseEvent(QMouseEvent *)));
+
     connect(&this->mediaStreaming, SIGNAL(captureFrame()), this, SLOT(captureFrame()));
 }
 
@@ -78,7 +90,7 @@ Core::Core(QObject *parent): QObject(parent)
  */
 void Core::devicesModified()
 {
-    this->shellManager.updateDevices(this->deviceManager.devicesToQml());
+    this->shellManager.updateDevices(this->deviceManager.devicesInfoList());
 }
 
 /*!
@@ -90,10 +102,18 @@ void Core::devicesModified()
 
   This slot is called when the user select a device to be used to capture from.
  */
-void Core::deviceSelected(QString deviceId)
+void Core::deviceEnable(QString deviceId)
 {
-    this->deviceManager.setDevice(deviceId);
-    this->pluginManager.resize(this->deviceManager.frameSize());
+    this->deviceManager.deviceEnable(deviceId);
+//    this->pluginManager.resize(this->deviceManager.frameSize());
+    this->spaceManager.setSpace(deviceId, QImage());
+}
+
+void Core::deviceDisable(QString deviceId)
+{
+    this->deviceManager.deviceDisable(deviceId);
+//    this->pluginManager.resize(this->deviceManager.frameSize());
+    this->spaceManager.removeSpace(deviceId);
 }
 
 /*!
@@ -107,7 +127,12 @@ void Core::captureFrame()
 {
     // Capture a frame from DeviceManager, send it to PluginManager to apply the effects,
     // and return the frame whit the effects applied.
-    QImage frame = this->pluginManager.getFrame(this->deviceManager.captureFrame());
+    /*QImage frame = this->pluginManager.getFrame(this->deviceManager.captureFrame());*/
+
+    foreach (QString deviceId, this->deviceManager.activeDevices())
+        this->spaceManager.setSpace(deviceId, this->deviceManager.captureFrame(deviceId));
+
+    QImage frame = this->spaceManager.render();
 
     // Send the frame to MediaStreamming for save it to a video or image file.
     this->mediaStreaming.setFrame(frame);

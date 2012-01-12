@@ -49,8 +49,8 @@ DeviceManager::DeviceManager(QObject *parent): QObject(parent)
  */
 DeviceManager::~DeviceManager()
 {
-    if (this->activeDevice != "")
-        this->disableDevice(this->activeDevice);
+    foreach (QString deviceId, this->m_activeDevices)
+        this->deviceDisable(deviceId);
 }
 
 /*!
@@ -60,16 +60,16 @@ DeviceManager::~DeviceManager()
 
   \brief Capture a frame from active device.
  */
-QImage DeviceManager::captureFrame()
+QImage DeviceManager::captureFrame(QString deviceId)
 {
-    if (this->activeDevice != "")
+    if (this->devicesInfo.contains(deviceId))
     {
         // Get a reference to the current loaded driver.
-        Driver *driver = this->driverManager.driver(this->devicesInfo[this->activeDevice].driverId());
+        Driver *driver = this->driverManager.driver(this->devicesInfo[deviceId].driverId());
 
         if (driver)
             // Capture a frame from the current device.
-            return driver->captureFrame(this->activeDevice);
+            return driver->captureFrame(deviceId);
     }
 
     // Else return a 1x1 black image.
@@ -87,16 +87,16 @@ QImage DeviceManager::captureFrame()
 
   \brief Returns the size of the captured frame from active device.
  */
-QSize DeviceManager::frameSize()
+QSize DeviceManager::frameSize(QString deviceId)
 {
-    if (this->activeDevice != "")
+    if (this->devicesInfo.contains(deviceId))
     {
-        Driver *driver = this->driverManager.driver(this->devicesInfo[this->activeDevice].driverId());
+        Driver *driver = this->driverManager.driver(this->devicesInfo[deviceId].driverId());
 
         if (!driver)
             return QSize(1, 1);
 
-        return driver->frameSize(this->activeDevice);
+        return driver->frameSize(deviceId);
     }
     else
         return QSize(1, 1);
@@ -109,7 +109,7 @@ QSize DeviceManager::frameSize()
 
   \brief Returns the list of devices information in standard format.
  */
-QList<QVariant> DeviceManager::devicesToQml()
+QList<QVariant> DeviceManager::devicesInfoList()
 {
     QList<QVariant> deviceList;
 
@@ -117,7 +117,7 @@ QList<QVariant> DeviceManager::devicesToQml()
     {
         QMap<QString, QVariant> deviceInfoMap;
 
-        deviceInfoMap["deviceId"] = QVariant(device.id());
+        deviceInfoMap["deviceId"] = QVariant(device.deviceId());
         deviceInfoMap["driverId"] = QVariant(device.driverId());
         deviceInfoMap["isEnabled"] = QVariant(device.isEnabled());
         deviceInfoMap["summary"] = QVariant(device.summary());
@@ -131,64 +131,6 @@ QList<QVariant> DeviceManager::devicesToQml()
 }
 
 /*!
-  \fn bool DeviceManager::setDevice()
-
-  \retval true if the device is active.
-  \retval false if the device is inactive.
-
-  \brief Try to activate the default device (/dev/video0).
- */
-bool DeviceManager::setDevice()
-{
-    return this->setDevice("/dev/video0");
-}
-
-/*!
-  \fn bool DeviceManager::setDevice(QString id)
-
-  \param id Unique device identifier.
-
-  \retval true if the device is active.
-  \retval false if the device is inactive.
-
-  \brief Try to activate the device id.
- */
-bool DeviceManager::setDevice(QString id)
-{
-    if (this->activeDevice == "")
-        this->enableDevice(id);
-    else
-        if (this->devicesInfo[this->activeDevice].driverId() != this->devicesInfo[id].driverId())
-        {
-            // If the current device and the new selected device uses a diferent driver,
-            // disable the current device and unload the driver (unload the QtPlugin from memory).
-            this->disableDevice(this->activeDevice);
-
-            // and load the new driver and setup the new device.
-            this->enableDevice(id);
-        }
-        else
-        {
-            // Both, the current device and the new selected device uses the same driver,
-            // Just get a reference to the current loaded driver.
-            Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
-
-            if (driver)
-            {
-                // Disable the current device,
-                driver->disableDevice(this->activeDevice);
-
-                // and load the new device.
-                driver->enableDevice(id);
-            }
-        }
-
-    this->activeDevice = id;
-
-    return true;
-}
-
-/*!
   \fn void DeviceManager::configure(QString id)
 
   \param id Unique device identifier.
@@ -196,13 +138,13 @@ bool DeviceManager::setDevice(QString id)
   \brief Calls the configuration dialog for the device id.
          the device must be active.
  */
-void DeviceManager::configure(QString id)
+void DeviceManager::configure(QString deviceId)
 {
-    if (this->activeDevice != id)
+    if (!this->devicesInfo.contains(deviceId))
         return;
 
-    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
-    driver->configureDevice(id);
+    Driver *driver = this->driverManager.driver(this->devicesInfo[deviceId].driverId());
+    driver->configureDevice(deviceId);
 }
 
 /*!
@@ -217,7 +159,7 @@ void DeviceManager::updateDevices()
     QHash<QString, bool> devicesPreStatus;
 
     foreach(DeviceInfo device, this->devicesInfo)
-        devicesPreStatus[device.id()] = this->devicesInfo[device.id()].isEnabled();
+        devicesPreStatus[device.deviceId()] = this->devicesInfo[device.deviceId()].isEnabled();
 
     this->devicesInfo.clear();
 
@@ -250,16 +192,15 @@ void DeviceManager::updateDevices()
  */
 void DeviceManager::onDevicesModified()
 {
-    this->disableDevice(this->activeDevice);
+    QStringList activeDevices = this->m_activeDevices;
+
+    foreach (QString deviceId, this->m_activeDevices)
+        this->deviceDisable(deviceId);
+
     this->updateDevices();
 
-    if (this->devicesInfo.contains(this->activeDevice))
-        this->enableDevice(this->activeDevice);
-    else
-    {
-        this->activeDevice = "";
-        this->setDevice();
-    }
+    foreach (QString deviceId, activeDevices)
+        this->deviceEnable(deviceId);
 
     emit devicesModified();
 }
@@ -274,20 +215,21 @@ void DeviceManager::onDevicesModified()
 
   \brief Try to activate the device id.
  */
-bool DeviceManager::enableDevice(QString id)
+bool DeviceManager::deviceEnable(QString deviceId)
 {
-    if (!this->devicesInfo.contains(id))
+    if (!this->devicesInfo.contains(deviceId))
         return false;
 
-    this->driverManager.load(this->devicesInfo[id].driverId());
-    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
+    this->driverManager.load(this->devicesInfo[deviceId].driverId());
+    Driver *driver = this->driverManager.driver(this->devicesInfo[deviceId].driverId());
 
-    if (this->driverConfigs.contains(this->devicesInfo[id].driverId()))
-        driver->setConfigs(this->driverConfigs[this->devicesInfo[id].driverId()]);
+    if (this->driverConfigs.contains(this->devicesInfo[deviceId].driverId()))
+        driver->setConfigs(this->driverConfigs[this->devicesInfo[deviceId].driverId()]);
 
     driver->begin();
-    driver->enableDevice(id);
+    driver->enableDevice(deviceId);
     connect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
+    this->m_activeDevices << deviceId;
 
     return true;
 }
@@ -302,21 +244,37 @@ bool DeviceManager::enableDevice(QString id)
 
   \brief Try to desactivate the device id.
  */
-bool DeviceManager::disableDevice(QString id)
+bool DeviceManager::deviceDisable(QString deviceId)
 {
-    if (!this->devicesInfo.contains(id))
+    if (!this->devicesInfo.contains(deviceId))
         return false;
 
-    Driver *driver = this->driverManager.driver(this->devicesInfo[id].driverId());
+    Driver *driver = this->driverManager.driver(this->devicesInfo[deviceId].driverId());
 
     if (!driver)
         return false;
 
-    this->driverConfigs[this->devicesInfo[id].driverId()] = driver->configs();
+    this->driverConfigs[this->devicesInfo[deviceId].driverId()] = driver->configs();
     disconnect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
-    driver->disableDevice(id);
+    driver->disableDevice(deviceId);
     driver->end();
-    this->driverManager.unload(this->devicesInfo[id].driverId());
+    this->driverManager.unload(this->devicesInfo[deviceId].driverId());
+    this->m_activeDevices.removeOne(deviceId);
 
     return true;
+}
+
+QStringList DeviceManager::activeDevices()
+{
+    return this->m_activeDevices;
+}
+
+void DeviceManager::setActiveDevices(QStringList value)
+{
+    this->m_activeDevices = value;
+}
+
+void DeviceManager::resetActiveDevices()
+{
+    this->m_activeDevices.clear();
 }

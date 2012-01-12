@@ -35,19 +35,23 @@ class DeviceManager: public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QStringList activeDevices READ activeDevices WRITE setActiveDevices RESET resetActiveDevices)
+
     public:
         explicit DeviceManager(QObject *parent = 0);
         ~DeviceManager();
-        Q_INVOKABLE QImage captureFrame();
-        Q_INVOKABLE QSize frameSize();
-        Q_INVOKABLE QList<QVariant> devicesToQml();
+        Q_INVOKABLE QImage captureFrame(QString deviceId);
+        Q_INVOKABLE QSize frameSize(QString deviceId);
+        Q_INVOKABLE QList<QVariant> devicesInfoList();
+
+        QStringList activeDevices();
 
     public slots:
-        bool setDevice();
-        bool setDevice(QString id);
-        bool enableDevice(QString id);
-        bool disableDevice(QString id);
-        void configure(QString id);
+        bool deviceEnable(QString deviceId);
+        bool deviceDisable(QString deviceId);
+        void configure(QString deviceId);
+        void setActiveDevices(QStringList value);
+        void resetActiveDevices();
 
     signals:
         /*!
@@ -59,7 +63,7 @@ class DeviceManager: public QObject
 
     private:
         DriverManager driverManager;
-        QString activeDevice;
+        QStringList m_activeDevices;
         QHash<QString, DeviceInfo> devicesInfo;
         QHash<QString, QVariant> driverConfigs;
 

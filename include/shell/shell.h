@@ -23,6 +23,7 @@
 #define SHELL_H
 
 #include <QImage>
+#include <QMouseEvent>
 
 /*!
   \class Shell
@@ -219,6 +220,13 @@ class Shell: public QObject
         virtual void updatePlugins(const QList<QVariant> &plugins) = 0;
 
     signals:
+        void viewPortSizeChanged(QSize size);
+        void mouseDoubleClicked(QMouseEvent *event);
+        void mousePositionChanged(QMouseEvent *event);
+        void mousePressed(QMouseEvent *event);
+        void mouseReleased(QMouseEvent *event);
+        void toggleEditMode();
+
         /*!
           \fn void Shell::takePicture()
 
@@ -233,14 +241,8 @@ class Shell: public QObject
          */
         void startStopRecord();
 
-        /*!
-          \fn void Shell::deviceSelected(QString deviceId)
-
-          \param deviceId The new device to capture from.
-
-          \brief This signal is emited when the user select a new device to capture from, current devices are disabled.
-         */
-        void deviceSelected(QString deviceId);
+        void deviceEnable(QString deviceId);
+        void deviceDisable(QString deviceId);
 
         /*!
           \fn void Shell::pluginActivated(QString pluginId)

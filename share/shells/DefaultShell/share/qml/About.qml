@@ -58,7 +58,7 @@ You should have received a copy of the GNU General Public License
 along with This program.  If not, see <http://www.gnu.org/licenses/>.
 
 Email   : hipersayan DOT x AT gmail DOT com
-Web-Site: http://hipersayanx.blogspot.com/"
+Web-Site: https://github.com/hipersayanX/Carnival-LiveCam"
         }
 
     }

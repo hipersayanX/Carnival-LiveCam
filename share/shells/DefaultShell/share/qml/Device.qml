@@ -31,8 +31,6 @@ Rectangle
     color: "#00000000"
     radius: 10
     clip: true
-    border.width: 2
-    border.color: recDevice.borderColorNormal
 
     property string deviceId: ""
     property string driverId: ""
@@ -46,6 +44,29 @@ Rectangle
 
     signal clicked
     signal configure
+
+    Rectangle
+    {
+        id: recHighlight
+        radius: 10
+        visible: recDevice.isEnabled
+        anchors.fill: parent
+
+        gradient: Gradient
+        {
+            GradientStop
+            {
+                position: 0
+                color: "#007fff"
+            }
+
+            GradientStop
+            {
+                position: 1
+                color: "#000000"
+            }
+        }
+    }
 
     Image
     {
@@ -66,6 +87,16 @@ Rectangle
         anchors.verticalCenter: parent.verticalCenter
     }
 
+    Rectangle
+    {
+        id: rectangle1
+        color: "#00000000"
+        radius: 10
+        anchors.fill: parent
+        border.width: 2
+        border.color: recDevice.borderColorNormal
+    }
+
     MouseArea
     {
         id: msaDevice
@@ -73,10 +104,10 @@ Rectangle
         hoverEnabled: true
 
         onClicked: recDevice.clicked()
-        onEntered: recDevice.border.color = recDevice.borderColorHover
-        onExited: recDevice.border.color = recDevice.borderColorNormal
-        onPressed: recDevice.border.color = recDevice.borderColorPressed
-        onReleased: recDevice.border.color = recDevice.borderColorHover
+        onEntered: rectangle1.border.color = recDevice.borderColorHover
+        onExited: rectangle1.border.color = recDevice.borderColorNormal
+        onPressed: rectangle1.border.color = recDevice.borderColorPressed
+        onReleased: rectangle1.border.color = recDevice.borderColorHover
     }
 
     Button
@@ -93,7 +124,9 @@ Rectangle
         anchors.right: parent.right
 
         onClicked: recDevice.configure()
-        onEntered: recDevice.border.color = recDevice.borderColorHover
-        onExited: recDevice.border.color = recDevice.borderColorNormal
+        onEntered: rectangle1.border.color = recDevice.borderColorHover
+        onExited: rectangle1.border.color = recDevice.borderColorNormal
     }
+
+
 }

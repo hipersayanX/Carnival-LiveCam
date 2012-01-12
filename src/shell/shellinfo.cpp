@@ -38,7 +38,7 @@ ShellInfo::ShellInfo(QObject *parent): QObject(parent)
 {
     this->m_fileName = "";
     this->m_isEnabled = false;
-    this->m_id = "";
+    this->m_shellId = "";
     this->m_name = "";
     this->m_version = "";
     this->m_summary = "";
@@ -60,7 +60,7 @@ ShellInfo::ShellInfo(const ShellInfo &object):
     QObject(object.parent()),
     m_fileName(object.m_fileName),
     m_isEnabled(object.m_isEnabled),
-    m_id(object.m_id),
+    m_shellId(object.m_shellId),
     m_name(object.m_name),
     m_version(object.m_version),
     m_summary(object.m_summary),
@@ -118,7 +118,7 @@ ShellInfo::ShellInfo(QString fileName,
                      bool isConfigurable):
     m_fileName(fileName),
     m_isEnabled(isEnabled),
-    m_id(id),
+    m_shellId(id),
     m_name(name),
     m_version(version),
     m_summary(summary),
@@ -143,7 +143,7 @@ ShellInfo& ShellInfo::operator =(const ShellInfo &other)
     {
         this->m_fileName = other.m_fileName;
         this->m_isEnabled = other.m_isEnabled;
-        this->m_id = other.m_id;
+        this->m_shellId = other.m_shellId;
         this->m_name = other.m_name;
         this->m_version = other.m_version;
         this->m_summary = other.m_summary;
@@ -184,9 +184,9 @@ bool ShellInfo::isEnabled()
 
   \brief The unique shell identifier.
  */
-QString ShellInfo::id()
+QString ShellInfo::shellId()
 {
-    return this->m_id;
+    return this->m_shellId;
 }
 
 /*!
@@ -320,9 +320,9 @@ void ShellInfo::setIsEnabled(bool value)
 
   \brief Set the unique shell identifier.
  */
-void ShellInfo::setId(QString value)
+void ShellInfo::setShellId(QString value)
 {
-    this->m_id = value;
+    this->m_shellId = value;
 }
 
 /*!
@@ -470,9 +470,9 @@ void ShellInfo::resetIsEnabled()
 
   \brief Reset ShellInfo::id to "".
  */
-void ShellInfo::resetId()
+void ShellInfo::resetShellId()
 {
-    this->m_id = "";
+    this->m_shellId = "";
 }
 
 /*!

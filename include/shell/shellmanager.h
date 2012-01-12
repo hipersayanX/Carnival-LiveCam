@@ -35,8 +35,8 @@ class ShellManager: public QObject
     public:
         explicit ShellManager(QObject *parent = 0);
         ~ShellManager();
-        Q_INVOKABLE QList<QVariant> shellsToQml();
-        Q_INVOKABLE QWidget *widget(QString id = "");
+        Q_INVOKABLE QList<QVariant> shellsInfoList();
+        Q_INVOKABLE QWidget *widget(QString shellId = "");
 
     private:
         QPluginLoader shellLoader;
@@ -46,19 +46,25 @@ class ShellManager: public QObject
         QHash<QString, QVariant> shellConfigs;
 
     public slots:
-        bool setShell();
-        bool setShell(QString id);
-        bool enableShell(QString id);
-        bool disableShell(QString id);
-        void configureShell(QString id);
+        bool setShell(QString shellId = "shell.DefaultShell");
+        bool enableShell(QString shellId);
+        bool disableShell(QString shellId);
+        void configureShell(QString shellId);
         void setFrame(const QImage &frame);
         void updateDevices(const QList<QVariant> &devices);
         void updatePlugins(const QList<QVariant> &plugins);
 
     private slots:
+        void onToggleEditMode();
+        void onViewPortSizeChanged(QSize size);
+        void onMouseDoubleClicked(QMouseEvent *event);
+        void onMousePositionChanged(QMouseEvent *event);
+        void onMousePressed(QMouseEvent *event);
+        void onMouseReleased(QMouseEvent *event);
         void onTakePicture();
         void onStartStopRecord();
-        void onDeviceSelected(QString deviceId);
+        void onDeviceEnable(QString deviceId);
+        void onDeviceDisable(QString deviceId);
         void onPluginActivated(QString pluginId);
         void onPluginDeactivated(QString pluginId);
         void onPluginMoved(int from, int to);
@@ -67,6 +73,13 @@ class ShellManager: public QObject
         void onClosed();
 
     signals:
+        void toggleEditMode();
+        void viewPortSizeChanged(QSize size);
+        void mouseDoubleClicked(QMouseEvent *event);
+        void mousePositionChanged(QMouseEvent *event);
+        void mousePressed(QMouseEvent *event);
+        void mouseReleased(QMouseEvent *event);
+
         /*!
           \fn void ShellManager::takePicture()
 
@@ -81,14 +94,8 @@ class ShellManager: public QObject
          */
         void startStopRecord();
 
-        /*!
-          \fn void ShellManager::deviceSelected(QString deviceId)
-
-          \param deviceId Unique device identifier.
-
-          \brief This signal is emited when the user select a new device.
-         */
-        void deviceSelected(QString deviceId);
+        void deviceEnable(QString deviceId);
+        void deviceDisable(QString deviceId);
 
         /*!
           \fn void ShellManager::pluginActivated(QString pluginId)

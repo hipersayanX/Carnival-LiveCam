@@ -35,7 +35,10 @@ Rectangle
     property bool resizing: false
     property real borderSize: 8
 
-    signal backgroundClicked
+    signal mouseDoubleClicked(real mouseX, real mouseY, variant pressedButtons)
+    signal mousePositionChanged(real mouseX, real mouseY, variant pressedButtons)
+    signal mousePressed(real mouseX, real mouseY, variant pressedButtons)
+    signal mouseReleased(real mouseX, real mouseY, variant pressedButtons)
 
     signal enteredResizeTopRight
     signal beginResizeTopRight
@@ -85,13 +88,18 @@ Rectangle
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent
         source: "image://webcam/image"
-    }
 
-    MouseArea
-    {
-        id: msaBackground
-        anchors.fill: parent
-        onClicked: parent.backgroundClicked()
+        MouseArea
+        {
+            id: msaBackground
+            hoverEnabled: true
+            anchors.fill: parent
+
+            onDoubleClicked: recWindow.mouseDoubleClicked(mouseX, mouseY, pressedButtons)
+            onPositionChanged: recWindow.mousePositionChanged(mouseX, mouseY, pressedButtons)
+            onPressed: recWindow.mousePressed(mouseX, mouseY, pressedButtons)
+            onReleased: recWindow.mouseReleased(mouseX, mouseY, pressedButtons)
+        }
     }
 
     MouseArea

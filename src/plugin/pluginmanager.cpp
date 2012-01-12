@@ -89,7 +89,8 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
                                                    plugin->website(),
                                                    plugin->mail(),
                                                    plugin->is3D(),
-                                                   plugin->isConfigurable());
+                                                   plugin->isConfigurable(),
+                                                   QStringList());
 
             this->pluginLoader.unload();
         }
@@ -105,7 +106,7 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
 
   \brief Returns the list of plugins information in standard format.
  */
-QList<QVariant> PluginManager::pluginsToQml()
+QList<QVariant> PluginManager::pluginsInfoList()
 {
     QList<QVariant> pluginList;
 
@@ -113,7 +114,7 @@ QList<QVariant> PluginManager::pluginsToQml()
     {
         QMap<QString, QVariant> pluginInfoMap;
 
-        pluginInfoMap["pluginId"] = QVariant(plugin.id());
+        pluginInfoMap["pluginId"] = QVariant(plugin.pluginId());
         pluginInfoMap["name"] = QVariant(plugin.name());
         pluginInfoMap["version"] = QVariant(plugin.version());
         pluginInfoMap["summary"] = QVariant(plugin.summary());
@@ -126,11 +127,24 @@ QList<QVariant> PluginManager::pluginsToQml()
         pluginInfoMap["mail"] = QVariant(plugin.mail());
         pluginInfoMap["isActivated"] = QVariant(false);
         pluginInfoMap["isConfigurable"] = QVariant(plugin.isConfigurable());
+        pluginInfoMap["applyTo"] = QVariant(plugin.applyTo());
 
         pluginList << pluginInfoMap;
     }
 
     return pluginList;
+}
+
+void PluginManager::applyTo(QString pluginId, QString deviceId, bool apply)
+{
+    QStringList applyToList = this->pluginsInfo[pluginId].applyTo();
+
+    if (applyToList.contains(deviceId) && !apply)
+        applyToList.removeOne(deviceId);
+    else if (!applyToList.contains(deviceId) && apply)
+        applyToList << deviceId;
+
+    this->pluginsInfo[pluginId].setApplyTo(applyToList);
 }
 
 /*!
@@ -143,9 +157,9 @@ QList<QVariant> PluginManager::pluginsToQml()
 
   \brief Try to activate the plugin id.
  */
-bool PluginManager::enablePlugin(QString id)
+bool PluginManager::enablePlugin(QString pluginId)
 {
-    this->pluginLoader.setFileName(pluginsInfo[id].fileName());
+    this->pluginLoader.setFileName(pluginsInfo[pluginId].fileName());
 
     QObject *pluginInstance = this->pluginLoader.instance();
 
@@ -157,11 +171,11 @@ bool PluginManager::enablePlugin(QString id)
     if (!plugin)
         return false;
 
-    this->pluginsInfo[id].setIsEnabled(true);
+    this->pluginsInfo[pluginId].setIsEnabled(true);
     this->activePlugins << plugin;
 
-    if (this->pluginConfigs.contains(id))
-        plugin->setConfigs(this->pluginConfigs[id]);
+    if (this->pluginConfigs.contains(pluginId))
+        plugin->setConfigs(this->pluginConfigs[pluginId]);
 
     plugin->begin();
     plugin->resize(this->frameSize.width(), this->frameSize.height());
@@ -180,9 +194,9 @@ bool PluginManager::enablePlugin(QString id)
 
   \brief Try to activate the plugin \b id and insert it to \b index.
  */
-bool PluginManager::enablePlugin(QString id, int index)
+bool PluginManager::enablePlugin(QString pluginId, int index)
 {
-    this->pluginLoader.setFileName(this->pluginsInfo[id].fileName());
+    this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
 
     if (!this->pluginLoader.load())
         return false;
@@ -197,11 +211,11 @@ bool PluginManager::enablePlugin(QString id, int index)
     if (!plugin)
         return false;
 
-    this->pluginsInfo[id].setIsEnabled(true);
+    this->pluginsInfo[pluginId].setIsEnabled(true);
     this->activePlugins.insert(index, plugin);
 
-    if (this->pluginConfigs.contains(id))
-        plugin->setConfigs(this->pluginConfigs[id]);
+    if (this->pluginConfigs.contains(pluginId))
+        plugin->setConfigs(this->pluginConfigs[pluginId]);
 
     plugin->begin();
     plugin->resize(this->frameSize.width(), this->frameSize.height());
@@ -219,14 +233,14 @@ bool PluginManager::enablePlugin(QString id, int index)
 
   \brief Try to desactivate the device id.
  */
-bool PluginManager::disablePlugin(QString id)
+bool PluginManager::disablePlugin(QString pluginId)
 {
     bool isEnabled = false;
 
     for (int i = 0; i < this->activePlugins.size(); i++)
-        if (this->activePlugins[i]->id() == id)
+        if (this->activePlugins[i]->id() == pluginId)
         {
-            this->pluginConfigs[id] = this->activePlugins[i]->configs();
+            this->pluginConfigs[pluginId] = this->activePlugins[i]->configs();
             this->activePlugins[i]->end();
             this->activePlugins.removeAt(i);
             isEnabled = true;
@@ -237,8 +251,8 @@ bool PluginManager::disablePlugin(QString id)
     if (!isEnabled)
         return false;
 
-    this->pluginLoader.setFileName(this->pluginsInfo[id].fileName());
-    this->pluginsInfo[id].setIsEnabled(false);
+    this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
+    this->pluginsInfo[pluginId].setIsEnabled(false);
     this->pluginLoader.unload();
 
     return true;
@@ -276,10 +290,10 @@ bool PluginManager::disablePlugin(int index)
 
   \brief Calls the configuration dialog of the plugin id.
  */
-void PluginManager::configurePlugin(QString id)
+void PluginManager::configurePlugin(QString pluginId)
 {
     for (int i = 0; i < this->activePlugins.size(); i++)
-        if (this->activePlugins[i]->id() == id)
+        if (this->activePlugins[i]->id() == pluginId)
         {
             this->activePlugins[i]->configure();
 
@@ -307,7 +321,7 @@ void PluginManager::movePlugin(int from, int to)
 
   \brief This method updates the frame size for all plugins.
  */
-void PluginManager::resize(QSize size)
+void PluginManager::resize(QSize size, QString deviceId)
 {
     this->frameSize = size;
 
@@ -324,7 +338,7 @@ void PluginManager::resize(QSize size)
 
   \brief Applies all plugin effects to a frame.
  */
-QImage PluginManager::getFrame(const QImage &image)
+QImage PluginManager::getFrame(const QImage &image, QString deviceId)
 {
     QImage frame = image;
 

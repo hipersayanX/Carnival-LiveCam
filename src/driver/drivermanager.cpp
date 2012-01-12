@@ -125,9 +125,9 @@ QStringList DriverManager::captureDrivers()
 
   \brief Query if driver is loaded.
  */
-bool DriverManager::isLoaded(QString id)
+bool DriverManager::isLoaded(QString driverId)
 {
-    return this->activeDrivers.contains(id);
+    return this->activeDrivers.contains(driverId);
 }
 
 /*!
@@ -139,9 +139,9 @@ bool DriverManager::isLoaded(QString id)
 
   \brief Returns a pointer to the driver object if loaded else returns NULL.
  */
-Driver *DriverManager::driver(QString id)
+Driver *DriverManager::driver(QString driverId)
 {
-    return isLoaded(id)? this->activeDrivers[id]: NULL;
+    return isLoaded(driverId)? this->activeDrivers[driverId]: NULL;
 }
 
 /*!
@@ -154,12 +154,12 @@ Driver *DriverManager::driver(QString id)
 
   \brief Load a driver.
  */
-bool DriverManager::load(QString id)
+bool DriverManager::load(QString driverId)
 {
-    if (this->activeDrivers.contains(id))
+    if (this->activeDrivers.contains(driverId))
         return false;
 
-    this->driverLoader.setFileName(this->driversInfo[id].fileName());
+    this->driverLoader.setFileName(this->driversInfo[driverId].fileName());
 
     if (!this->driverLoader.load())
         return false;
@@ -179,8 +179,8 @@ bool DriverManager::load(QString id)
     if (!driver)
         return false;
 
-    this->driversInfo[id].setIsEnabled(true);
-    this->activeDrivers[id] = driver;
+    this->driversInfo[driverId].setIsEnabled(true);
+    this->activeDrivers[driverId] = driver;
     driver->begin();
 
     return true;
@@ -196,16 +196,16 @@ bool DriverManager::load(QString id)
 
   \brief Unload a driver.
  */
-bool DriverManager::unload(QString id)
+bool DriverManager::unload(QString driverId)
 {
-    if(!this->driversInfo[id].isEnabled())
+    if(!this->driversInfo[driverId].isEnabled())
          return false;
 
-    this->activeDrivers[id]->end();
-    delete this->activeDrivers[id];
-    this->activeDrivers.remove(id);
-    this->driverLoader.setFileName(this->driversInfo[id].fileName());
-    this->driversInfo[id].setIsEnabled(false);
+    this->activeDrivers[driverId]->end();
+    delete this->activeDrivers[driverId];
+    this->activeDrivers.remove(driverId);
+    this->driverLoader.setFileName(this->driversInfo[driverId].fileName());
+    this->driversInfo[driverId].setIsEnabled(false);
     this->driverLoader.unload();
 
     return true;

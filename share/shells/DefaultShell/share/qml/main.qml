@@ -32,7 +32,7 @@ Window
     color: "#e6000000"
     property bool showCandyBar: false
 
-    onBackgroundClicked:
+    onMousePressed:
     {
         webcams.visible = false
         about.visible = false
@@ -59,7 +59,7 @@ Window
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
 
-        Component.onCompleted: updateItems({"Set webcam": "../images/icons/webcam.svg", "Take a picture": "../images/icons/picture.svg", "Record video": "../images/icons/video.svg", "Candy Bar": "../images/icons/effects.svg", "Fullscreen": "../images/icons/fullscreen.svg", "About": "../images/icons/about.svg"})
+        Component.onCompleted: updateItems({"Set a Device": "../images/icons/webcam.svg", "Take a Picture": "../images/icons/picture.svg", "Record Video": "../images/icons/video.svg", "Candy Bar": "../images/icons/effects.svg", "Edit Spaces": "../images/icons/spaces.svg", "Fullscreen": "../images/icons/fullscreen.svg", "About": "../images/icons/about.svg"})
 
         onEntered: iconbar.opacity = 1
         onExited: iconbar.opacity = 0.5
@@ -99,15 +99,23 @@ Window
                 {
                     about.visible = false
                     webcams.visible = false
-
-                    if(getIconSrc(4) == "../images/icons/fullscreen.svg")
-                        setIconSrc(4, "../images/icons/windowed.svg")
-                    else
-                        setIconSrc(4, "../images/icons/fullscreen.svg")
+                    wdgMainWidget.showCandyBar = false
                 }
                 break
 
                 case 5:
+                {
+                    about.visible = false
+                    webcams.visible = false
+
+                    if(getIconSrc(5) == "../images/icons/fullscreen.svg")
+                        setIconSrc(5, "../images/icons/windowed.svg")
+                    else
+                        setIconSrc(5, "../images/icons/fullscreen.svg")
+                }
+                break
+
+                case 6:
                 {
                     webcams.visible = false
                     about.visible = !about.visible
@@ -119,6 +127,7 @@ Window
                 {
                     about.visible = false
                     webcams.visible = false
+                    wdgMainWidget.showCandyBar = false
                 }
                 break
             }

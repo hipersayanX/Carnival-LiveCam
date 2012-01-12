@@ -23,13 +23,14 @@
 #define PLUGININFO_H
 
 #include <QObject>
+#include <QStringList>
 
 class PluginInfo: public QObject
 {
     Q_OBJECT
 
     Q_PROPERTY(QString fileName READ fileName WRITE setFileName RESET resetFileName)
-    Q_PROPERTY(QString id READ id WRITE setId RESET resetId)
+    Q_PROPERTY(QString pluginId READ pluginId WRITE setPluginId RESET resetPluginId)
     Q_PROPERTY(bool isEnabled READ isEnabled WRITE setIsEnabled RESET resetIsEnabled)
     Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
     Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
@@ -42,13 +43,14 @@ class PluginInfo: public QObject
     Q_PROPERTY(QString mail READ mail WRITE setMail RESET resetMail)
     Q_PROPERTY(bool is3D READ is3D WRITE setIs3D RESET resetIs3D)
     Q_PROPERTY(bool isConfigurable READ isConfigurable WRITE setIsConfigurable RESET resetIsConfigurable)
+    Q_PROPERTY(QStringList applyTo READ applyTo WRITE setApplyTo RESET resetApplyTo)
 
     public:
         explicit PluginInfo(QObject *parent = 0);
         PluginInfo(const PluginInfo &object);
 
         PluginInfo(QString fileName,
-                   QString id,
+                   QString pluginId,
                    bool isEnabled,
                    QString name,
                    QString version,
@@ -60,12 +62,13 @@ class PluginInfo: public QObject
                    QString website,
                    QString mail,
                    bool is3D,
-                   bool isConfigurable);
+                   bool isConfigurable,
+                   QStringList applyTo);
 
         PluginInfo& operator =(const PluginInfo &other);
 
         QString fileName();
-        QString id();
+        QString pluginId();
         bool isEnabled();
         QString name();
         QString version();
@@ -78,10 +81,11 @@ class PluginInfo: public QObject
         QString mail();
         bool is3D();
         bool isConfigurable();
+        QStringList applyTo();
 
     private:
         QString m_fileName;
-        QString m_id;
+        QString m_pluginId;
         bool m_isEnabled;
         QString m_name;
         QString m_version;
@@ -94,10 +98,11 @@ class PluginInfo: public QObject
         QString m_mail;
         bool m_is3D;
         bool m_isConfigurable;
+        QStringList m_applyTo;
 
     public slots:
         void setFileName(QString value);
-        void setId(QString value);
+        void setPluginId(QString value);
         void setIsEnabled(bool value);
         void setName(QString value);
         void setVersion(QString value);
@@ -110,8 +115,9 @@ class PluginInfo: public QObject
         void setMail(QString value);
         void setIs3D(bool value);
         void setIsConfigurable(bool value);
+        void setApplyTo(QStringList value);
         void resetFileName();
-        void resetId();
+        void resetPluginId();
         void resetIsEnabled();
         void resetName();
         void resetVersion();
@@ -124,6 +130,7 @@ class PluginInfo: public QObject
         void resetMail();
         void resetIs3D();
         void resetIsConfigurable();
+        void resetApplyTo();
 };
 
 #endif // PLUGININFO_H

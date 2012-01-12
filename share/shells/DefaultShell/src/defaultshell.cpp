@@ -82,9 +82,16 @@ void DefaultShell::begin()
 {
     this->gui = new Gui();
 
+    connect(this->gui, SIGNAL(viewPortSizeChanged(QSize)), this, SLOT(onViewPortSizeChanged(QSize)));
+    connect(this->gui, SIGNAL(mouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
+    connect(this->gui, SIGNAL(mousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
+    connect(this->gui, SIGNAL(mousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
+    connect(this->gui, SIGNAL(mouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
+    connect(this->gui, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
     connect(this->gui, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     connect(this->gui, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
-    connect(this->gui, SIGNAL(deviceSelected(QString)), this, SLOT(onDeviceSelected(QString)));
+    connect(this->gui, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
+    connect(this->gui, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     connect(this->gui, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
     connect(this->gui, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
     connect(this->gui, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
@@ -133,6 +140,36 @@ void DefaultShell::updatePlugins(const QList<QVariant> &plugins)
     this->gui->updatePlugins(plugins);
 }
 
+void DefaultShell::onViewPortSizeChanged(QSize size)
+{
+    emit viewPortSizeChanged(size);
+}
+
+void DefaultShell::onMouseDoubleClicked(QMouseEvent *event)
+{
+    emit mouseDoubleClicked(event);
+}
+
+void DefaultShell::onMousePositionChanged(QMouseEvent *event)
+{
+    emit mousePositionChanged(event);
+}
+
+void DefaultShell::onMousePressed(QMouseEvent *event)
+{
+    emit mousePressed(event);
+}
+
+void DefaultShell::onMouseReleased(QMouseEvent *event)
+{
+    emit mouseReleased(event);
+}
+
+void DefaultShell::onToggleEditMode()
+{
+    emit toggleEditMode();
+}
+
 void DefaultShell::onTakePicture()
 {
     emit takePicture();
@@ -143,9 +180,14 @@ void DefaultShell::onStartStopRecord()
     emit startStopRecord();
 }
 
-void DefaultShell::onDeviceSelected(QString deviceId)
+void DefaultShell::onDeviceEnable(QString deviceId)
 {
-    emit deviceSelected(deviceId);
+    emit deviceEnable(deviceId);
+}
+
+void DefaultShell::onDeviceDisable(QString deviceId)
+{
+    emit deviceDisable(deviceId);
 }
 
 void DefaultShell::onPluginActivated(QString pluginId)

@@ -30,7 +30,7 @@ class ShellInfo: public QObject
 
     Q_PROPERTY(QString fileName READ fileName WRITE setFileName RESET resetFileName)
     Q_PROPERTY(bool isEnabled READ isEnabled WRITE setIsEnabled RESET resetIsEnabled)
-    Q_PROPERTY(QString id READ id WRITE setId RESET resetId)
+    Q_PROPERTY(QString shellId READ shellId WRITE setShellId RESET resetShellId)
     Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
     Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
     Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
@@ -48,7 +48,7 @@ class ShellInfo: public QObject
 
         ShellInfo(QString fileName,
                   bool isEnabled,
-                  QString id,
+                  QString shellId,
                   QString name,
                   QString version,
                   QString summary,
@@ -64,7 +64,7 @@ class ShellInfo: public QObject
 
         QString fileName();
         bool isEnabled();
-        QString id();
+        QString shellId();
         QString name();
         QString version();
         QString summary();
@@ -79,7 +79,7 @@ class ShellInfo: public QObject
     private:
         QString m_fileName;
         bool m_isEnabled;
-        QString m_id;
+        QString m_shellId;
         QString m_name;
         QString m_version;
         QString m_summary;
@@ -94,7 +94,7 @@ class ShellInfo: public QObject
     public slots:
         void setFileName(QString value);
         void setIsEnabled(bool value);
-        void setId(QString value);
+        void setShellId(QString value);
         void setName(QString value);
         void setVersion(QString value);
         void setSummary(QString value);
@@ -107,7 +107,7 @@ class ShellInfo: public QObject
         void setIsConfigurable(bool value);
         void resetFileName();
         void resetIsEnabled();
-        void resetId();
+        void resetShellId();
         void resetName();
         void resetVersion();
         void resetSummary();

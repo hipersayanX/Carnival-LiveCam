@@ -62,9 +62,16 @@ class DefaultShell: public Shell
         Gui *gui;
 
     private slots:
+        void onViewPortSizeChanged(QSize size);
+        void onMouseDoubleClicked(QMouseEvent *event);
+        void onMousePositionChanged(QMouseEvent *event);
+        void onMousePressed(QMouseEvent *event);
+        void onMouseReleased(QMouseEvent *event);
+        void onToggleEditMode();
         void onTakePicture();
         void onStartStopRecord();
-        void onDeviceSelected(QString deviceId);
+        void onDeviceEnable(QString deviceId);
+        void onDeviceDisable(QString deviceId);
         void onPluginActivated(QString pluginId);
         void onPluginDeactivated(QString pluginId);
         void onPluginMoved(int from, int to);

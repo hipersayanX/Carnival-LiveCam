@@ -37,10 +37,10 @@ class DriverManager: public QObject
     public:
         explicit DriverManager(QObject *parent = 0);
         Q_INVOKABLE QStringList captureDrivers();
-        Q_INVOKABLE bool isLoaded(QString id);
-        Q_INVOKABLE Driver *driver(QString id);
-        Q_INVOKABLE bool load(QString id);
-        Q_INVOKABLE bool unload(QString id);
+        Q_INVOKABLE bool isLoaded(QString driverId);
+        Q_INVOKABLE Driver *driver(QString driverId);
+        Q_INVOKABLE bool load(QString driverId);
+        Q_INVOKABLE bool unload(QString driverId);
 
      private:
         QPluginLoader driverLoader;

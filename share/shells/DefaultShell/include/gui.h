@@ -26,6 +26,7 @@
 
 #include <QDeclarativeView>
 #include <QDeclarativeItem>
+#include <QMouseEvent>
 
 #include "webcamimageprovider.h"
 
@@ -51,9 +52,16 @@ class Gui: public QDeclarativeView
         char currentFrame;
 
     signals:
+        void viewPortSizeChanged(QSize size);
+        void mouseDoubleClicked(QMouseEvent *event);
+        void mousePositionChanged(QMouseEvent *event);
+        void mousePressed(QMouseEvent *event);
+        void mouseReleased(QMouseEvent *event);
+        void toggleEditMode();
         void takePicture();
         void startStopRecord();
-        void deviceSelected(QString deviceId);
+        void deviceEnable(QString deviceId);
+        void deviceDisable(QString deviceId);
         void pluginActivated(QString pluginId);
         void pluginDeactivated(QString pluginId);
         void pluginMoved(int from, int to);
@@ -66,15 +74,22 @@ class Gui: public QDeclarativeView
         void updateDevices(const QList<QVariant> &devices);
         void updatePlugins(const QList<QVariant> &plugins);
 
+    protected:
+        void resizeEvent(QResizeEvent *event);
+
     private slots:
         void iconClicked(int index=0);
-        void onDeviceSelected(QString deviceId);
+        void onDeviceEnable(QString deviceId);
+        void onDeviceDisable(QString deviceId);
         void onPluginActivated(QString pluginId);
         void onPluginDeactivated(QString pluginId);
         void onPluginMoved(int from, int to);
         void onPluginConfigureClicked(QString pluginId);
         void onDeviceConfigureClicked(QString deviceId);
-
+        void onMouseDoubleClicked(qreal mouseX, qreal mouseY, QVariant pressedButtons);
+        void onMousePositionChanged(qreal mouseX, qreal mouseY, QVariant pressedButtons);
+        void onMousePressed(qreal mouseX, qreal mouseY, QVariant pressedButtons);
+        void onMouseReleased(qreal mouseX, qreal mouseY, QVariant pressedButtons);
         void onEnteredMove();
         void onBeginMove();
         void onMove();

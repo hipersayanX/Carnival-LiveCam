@@ -118,7 +118,7 @@ ShellManager::~ShellManager()
 
   \brief Returns the list of shells information in standard format.
  */
-QList<QVariant> ShellManager::shellsToQml()
+QList<QVariant> ShellManager::shellsInfoList()
 {
     QList<QVariant> shellList;
 
@@ -126,7 +126,7 @@ QList<QVariant> ShellManager::shellsToQml()
     {
         QMap<QString, QVariant> shellInfoMap;
 
-        shellInfoMap["shellId"] = QVariant(shell.id());
+        shellInfoMap["shellId"] = QVariant(shell.shellId());
         shellInfoMap["isEnabled"] = QVariant(shell.isEnabled());
         shellInfoMap["name"] = QVariant(shell.name());
         shellInfoMap["version"] = QVariant(shell.version());
@@ -154,25 +154,12 @@ QList<QVariant> ShellManager::shellsToQml()
 
   \brief Returns a pointer to the shell widget object if active else returns NULL.
  */
-QWidget *ShellManager::widget(QString id)
+QWidget *ShellManager::widget(QString shellId)
 {
-    if (this->activeShellId == id || id == "")
+    if (this->activeShellId == shellId || shellId == "")
         return this->activeShell->widget();
 
     return NULL;
-}
-
-/*!
-  \fn bool ShellManager::setShell()
-
-  \retval true if the shell is active.
-  \retval false if the shell is inactive.
-
-  \brief Try to activate the default shell (shell.DefaultShell).
- */
-bool ShellManager::setShell()
-{
-    return setShell("shell.DefaultShell");
 }
 
 /*!
@@ -185,13 +172,13 @@ bool ShellManager::setShell()
 
   \brief Try to activate the shell id.
  */
-bool ShellManager::setShell(QString id)
+bool ShellManager::setShell(QString shellId)
 {
     if (this->activeShellId != "")
         disableShell(this->activeShellId);
 
-    enableShell(id);
-    this->activeShellId = id;
+    enableShell(shellId);
+    this->activeShellId = shellId;
 
     return true;
 }
@@ -206,12 +193,12 @@ bool ShellManager::setShell(QString id)
 
   \brief Try to activate the shell id.
  */
-bool ShellManager::enableShell(QString id)
+bool ShellManager::enableShell(QString shellId)
 {
-    if (!this->shellsInfo.contains(id))
+    if (!this->shellsInfo.contains(shellId))
         return false;
 
-    this->shellLoader.setFileName(this->shellsInfo[id].fileName());
+    this->shellLoader.setFileName(this->shellsInfo[shellId].fileName());
 
     if (!this->shellLoader.load())
         return false;
@@ -231,16 +218,23 @@ bool ShellManager::enableShell(QString id)
     if (!shell)
         return false;
 
-    if (this->shellConfigs.contains(id))
-        shell->setConfigs(this->shellConfigs[id]);
+    if (this->shellConfigs.contains(shellId))
+        shell->setConfigs(this->shellConfigs[shellId]);
 
-    this->shellsInfo[id].setIsEnabled(true);
+    this->shellsInfo[shellId].setIsEnabled(true);
     this->activeShell = shell;
     this->activeShell->begin();
 
+    connect(this->activeShell, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
+    connect(this->activeShell, SIGNAL(viewPortSizeChanged(QSize)), this, SLOT(onViewPortSizeChanged(QSize)));
+    connect(this->activeShell, SIGNAL(mouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
+    connect(this->activeShell, SIGNAL(mousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
+    connect(this->activeShell, SIGNAL(mousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
+    connect(this->activeShell, SIGNAL(mouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
     connect(this->activeShell, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     connect(this->activeShell, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
-    connect(this->activeShell, SIGNAL(deviceSelected(QString)), this, SLOT(onDeviceSelected(QString)));
+    connect(this->activeShell, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
+    connect(this->activeShell, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     connect(this->activeShell, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
     connect(this->activeShell, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
     connect(this->activeShell, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
@@ -261,16 +255,23 @@ bool ShellManager::enableShell(QString id)
 
   \brief Try to desactivate the shell id.
  */
-bool ShellManager::disableShell(QString id)
+bool ShellManager::disableShell(QString shellId)
 {
-    if (!this->shellsInfo.contains(id) || this->activeShellId != id)
+    if (!this->shellsInfo.contains(shellId) || this->activeShellId != shellId)
         return false;
 
-    this->shellConfigs[id] = this->activeShell->configs();
+    this->shellConfigs[shellId] = this->activeShell->configs();
 
+    disconnect(this->activeShell, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
+    disconnect(this->activeShell, SIGNAL(viewPortSizeChanged(QSize)), this, SLOT(onViewPortSizeChanged(QSize)));
+    disconnect(this->activeShell, SIGNAL(mouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
+    disconnect(this->activeShell, SIGNAL(mousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
+    disconnect(this->activeShell, SIGNAL(mousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
+    disconnect(this->activeShell, SIGNAL(mouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
     disconnect(this->activeShell, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     disconnect(this->activeShell, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
-    disconnect(this->activeShell, SIGNAL(deviceSelected(QString)), this, SLOT(onDeviceSelected(QString)));
+    disconnect(this->activeShell, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
+    disconnect(this->activeShell, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     disconnect(this->activeShell, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
     disconnect(this->activeShell, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
     disconnect(this->activeShell, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
@@ -281,9 +282,9 @@ bool ShellManager::disableShell(QString id)
     this->activeShell->end();
     delete this->activeShell;
     this->activeShell = NULL;
-    this->shellLoader.setFileName(this->shellsInfo[id].fileName());
+    this->shellLoader.setFileName(this->shellsInfo[shellId].fileName());
     this->shellLoader.unload();
-    this->shellsInfo[id].setIsEnabled(false);
+    this->shellsInfo[shellId].setIsEnabled(false);
     this->activeShellId = "";
 
     return true;
@@ -296,9 +297,9 @@ bool ShellManager::disableShell(QString id)
 
   \brief Calls the configuration dialog of the shell id.
  */
-void ShellManager::configureShell(QString id)
+void ShellManager::configureShell(QString shellId)
 {
-    if (this->activeShellId == id)
+    if (this->activeShellId == shellId)
         this->activeShell->configure();
 }
 
@@ -338,6 +339,36 @@ void ShellManager::updatePlugins(const QList<QVariant> &plugins)
     this->activeShell->updatePlugins(plugins);
 }
 
+void ShellManager::onToggleEditMode()
+{
+    emit toggleEditMode();
+}
+
+void ShellManager::onViewPortSizeChanged(QSize size)
+{
+    emit viewPortSizeChanged(size);
+}
+
+void ShellManager::onMouseDoubleClicked(QMouseEvent *event)
+{
+    emit mouseDoubleClicked(event);
+}
+
+void ShellManager::onMousePositionChanged(QMouseEvent *event)
+{
+    emit mousePositionChanged(event);
+}
+
+void ShellManager::onMousePressed(QMouseEvent *event)
+{
+    emit mousePressed(event);
+}
+
+void ShellManager::onMouseReleased(QMouseEvent *event)
+{
+    emit mouseReleased(event);
+}
+
 /*!
   \internal
 
@@ -362,18 +393,14 @@ void ShellManager::onStartStopRecord()
     emit startStopRecord();
 }
 
-/*!
-  \internal
-
-  \fn void ShellManager::onDeviceSelected(QString deviceId)
-
-  \param deviceId Unique device identifier.
-
-  \brief This slot is called when the user select a new device.
- */
-void ShellManager::onDeviceSelected(QString deviceId)
+void ShellManager::onDeviceEnable(QString deviceId)
 {
-    emit deviceSelected(deviceId);
+    emit deviceEnable(deviceId);
+}
+
+void ShellManager::onDeviceDisable(QString deviceId)
+{
+    emit deviceDisable(deviceId);
 }
 
 /*!
