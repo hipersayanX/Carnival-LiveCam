@@ -21,6 +21,7 @@
 
 #include <cmath>
 #include <QSet>
+#include <QtDebug>
 
 #include "../../include/space/spacemodel.h"
 
@@ -46,21 +47,21 @@ void SpaceModel::setSnapping(bool snapping, int nParts, qreal snappingPT, qreal 
         this->m_spaces[space].setSnapping(snapping, nParts, snappingPT, snappingRT);
 }
 
-void SpaceModel::addSpace(QString spaceId, QSizeF size)
+void SpaceModel::setSpace(QString spaceId, QSizeF size)
 {
+    for (int mspace = 0; mspace < this->m_spaces.count(); mspace++)
+        if (this->m_spaces[mspace].spaceId() == spaceId)
+        {
+            this->m_spaces[mspace].setSize(size);
+            this->updateSize();
+
+            return;
+        }
+
     QPointF center(this->m_size.width(), this->m_size.height());
 
     Space space(spaceId, center / 2, size, 1, 0);
 
-    space.setSnapping(this->m_snapping, this->m_nParts, this->m_snappingPT, this->m_snappingRT);
-
-    this->m_spaces << space;
-
-    this->updateSize();
-}
-
-void SpaceModel::addSpace(Space space)
-{
     space.setSnapping(this->m_snapping, this->m_nParts, this->m_snappingPT, this->m_snappingRT);
 
     this->m_spaces << space;

@@ -28,8 +28,7 @@ HEADERS += \
     include/themask.h \
     include/mask.h
 
-unix
-{
+unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += opencv
 }

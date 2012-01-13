@@ -53,10 +53,10 @@ class Gui: public QDeclarativeView
 
     signals:
         void viewPortSizeChanged(QSize size);
-        void mouseDoubleClicked(QMouseEvent *event);
-        void mousePositionChanged(QMouseEvent *event);
-        void mousePressed(QMouseEvent *event);
-        void mouseReleased(QMouseEvent *event);
+        void sMouseDoubleClicked(QMouseEvent *event);
+        void sMousePositionChanged(QMouseEvent *event);
+        void sMousePressed(QMouseEvent *event);
+        void sMouseReleased(QMouseEvent *event);
         void toggleEditMode();
         void takePicture();
         void startStopRecord();

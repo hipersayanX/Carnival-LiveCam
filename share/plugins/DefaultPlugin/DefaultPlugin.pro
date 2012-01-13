@@ -28,8 +28,7 @@ HEADERS += \
     include/defaultplugin.h \
     include/qosgwidget.h
 
-unix
-{
+unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += openscenegraph openscenegraph-osgViewer
 }

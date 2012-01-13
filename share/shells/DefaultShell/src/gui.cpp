@@ -199,8 +199,7 @@ void Gui::setFrame(const QImage &frame)
 
 void Gui::resizeEvent(QResizeEvent *event)
 {
-    Q_UNUSED(event)
-
+    QDeclarativeView::resizeEvent(event);
     emit viewPortSizeChanged(this->windowBackground->childrenRect().size().toSize());
 }
 
@@ -212,7 +211,7 @@ void Gui::onMouseDoubleClicked(qreal mouseX, qreal mouseY, QVariant pressedButto
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit mouseDoubleClicked(event);
+    emit sMouseDoubleClicked(event);
 }
 
 void Gui::onMousePositionChanged(qreal mouseX, qreal mouseY, QVariant pressedButtons)
@@ -223,7 +222,7 @@ void Gui::onMousePositionChanged(qreal mouseX, qreal mouseY, QVariant pressedBut
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit mousePositionChanged(event);
+    emit sMousePositionChanged(event);
 }
 
 void Gui::onMousePressed(qreal mouseX, qreal mouseY, QVariant pressedButtons)
@@ -234,7 +233,7 @@ void Gui::onMousePressed(qreal mouseX, qreal mouseY, QVariant pressedButtons)
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit mousePressed(event);
+    emit sMousePressed(event);
 }
 
 void Gui::onMouseReleased(qreal mouseX, qreal mouseY, QVariant pressedButtons)
@@ -245,7 +244,7 @@ void Gui::onMouseReleased(qreal mouseX, qreal mouseY, QVariant pressedButtons)
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit mouseReleased(event);
+    emit sMouseReleased(event);
 }
 
 void Gui::onEnteredMove()

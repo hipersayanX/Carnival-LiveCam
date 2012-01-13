@@ -93,12 +93,15 @@ Rectangle
         {
             id: msaBackground
             hoverEnabled: true
-            anchors.fill: parent
+            width: imgBackground.paintedWidth
+            height: imgBackground.paintedHeight
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
 
-            onDoubleClicked: recWindow.mouseDoubleClicked(mouseX, mouseY, pressedButtons)
-            onPositionChanged: recWindow.mousePositionChanged(mouseX, mouseY, pressedButtons)
-            onPressed: recWindow.mousePressed(mouseX, mouseY, pressedButtons)
-            onReleased: recWindow.mouseReleased(mouseX, mouseY, pressedButtons)
+            onDoubleClicked: recWindow.mouseDoubleClicked(mouseX, mouseY, Qt.LeftButton)
+            onPositionChanged: recWindow.mousePositionChanged(mouseX, mouseY, Qt.LeftButton)
+            onPressed: recWindow.mousePressed(mouseX, mouseY, Qt.LeftButton)
+            onReleased: recWindow.mouseReleased(mouseX, mouseY, Qt.LeftButton)
         }
     }
 

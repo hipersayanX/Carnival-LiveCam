@@ -43,15 +43,13 @@ class DefaultShell: public Shell
         QString website();
         QString mail();
         bool isConfigurable();
-
         void begin();
         void end();
-
         void configure();
         QVariant configs();
         void setConfigs(QVariant configs);
-
         QWidget *widget();
+        QSize viewPortSize();
 
     public slots:
         void setFrame(const QImage &frame);

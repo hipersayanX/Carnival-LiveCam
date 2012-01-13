@@ -37,6 +37,7 @@ class ShellManager: public QObject
         ~ShellManager();
         Q_INVOKABLE QList<QVariant> shellsInfoList();
         Q_INVOKABLE QWidget *widget(QString shellId = "");
+        Q_INVOKABLE QSize viewPortSize(QString shellId);
 
     private:
         QPluginLoader shellLoader;
@@ -46,7 +47,7 @@ class ShellManager: public QObject
         QHash<QString, QVariant> shellConfigs;
 
     public slots:
-        bool setShell(QString shellId = "shell.DefaultShell");
+        bool setShell(QString shellId);
         bool enableShell(QString shellId);
         bool disableShell(QString shellId);
         void configureShell(QString shellId);

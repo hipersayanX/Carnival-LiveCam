@@ -230,6 +230,7 @@ bool DeviceManager::deviceEnable(QString deviceId)
     driver->enableDevice(deviceId);
     connect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
     this->m_activeDevices << deviceId;
+    this->devicesInfo[deviceId].setIsEnabled(true);
 
     return true;
 }
@@ -260,6 +261,7 @@ bool DeviceManager::deviceDisable(QString deviceId)
     driver->end();
     this->driverManager.unload(this->devicesInfo[deviceId].driverId());
     this->m_activeDevices.removeOne(deviceId);
+    this->devicesInfo[deviceId].setIsEnabled(false);
 
     return true;
 }

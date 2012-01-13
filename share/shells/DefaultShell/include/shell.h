@@ -191,6 +191,8 @@ class Shell: public QObject
          */
         virtual QWidget *widget() = 0;
 
+        virtual QSize viewPortSize() = 0;
+
     public slots:
         /*!
           \fn void Shell::setFrame(const QImage &frame)

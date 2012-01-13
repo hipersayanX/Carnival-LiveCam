@@ -30,8 +30,7 @@ HEADERS += \
     include/videodriver.h \
     include/videodriverfactory.h
 
-unix
-{
+unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += opencv
 }

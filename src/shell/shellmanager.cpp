@@ -162,6 +162,14 @@ QWidget *ShellManager::widget(QString shellId)
     return NULL;
 }
 
+QSize ShellManager::viewPortSize(QString shellId)
+{
+    if (this->activeShellId == shellId || shellId == "")
+        return this->activeShell->viewPortSize();
+
+    return QSize();
+}
+
 /*!
   \fn bool ShellManager::setShell(QString id)
 

@@ -23,6 +23,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsProxyWidget>
 #include <QMoveEvent>
+#include <QtDebug>
 
 #include "../../include/space/spacemanager.h"
 
@@ -129,10 +130,13 @@ QWidget *SpaceManager::sendMouseEvent(QEvent::Type type,
 void SpaceManager::setSpace(QString spaceId, const QImage &frame)
 {
     if (this->spacesWidgets.contains(spaceId))
+    {
+        this->spaceModel.setSpace(spaceId, frame.size());
         this->spacesWidgets[spaceId]->setFrame(frame);
+    }
     else
     {
-        this->spaceModel.addSpace(spaceId, frame.size());
+        this->spaceModel.setSpace(spaceId, frame.size());
         this->spacesWidgets[spaceId] = new SpaceWidget(frame);
         this->spacesWidgets[spaceId]->setControlButtons(this->m_toggleMaximizedButton, this->m_scaleAndRotateButton);
         this->proxySpacesWidgets[spaceId] = this->mainSpace.addWidget(this->spacesWidgets[spaceId]);

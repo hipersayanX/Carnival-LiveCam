@@ -83,10 +83,10 @@ void DefaultShell::begin()
     this->gui = new Gui();
 
     connect(this->gui, SIGNAL(viewPortSizeChanged(QSize)), this, SLOT(onViewPortSizeChanged(QSize)));
-    connect(this->gui, SIGNAL(mouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
-    connect(this->gui, SIGNAL(mousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
-    connect(this->gui, SIGNAL(mousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
-    connect(this->gui, SIGNAL(mouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
+    connect(this->gui, SIGNAL(sMouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
+    connect(this->gui, SIGNAL(sMousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
+    connect(this->gui, SIGNAL(sMousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
+    connect(this->gui, SIGNAL(sMouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
     connect(this->gui, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
     connect(this->gui, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     connect(this->gui, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
@@ -123,6 +123,11 @@ void DefaultShell::setConfigs(QVariant configs)
 QWidget *DefaultShell::widget()
 {
     return this->gui;
+}
+
+QSize DefaultShell::viewPortSize()
+{
+    return this->gui->size();
 }
 
 void DefaultShell::setFrame(const QImage &frame)

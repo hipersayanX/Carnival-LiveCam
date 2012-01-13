@@ -30,8 +30,7 @@ HEADERS += \
     include/webcamlinuxfactory.h \
     include/sleep.h
 
-unix
-{
+unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += opencv
 }

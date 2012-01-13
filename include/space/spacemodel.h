@@ -40,8 +40,7 @@ class SpaceModel: public QObject
     public:
         explicit SpaceModel(QObject *parent = 0);
         Q_INVOKABLE void setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT);
-        Q_INVOKABLE void addSpace(QString spaceId, QSizeF size);
-        Q_INVOKABLE void addSpace(Space space);
+        Q_INVOKABLE void setSpace(QString spaceId, QSizeF size);
         Q_INVOKABLE void removeSpace(QString spaceId);
         Q_INVOKABLE void selectSpace(QString spaceId);
         Q_INVOKABLE void selectSpace(QPointF point);
