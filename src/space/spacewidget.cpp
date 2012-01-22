@@ -28,6 +28,7 @@ SpaceWidget::SpaceWidget(QWidget *parent): QWidget(parent)
     this->setObjectName("wdgSpaceWidget");
     this->setGeometry(0, 0, 0, 0);
 
+    this->spacePixmap.setObjectName("lblSpacePixmap");
     this->spacePixmap.setGeometry(0, 0, 0, 0);
     this->spacePixmap.setScaledContents(true);
     this->spacePixmap.setParent(this);
@@ -44,6 +45,7 @@ SpaceWidget::SpaceWidget(const QImage &frame)
     this->setObjectName("wdgSpaceWidget");
     this->setGeometry(0, 0, frame.width(), frame.height());
 
+    this->spacePixmap.setObjectName("lblSpacePixmap");
     this->spacePixmap.setGeometry(0, 0, frame.width(), frame.height());
     this->spacePixmap.setScaledContents(true);
     this->spacePixmap.setPixmap(QPixmap::fromImage(frame));

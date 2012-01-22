@@ -19,6 +19,7 @@
  * Web-Site: http://hipersayanx.blogspot.com/
  */
 
+#include <cmath>
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QGraphicsProxyWidget>
@@ -52,7 +53,9 @@ SpaceManager::~SpaceManager()
 
 QImage SpaceManager::render()
 {
-    QImage mainFrame(this->mainSpace.width(), this->mainSpace.height(), QImage::Format_RGB888);
+    this->spaceModel.updateRect();
+
+    QImage mainFrame(this->spaceModel.rect().size().toSize(), QImage::Format_RGB888);
 
     mainFrame.fill(0);
 
@@ -61,16 +64,16 @@ QImage SpaceManager::render()
     for (int space = 0; space < this->spaceModel.spaces().count(); space++)
     {
         Space spaceItem = this->spaceModel.spaces()[space];
-        this->proxySpacesWidgets[spaceItem.spaceId()]->setZValue(space);
 
-        this->proxySpacesWidgets[spaceItem.spaceId()]->setTransform(QTransform()
-                                                       .translate(spaceItem.size().width() / 2, spaceItem.size().height() / 2)
-                                                       .rotate(-spaceItem.rotation(), Qt::ZAxis)
-                                                       .scale(spaceItem.scale(), spaceItem.scale())
-                                                       .translate(-spaceItem.size().width() / 2, -spaceItem.size().height() / 2));
+        this->proxySpacesWidgets[spaceItem.spaceId()]->setZValue(space);
+        this->proxySpacesWidgets[spaceItem.spaceId()]->resetTransform();
+        this->proxySpacesWidgets[spaceItem.spaceId()]->setTransformOriginPoint(this->proxySpacesWidgets[spaceItem.spaceId()]->sceneBoundingRect().center());
+        this->proxySpacesWidgets[spaceItem.spaceId()]->setRotation(-180.0 * spaceItem.rotation() / M_PI);
+        this->proxySpacesWidgets[spaceItem.spaceId()]->setScale(spaceItem.scale());
+        this->proxySpacesWidgets[spaceItem.spaceId()]->setPos(spaceItem.pos());
     }
 
-    this->mainSpace.render(&mainPainter);
+    this->mainSpace.render(&mainPainter, QRectF(), this->spaceModel.rect());
 
     return mainFrame;
 }
@@ -90,10 +93,12 @@ void SpaceManager::setControlButtons(QPushButton *toggleMaximizedButton, QPushBu
         spaceWidget->setControlButtons(toggleMaximizedButton, scaleAndRotateButton);
 }
 
-QPoint SpaceManager::mapToMainSpace(const QPoint &pos, const QSize &viewportSize)
+QPoint SpaceManager::mapViewPortToModel(const QPoint &pos, const QSize &viewportSize)
 {
-    QPoint posSpace(pos.x() * this->mainSpace.width() / viewportSize.width(),
-                    pos.y() * this->mainSpace.height() / viewportSize.height());
+    QPoint posSpace(pos.x() * (this->spaceModel.rect().right() - this->spaceModel.rect().left()) /
+                    viewportSize.width() + this->spaceModel.rect().left(),
+                    pos.y() * (this->spaceModel.rect().bottom() - this->spaceModel.rect().top()) /
+                    viewportSize.height() + this->spaceModel.rect().top());
 
     return posSpace;
 }
@@ -136,12 +141,13 @@ void SpaceManager::setSpace(QString spaceId, const QImage &frame)
     }
     else
     {
-        this->spaceModel.setSpace(spaceId, frame.size());
+        Space spaceItem = this->spaceModel.setSpace(spaceId, frame.size());
         this->spacesWidgets[spaceId] = new SpaceWidget(frame);
+        this->spacesWidgets[spaceId]->setEditMode(this->m_editMode);
         this->spacesWidgets[spaceId]->setControlButtons(this->m_toggleMaximizedButton, this->m_scaleAndRotateButton);
         this->proxySpacesWidgets[spaceId] = this->mainSpace.addWidget(this->spacesWidgets[spaceId]);
-        this->proxySpacesWidgets[spaceId]->setTransformOriginPoint(this->spacesWidgets[spaceId]->width() / 2,
-                                                                               this->spacesWidgets[spaceId]->height() / 2);
+        this->proxySpacesWidgets[spaceId]->setPos(spaceItem.center().x() - spaceItem.size().width() / 2,
+                                                  spaceItem.center().y() - spaceItem.size().height() / 2);
     }
 }
 
@@ -195,7 +201,7 @@ void SpaceManager::resetEditMode()
     this->m_editMode = false;
 
     foreach (SpaceWidget *spaceWidget, this->spacesWidgets)
-        spaceWidget->resetEditMode();
+        spaceWidget->setEditMode(false);
 }
 
 void SpaceManager::toggleEditMode()
@@ -203,7 +209,7 @@ void SpaceManager::toggleEditMode()
     this->m_editMode = !this->m_editMode;
 
     foreach (SpaceWidget *spaceWidget, this->spacesWidgets)
-        spaceWidget->toggleEditMode();
+        spaceWidget->setEditMode(this->m_editMode);
 }
 
 void SpaceManager::selectSpace(QString spaceId)
@@ -223,10 +229,10 @@ void SpaceManager::mouseDoubleClickEvent(QMouseEvent *event)
         return;
     }
 
-    this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
+//    this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
 
     this->sendMouseEvent(QEvent::MouseButtonDblClick,
-                         this->mapToMainSpace(event->pos(), this->m_viewPortSize),
+                         this->mapViewPortToModel(event->pos(), this->m_viewPortSize),
                          event->button(),
                          event->buttons(),
                          Qt::NoModifier);
@@ -246,17 +252,18 @@ void SpaceManager::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
+//    qDebug() << this->mapToMainSpace(event->pos(), this->m_viewPortSize);
     this->sendMouseEvent(QEvent::MouseMove,
-                         this->mapToMainSpace(event->pos(), this->m_viewPortSize),
+                         this->mapViewPortToModel(event->pos(), this->m_viewPortSize),
                          event->button(),
                          event->buttons(),
                          Qt::NoModifier);
 
     if (this->scaleAndRotate)
-        this->spaceModel.scaleAndRotateSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
+        this->spaceModel.scaleAndRotateSpace(this->mapViewPortToModel(event->pos(), this->m_viewPortSize));
 
     if (this->move)
-        this->spaceModel.moveSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
+        this->spaceModel.moveSpace(this->mapViewPortToModel(event->pos(), this->m_viewPortSize));
 
     delete event;
 }
@@ -273,22 +280,20 @@ void SpaceManager::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
+    this->spaceModel.selectSpace(this->mapViewPortToModel(event->pos(), this->m_viewPortSize));
 
     QWidget *widget = this->sendMouseEvent(QEvent::MouseButtonPress,
-                                           this->mapToMainSpace(event->pos(), this->m_viewPortSize),
+                                           this->mapViewPortToModel(event->pos(), this->m_viewPortSize),
                                            event->button(),
                                            event->buttons(),
                                             Qt::NoModifier);
 
-    if (!widget)
-        return;
-    else if (widget->objectName() == "wdgSpaceWidget")
-        this->move = true;
-    else if (widget->objectName() == "btnToggleMaximize")
+    if (widget && widget->objectName() == "btnToggleMaximize")
         this->spaceModel.toggleMaximizedSpace();
-    else if (widget->objectName() == "btnScaleAndRotate" && event->button() == Qt::LeftButton)
+    else if (widget && widget->objectName() == "btnScaleAndRotate" && event->button() == Qt::LeftButton)
         this->scaleAndRotate = true;
+    else if (this->spaceModel.currentSelectedSpace() != "")
+        this->move = true;
 
     delete event;
 }
@@ -305,8 +310,10 @@ void SpaceManager::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
 
+//    this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
+
     this->sendMouseEvent(QEvent::MouseButtonRelease,
-                         this->mapToMainSpace(event->pos(), this->m_viewPortSize),
+                         this->mapViewPortToModel(event->pos(), this->m_viewPortSize),
                          event->button(),
                          event->buttons(),
                          Qt::NoModifier);

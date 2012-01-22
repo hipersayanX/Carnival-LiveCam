@@ -178,6 +178,7 @@ void ImageDriver::configureDevice(QString id)
     Q_UNUSED(id)
 
     this->config.exec();
+    this->imageDevices.removeOne("/image/null");
     emit devicesModified();
 }
 

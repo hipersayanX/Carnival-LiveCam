@@ -20,6 +20,7 @@
  */
 
 #include <cmath>
+#include <QtDebug>
 #include <QtAlgorithms>
 
 #include "../../include/space/space.h"
@@ -198,7 +199,7 @@ void Space::resetStatus()
 
 QList<qreal> Space::hLines()
 {
-    QRectF rect = this->boundRect();
+    QRectF rect = this->boundingRect();
     QList<qreal> lines;
 
     lines << rect.top() << rect.bottom();
@@ -208,7 +209,7 @@ QList<qreal> Space::hLines()
 
 QList<qreal> Space::vLines()
 {
-    QRectF rect = this->boundRect();
+    QRectF rect = this->boundingRect();
     QList<qreal> lines;
 
     lines << rect.left() << rect.right();
@@ -219,31 +220,32 @@ QList<qreal> Space::vLines()
 void Space::scaleAndRotate(qreal factor, qreal rotation, const QList<qreal> &hLines, const QList<qreal> &vLines)
 {
     this->m_scale = factor;
-    this->m_rotation = rotation;
 
     while (true)
     {
-        if (this->m_rotation > 2 * M_PI)
-            this->m_rotation -= 2 * M_PI;
-        else if (this->m_rotation < -2 * M_PI)
-            this->m_rotation += 2 * M_PI;
+        if (rotation > 2 * M_PI)
+            rotation -= 2 * M_PI;
+        else if (rotation < -2 * M_PI)
+            rotation += 2 * M_PI;
         else
             break;
     }
+
+    this->m_rotation = (rotation < 0)? 2 * M_PI + rotation: rotation;
 
     if (!this->m_snapping)
         return;
 
     if (!this->m_snapAngles.contains(this->m_rotation))
         foreach (qreal angle, this->m_snapAngles)
-            if (abs(this->m_rotation - angle) <= this->m_snappingRT)
+            if (fabs(this->m_rotation - angle) <= this->m_snappingRT)
             {
                 this->m_rotation = angle;
 
                 break;
             }
 
-    QRectF boundingBox = this->boundRect();
+    QRectF boundingBox = this->boundingRect();
     QSizeF internalRect;
 
     bool snapped = false;
@@ -251,7 +253,7 @@ void Space::scaleAndRotate(qreal factor, qreal rotation, const QList<qreal> &hLi
     foreach (qreal hLine, hLines)
     {
         foreach (qreal line, this->hLines())
-            if (abs(line - hLine) <= this->m_snappingPT)
+            if (fabs(line - hLine) <= this->m_snappingPT)
             {
                 internalRect = this->internalRectSize(QSizeF(boundingBox.width(), boundingBox.height() + hLine - line));
                 this->m_scale = internalRect.width() / this->m_size.width();
@@ -269,7 +271,7 @@ void Space::scaleAndRotate(qreal factor, qreal rotation, const QList<qreal> &hLi
     foreach (qreal vLine, vLines)
     {
         foreach (qreal line, this->vLines())
-            if (abs(line - vLine) <= this->m_snappingPT)
+            if (fabs(line - vLine) <= this->m_snappingPT)
             {
                 internalRect = this->internalRectSize(QSizeF(boundingBox.width() + vLine - line, boundingBox.height()));
                 this->m_scale = internalRect.width() / this->m_size.width();
@@ -290,7 +292,7 @@ void Space::setScale(qreal factor, const QList<qreal> &hLines, const QList<qreal
     if (!this->m_snapping)
         return;
 
-    QRectF boundingBox = this->boundRect();
+    QRectF boundingBox = this->boundingRect();
     QSizeF internalRect;
 
     bool snapped = false;
@@ -298,7 +300,7 @@ void Space::setScale(qreal factor, const QList<qreal> &hLines, const QList<qreal
     foreach (qreal hLine, hLines)
     {
         foreach (qreal line, this->hLines())
-            if (abs(line - hLine) <= this->m_snappingPT)
+            if (fabs(line - hLine) <= this->m_snappingPT)
             {
                 internalRect = this->internalRectSize(QSizeF(boundingBox.width(), boundingBox.height() + hLine - line));
                 this->m_scale = internalRect.width() / this->m_size.width();
@@ -316,7 +318,7 @@ void Space::setScale(qreal factor, const QList<qreal> &hLines, const QList<qreal
     foreach (qreal vLine, vLines)
     {
         foreach (qreal line, this->vLines())
-            if (abs(line - vLine) <= this->m_snappingPT)
+            if (fabs(line - vLine) <= this->m_snappingPT)
             {
                 internalRect = this->internalRectSize(QSizeF(boundingBox.width() + vLine - line, boundingBox.height()));
                 this->m_scale = internalRect.width() / this->m_size.width();
@@ -342,7 +344,7 @@ void Space::move(QPointF pos, const QList<qreal> &hLines, const QList<qreal> &vL
     foreach (qreal hLine, hLines)
     {
         foreach (qreal line, this->hLines())
-            if (abs(line - hLine) <= this->m_snappingPT)
+            if (fabs(line - hLine) <= this->m_snappingPT)
             {
                 this->m_center += QPointF(0, hLine - line);
                 snapped = true;
@@ -359,7 +361,7 @@ void Space::move(QPointF pos, const QList<qreal> &hLines, const QList<qreal> &vL
     foreach (qreal vLine, vLines)
     {
         foreach (qreal line, this->vLines())
-            if (abs(line - vLine) <= this->m_snappingPT)
+            if (fabs(line - vLine) <= this->m_snappingPT)
             {
                 this->m_center += QPointF(vLine - line, 0);
                 snapped = true;
@@ -396,21 +398,26 @@ QSizeF Space::internalRectSize(QSizeF size)
         d = cos(2 * rot);
     }
 
-    qreal width = size.width() * abs(cos(rot)) - size.height() * abs(sin(rot));
-    qreal height = size.height() * abs(cos(rot)) - size.width() * abs(sin(rot));
+    qreal width = size.width() * fabs(cos(rot)) - size.height() * fabs(sin(rot));
+    qreal height = size.height() * fabs(cos(rot)) - size.width() * fabs(sin(rot));
 
     return QSizeF(width, height) / d;
 }
 
-QRectF Space::boundRect()
+QRectF Space::boundingRect()
 {
-    qreal width = this->m_size.width() * abs(cos(this->m_rotation)) + this->m_size.height() * abs(sin(this->m_rotation));
-    qreal height = this->m_size.width() * abs(sin(this->m_rotation)) + this->m_size.height() * abs(cos(this->m_rotation));
+    qreal width = this->m_size.width() * fabs(cos(this->m_rotation)) + this->m_size.height() * fabs(sin(this->m_rotation));
+    qreal height = this->m_size.width() * fabs(sin(this->m_rotation)) + this->m_size.height() * fabs(cos(this->m_rotation));
 
-    QSizeF boundSize = this->m_scale * QSize(width, height);
+    QSizeF boundSize = this->m_scale * QSizeF(width, height);
     QPointF topLeft = this->m_center - QPointF(boundSize.width(), boundSize.height()) / 2;
 
     return QRectF(topLeft, boundSize);
+}
+
+QPointF Space::pos()
+{
+    return this->m_center - QPointF(this->m_size.width(), this->m_size.height()) / 2;
 }
 
 QString Space::spaceId()
@@ -505,21 +512,21 @@ void Space::setScale(qreal value)
 
 void Space::setRotation(qreal rotation)
 {
-    this->m_rotation = rotation;
-
     while (true)
     {
-        if (this->m_rotation > 2 * M_PI)
-            this->m_rotation -= 2 * M_PI;
-        else if (this->m_rotation < -2 * M_PI)
-            this->m_rotation += 2 * M_PI;
+        if (rotation > 2 * M_PI)
+            rotation -= 2 * M_PI;
+        else if (rotation < -2 * M_PI)
+            rotation += 2 * M_PI;
         else
             break;
     }
 
+    this->m_rotation = (rotation < 0)? 2 * M_PI + rotation: rotation;
+
     if (this->m_snapping && !this->m_snapAngles.contains(this->m_rotation))
         foreach (qreal angle, this->m_snapAngles)
-            if (abs(this->m_rotation - angle) <= this->m_snappingRT)
+            if (fabs(this->m_rotation - angle) <= this->m_snappingRT)
             {
                 this->m_rotation = angle;
 

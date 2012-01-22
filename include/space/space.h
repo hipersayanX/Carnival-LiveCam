@@ -57,7 +57,8 @@ class Space: public QObject
         Q_INVOKABLE void move(QPointF pos, const QList<qreal> &hLines = QList<qreal>(), const QList<qreal> &vLines = QList<qreal>());
         Q_INVOKABLE void scaleAndRotate(qreal factor, qreal rotation, const QList<qreal> &hLines, const QList<qreal> &vLines);
         Q_INVOKABLE bool contains(QPointF point = QPointF(0, 0));
-        Q_INVOKABLE QRectF boundRect();
+        Q_INVOKABLE QRectF boundingRect();
+        Q_INVOKABLE QPointF pos();
 
         QString spaceId();
         int nParts();

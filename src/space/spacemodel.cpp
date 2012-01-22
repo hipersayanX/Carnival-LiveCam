@@ -27,9 +27,9 @@
 
 SpaceModel::SpaceModel(QObject *parent): QObject(parent)
 {
-    this->m_size = QSize(0, 0);
+    this->m_currentSelectedSpace = "";
+    this->m_rect = QRectF(0, 0, 0, 0);
     this->m_pointRef = QPoint(0, 0);
-    this->m_spaceIdRef = "";
     this->m_snapping = false;
     this->m_nParts = 1;
     this->m_snappingPT = 0;
@@ -47,26 +47,23 @@ void SpaceModel::setSnapping(bool snapping, int nParts, qreal snappingPT, qreal 
         this->m_spaces[space].setSnapping(snapping, nParts, snappingPT, snappingRT);
 }
 
-void SpaceModel::setSpace(QString spaceId, QSizeF size)
+Space SpaceModel::setSpace(QString spaceId, QSizeF size)
 {
     for (int mspace = 0; mspace < this->m_spaces.count(); mspace++)
         if (this->m_spaces[mspace].spaceId() == spaceId)
         {
             this->m_spaces[mspace].setSize(size);
-            this->updateSize();
 
-            return;
+            return this->m_spaces[mspace];
         }
 
-    QPointF center(this->m_size.width(), this->m_size.height());
-
-    Space space(spaceId, center / 2, size, 1, 0);
+    Space space(spaceId, this->m_rect.center(), size, 1, 0);
 
     space.setSnapping(this->m_snapping, this->m_nParts, this->m_snappingPT, this->m_snappingRT);
 
     this->m_spaces << space;
 
-    this->updateSize();
+    return space;
 }
 
 void SpaceModel::removeSpace(QString spaceId)
@@ -76,13 +73,22 @@ void SpaceModel::removeSpace(QString spaceId)
         {
             this->m_spaces.removeOne(space);
 
-            if (this->m_spaceIdRef == spaceId)
-                this->m_spaceIdRef = "";
+            if (this->m_currentSelectedSpace == spaceId)
+                this->m_currentSelectedSpace = "";
 
             return;
         }
+}
 
-    this->updateSize();
+template <typename T> QList<T> SpaceModel::removeDuplicates(QList<T> &list)
+{
+    QList<T> newList;
+
+    foreach (T element, this->reversed(list))
+        if (!newList.contains(element))
+            newList << element;
+
+    return this->reversed(newList);
 }
 
 template <typename T> QList<T> SpaceModel::reversed(const QList<T> &list)
@@ -98,45 +104,38 @@ template <typename T> QList<T> SpaceModel::reversed(const QList<T> &list)
 
 void SpaceModel::selectSpace(QString spaceId)
 {
-    foreach (Space space, this->m_spaces)
-        if (space.spaceId() == spaceId)
+    this->m_currentSelectedSpace = "";
+
+    for (int space = this->m_spaces.count() - 1; space >= 0; space--)
+        if (this->m_spaces[space].spaceId() == spaceId)
         {
-            space.setRef();
-            this->m_spaces.removeOne(space);
-            this->m_spaces << space;
-            this->m_spaceIdRef = space.spaceId();
+            this->m_spaces[space].setRef();
+            this->m_spaces << this->m_spaces.takeAt(space);
+            this->m_currentSelectedSpace = this->m_spaces[space].spaceId();
 
             return;
         }
-
-    this->m_spaceIdRef = "";
 }
 
 void SpaceModel::selectSpace(QPointF point)
 {
     this->m_pointRef = point;
+    this->m_currentSelectedSpace = "";
 
-    foreach (Space space, this->reversed(this->m_spaces))
-        if (space.contains(point))
+    for (int space = this->m_spaces.count() - 1; space >= 0; space--)
+        if (this->m_spaces[space].contains(point))
         {
-            space.setRef();
-            this->m_spaces.removeOne(space);
-            this->m_spaces << space;
-            this->m_spaceIdRef = space.spaceId();
+            this->m_spaces[space].setRef();
+            this->m_currentSelectedSpace = this->m_spaces[space].spaceId();
+            this->m_spaces << this->m_spaces.takeAt(space);
 
             return;
         }
-
-    this->m_spaceIdRef = "";
 }
 
-template <typename T> void SpaceModel::cleanAndSort(QList<T> &list)
+template <typename T> void SpaceModel::removeDuplicatesAndSort(QList<T> &list)
 {
-    QList<T> set;
-
-    foreach (T element, list)
-        if (!set.contains(element))
-            set << element;
+    QList<T> set = this->removeDuplicates(list);
 
     list.clear();
     list << set;
@@ -145,21 +144,21 @@ template <typename T> void SpaceModel::cleanAndSort(QList<T> &list)
 
 template <typename T> bool SpaceModel::snapLines(QList<T> &hLines, QList<T> &vLines)
 {
-    if (this->m_spaceIdRef == "")
+    if (this->m_currentSelectedSpace == "")
         return false;
 
     hLines.clear();
     vLines.clear();
 
     foreach (Space space, this->m_spaces)
-        if (space.spaceId() != this->m_spaceIdRef)
+        if (space.spaceId() != this->m_currentSelectedSpace)
         {
             hLines << space.hLines();
             vLines << space.vLines();
         }
 
-    this->cleanAndSort(hLines);
-    this->cleanAndSort(vLines);
+    this->removeDuplicatesAndSort(hLines);
+    this->removeDuplicatesAndSort(vLines);
 
     return true;
 }
@@ -172,7 +171,7 @@ void SpaceModel::toggleMaximizedSpace()
         return;
 
     for (int space = 0; space < this->m_spaces.count(); space++)
-        if (this->m_spaces[space].spaceId() == this->m_spaceIdRef)
+        if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].toggleMaximized(hLines, vLines);
 
@@ -204,7 +203,7 @@ void SpaceModel::scaleSpace(QPointF to)
         return;
 
     for (int space = 0; space < this->m_spaces.count(); space++)
-        if (this->m_spaces[space].spaceId() == this->m_spaceIdRef)
+        if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].resetStatus();
             QPointF center = this->m_spaces[space].center();
@@ -215,14 +214,12 @@ void SpaceModel::scaleSpace(QPointF to)
 
             break;
         }
-
-    this->updateSize();
 }
 
 void SpaceModel::rotateSpace(QPointF to)
 {
     for (int space = 0; space < this->m_spaces.count(); space++)
-        if (this->m_spaces[space].spaceId() == this->m_spaceIdRef)
+        if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].resetStatus();
             QPointF center = this->m_spaces[space].center();
@@ -231,8 +228,6 @@ void SpaceModel::rotateSpace(QPointF to)
 
             break;
         }
-
-    this->updateSize();
 }
 
 void SpaceModel::scaleAndRotateSpace(QPointF to)
@@ -243,7 +238,7 @@ void SpaceModel::scaleAndRotateSpace(QPointF to)
         return;
 
     for (int space = 0; space < this->m_spaces.count(); space++)
-        if (this->m_spaces[space].spaceId() == this->m_spaceIdRef)
+        if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].resetStatus();
             QPointF center = this->m_spaces[space].center();
@@ -257,8 +252,6 @@ void SpaceModel::scaleAndRotateSpace(QPointF to)
 
             break;
         }
-
-    this->updateSize();
 }
 
 void SpaceModel::moveSpace(QPointF to)
@@ -269,71 +262,35 @@ void SpaceModel::moveSpace(QPointF to)
         return;
 
     for (int space = 0; space < this->m_spaces.count(); space++)
-        if (this->m_spaces[space].spaceId() == this->m_spaceIdRef)
+        if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].resetStatus();
             this->m_spaces[space].move(this->m_spaces[space].center() + to - this->m_pointRef, hLines, vLines);
 
             break;
         }
-
-    this->updateSize();
 }
 
-void SpaceModel::updateSize()
+void SpaceModel::updateRect()
 {
-    qreal minX = 0, maxX = 0, minY = 0, maxY = 0;
-    QList<qreal> v, h;
-    bool fst = true;
+    QRectF modelRect;
+
+    this->m_spaces = this->removeDuplicates(this->m_spaces);
 
     foreach (Space space, this->m_spaces)
-        if (fst)
-        {
-            v = space.vLines();
+        modelRect = (modelRect.isNull())? space.boundingRect(): modelRect.united(space.boundingRect());
 
-            minX = v[0];
-            maxX = v[1];
-
-            h = space.hLines();
-
-            minY = h[0];
-            maxY = h[1];
-
-            fst = false;
-        }
-        else
-        {
-            v = space.vLines();
-
-            if (v[0] < minX)
-                minX = v[0];
-
-            if (v[1] > maxX)
-                maxX = v[1];
-
-            h = space.hLines();
-
-            if (h[0] < minY)
-                minY = h[0];
-
-            if (h[1] > maxY)
-                maxY = h[1];
-        }
-
-    QPointF diff(minX, minY);
-
-    for (int space = 0; space < this->m_spaces.count(); space++)
-    {
-        this->m_spaces[space].move(this->m_spaces[space].center() - diff);
-        this->m_spaces[space].setRef();
-    }
-
-    this->m_size = QSize(maxX - minX + 1, maxY - minY + 1);
+    this->m_rect = modelRect;
 }
 
-QSizeF SpaceModel::size()
+QString SpaceModel::currentSelectedSpace()
 {
-    return this->m_size;
+    return this->m_currentSelectedSpace;
+}
+
+QRectF SpaceModel::rect()
+{
+    return this->m_rect;
 }
 
 QList<Space> SpaceModel::spaces()
@@ -361,9 +318,14 @@ qreal SpaceModel::snappingRT()
     return this->m_snappingRT;
 }
 
-void SpaceModel::setSize(QSizeF value)
+void SpaceModel::setCurrentSelectedSpace(QString value)
 {
-    this->m_size = value;
+    this->m_currentSelectedSpace = value;
+}
+
+void SpaceModel::setRect(QRectF value)
+{
+    this->m_rect = value;
 }
 
 void SpaceModel::setSpaces(QList<Space> value)
@@ -391,9 +353,14 @@ void SpaceModel::setSnappingRT(qreal value)
     this->m_snappingRT = value;
 }
 
-void SpaceModel::resetSize()
+void SpaceModel::resetCurrentSelectedSpace()
 {
-    this->m_size = QSizeF(0, 0);
+    this->m_currentSelectedSpace = "";
+}
+
+void SpaceModel::resetRect()
+{
+    this->m_rect = QRectF(0, 0, 0, 0);
 }
 
 void SpaceModel::resetSpaces()

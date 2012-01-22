@@ -41,7 +41,7 @@ class SpaceManager: public QObject
         explicit SpaceManager(QObject *parent = 0);
         ~SpaceManager();
         Q_INVOKABLE QImage render();
-        Q_INVOKABLE QPoint mapToMainSpace(const QPoint &pos, const QSize &viewportSize);
+        Q_INVOKABLE QPoint mapViewPortToModel(const QPoint &pos, const QSize &viewportSize);
 
         QSize viewPortSize();
         bool editMode();

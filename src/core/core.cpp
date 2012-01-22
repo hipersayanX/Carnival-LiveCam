@@ -19,6 +19,7 @@
  * Web-Site: http://hipersayanx.blogspot.com/
  */
 
+#include <cmath>
 #include <QWidget>
 #include <QtDebug>
 
@@ -44,7 +45,7 @@ Core::Core(QObject *parent): QObject(parent)
     this->deviceManager.deviceEnable("/dev/video0");
 //    this->pluginManager.resize(this->deviceManager.frameSize('/dev/video0'));
     this->spaceManager.setSpace("/dev/video0", QImage());
-    this->spaceManager.setSnapping(true, 24, 5, 3);
+    this->spaceManager.setSnapping(true, 24, 5, 3.0 * M_PI / 180.0);
     this->spaceManager.setViewPortSize(this->shellManager.viewPortSize("shell.DefaultShell"));
 
 //    this->spaceManager.setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);
