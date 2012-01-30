@@ -190,9 +190,18 @@ bool SpaceModel::isMaximized(QString spaceId)
 
 qreal SpaceModel::calculateAngle(QPointF point)
 {
-    qreal angle = atan2(point.y(), point.x());
+    if (point.x() == 0 && point.y() == 0)
+        return 0;
+    else if (point.x() > 0 && point.y() > 0)
+        return atan2(point.y(), point.x());
+    else if (point.x() <= 0 && point.y() > 0)
+        return atan2(fabs(point.x()), point.y()) + M_PI / 2;
+    else if (point.x() <= 0 && point.y() <= 0)
+        return atan2(fabs(point.y()), fabs(point.x())) + M_PI;
+    else if (point.x() > 0 && point.y() <= 0)
+        return atan2(point.x(), fabs(point.y())) + 3 * M_PI / 2;
 
-    return (angle > 0)? angle: 2 * M_PI - angle;
+    return 0;
 }
 
 void SpaceModel::scaleSpace(QPointF to)

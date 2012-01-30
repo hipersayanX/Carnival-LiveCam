@@ -155,14 +155,19 @@ void Space::toggleMaximized(const QList<qreal> &hLines, const QList<qreal> &vLin
     {
         this->m_rotation = 0;
 
-        qreal width = this->max(vLines) - this->min(vLines) + 1;
-        qreal height = this->max(hLines) - this->min(hLines) + 1;
+        qreal left = (vLines.isEmpty())? -this->m_size.width() / 2: this->min(vLines);
+        qreal right = (vLines.isEmpty())? this->m_size.width() / 2: this->max(vLines);
+        qreal top = (vLines.isEmpty())? -this->m_size.height() / 2: this->min(hLines);
+        qreal bottom = (vLines.isEmpty())? this->m_size.height() / 2: this->max(hLines);
 
-        QSizeF size = this->m_scale * this->m_size;
+        qreal width = right - left;
+        qreal height = bottom - top;
+
+        QSizeF size = this->m_size;
         size.scale(width, height, Qt::KeepAspectRatio);
 
         this->m_scale = size.width() / this->m_size.width();
-        this->m_center = QPointF(width, height) / 2;
+        this->m_center = QPointF(left + right, top + bottom) / 2;
     }
     else
         this->resetStatus();

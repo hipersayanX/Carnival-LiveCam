@@ -24,6 +24,7 @@
 
 #include <QVariant>
 #include <QPluginLoader>
+#include <QPushButton>
 
 #include "shell.h"
 #include "shellinfo.h"
@@ -54,6 +55,7 @@ class ShellManager: public QObject
         void setFrame(const QImage &frame);
         void updateDevices(const QList<QVariant> &devices);
         void updatePlugins(const QList<QVariant> &plugins);
+        void setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);
 
     private slots:
         void onToggleEditMode();

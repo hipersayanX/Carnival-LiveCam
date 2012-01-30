@@ -35,6 +35,8 @@ Rectangle
     property bool resizing: false
     property real borderSize: 8
 
+    signal viewPortSizeChanged(int width, int height)
+
     signal mouseDoubleClicked(real mouseX, real mouseY, variant pressedButtons)
     signal mousePositionChanged(real mouseX, real mouseY, variant pressedButtons)
     signal mousePressed(real mouseX, real mouseY, variant pressedButtons)
@@ -102,6 +104,9 @@ Rectangle
             onPositionChanged: recWindow.mousePositionChanged(mouseX, mouseY, Qt.LeftButton)
             onPressed: recWindow.mousePressed(mouseX, mouseY, Qt.LeftButton)
             onReleased: recWindow.mouseReleased(mouseX, mouseY, Qt.LeftButton)
+
+            onWidthChanged: recWindow.viewPortSizeChanged(msaBackground.width, msaBackground.height)
+            onHeightChanged: recWindow.viewPortSizeChanged(msaBackground.width, msaBackground.height)
         }
     }
 

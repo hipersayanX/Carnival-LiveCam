@@ -48,7 +48,10 @@ Core::Core(QObject *parent): QObject(parent)
     this->spaceManager.setSnapping(true, 24, 5, 3.0 * M_PI / 180.0);
     this->spaceManager.setViewPortSize(this->shellManager.viewPortSize("shell.DefaultShell"));
 
-//    this->spaceManager.setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);
+    this->shellManager.setControlButtons(&this->toggleMaximizedButton, &this->scaleAndRotateButton);
+    this->spaceManager.setControlButtons(&this->toggleMaximizedButton, &this->scaleAndRotateButton);
+    this->toggleMaximizedButton.setHidden(true);
+    this->scaleAndRotateButton.setHidden(true);
 
     connect(&this->deviceManager, SIGNAL(devicesModified()), this, SLOT(devicesModified()));
 
@@ -94,6 +97,7 @@ Core::Core(QObject *parent): QObject(parent)
 void Core::devicesModified()
 {
     this->shellManager.updateDevices(this->deviceManager.devicesInfoList());
+    this->spaceManager.updateSpaces(this->deviceManager.devicesInfoList());
 }
 
 /*!

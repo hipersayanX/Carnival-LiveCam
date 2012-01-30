@@ -24,6 +24,7 @@
 
 #include <QImage>
 #include <QMouseEvent>
+#include <QPushButton>
 
 /*!
   \class Shell
@@ -220,6 +221,8 @@ class Shell: public QObject
           \brief Set the plugins to be selected by the user in the GUI.
          */
         virtual void updatePlugins(const QList<QVariant> &plugins) = 0;
+
+        virtual void setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton) = 0;
 
     signals:
         void viewPortSizeChanged(QSize size);

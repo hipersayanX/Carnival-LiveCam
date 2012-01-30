@@ -74,10 +74,8 @@ class Gui: public QDeclarativeView
         void updateDevices(const QList<QVariant> &devices);
         void updatePlugins(const QList<QVariant> &plugins);
 
-    protected:
-        void resizeEvent(QResizeEvent *event);
-
     private slots:
+        void onViewPortSizeChanged(int width, int height);
         void iconClicked(int index=0);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);

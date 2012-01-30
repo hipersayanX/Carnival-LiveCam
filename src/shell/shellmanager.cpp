@@ -347,6 +347,11 @@ void ShellManager::updatePlugins(const QList<QVariant> &plugins)
     this->activeShell->updatePlugins(plugins);
 }
 
+void ShellManager::setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton)
+{
+    this->activeShell->setControlButtons(toggleMaximizedButton, scaleAndRotateButton);
+}
+
 void ShellManager::onToggleEditMode()
 {
     emit toggleEditMode();

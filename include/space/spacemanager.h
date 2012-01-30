@@ -41,12 +41,13 @@ class SpaceManager: public QObject
         explicit SpaceManager(QObject *parent = 0);
         ~SpaceManager();
         Q_INVOKABLE QImage render();
-        Q_INVOKABLE QPoint mapViewPortToModel(const QPoint &pos, const QSize &viewportSize);
+        Q_INVOKABLE QPointF mapViewPortToModel(const QPoint &pos, const QSize &viewportSize);
 
         QSize viewPortSize();
         bool editMode();
 
     private:
+        QWidget *oldReceiver;
         bool move;
         bool scaleAndRotate;
         QSize m_viewPortSize;
@@ -56,10 +57,14 @@ class SpaceManager: public QObject
         QHash<QString, QGraphicsProxyWidget *> proxySpacesWidgets;
         QPushButton *m_toggleMaximizedButton;
         QPushButton *m_scaleAndRotateButton;
+        bool m_toggleMaximizedButtonVisible;
+        bool m_scaleAndRotateButtonVisible;
         bool m_editMode;
 
+        void sendHoverEvent(QWidget *receiver, const QPoint &position);
+
         QWidget *sendMouseEvent(QEvent::Type type,
-                                const QPoint &position,
+                                const QPointF &position,
                                 Qt::MouseButton button,
                                 Qt::MouseButtons buttons,
                                 Qt::KeyboardModifiers modifiers);
@@ -67,6 +72,7 @@ class SpaceManager: public QObject
     public slots:
         void setSpace(QString spaceId, const QImage &frame);
         void removeSpace(QString spaceId);
+        void updateSpaces(const QList<QVariant> &devices);
         void setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT);
         void setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);
         void setViewPortSize(QSize size);

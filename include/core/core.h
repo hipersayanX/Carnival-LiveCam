@@ -43,6 +43,8 @@ class Core: public QObject
         PluginManager pluginManager;
         MediaStreaming mediaStreaming;
         SpaceManager spaceManager;
+        QPushButton toggleMaximizedButton;
+        QPushButton scaleAndRotateButton;
 
     private slots:
         void devicesModified();

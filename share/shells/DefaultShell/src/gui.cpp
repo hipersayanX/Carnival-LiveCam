@@ -61,6 +61,8 @@ Gui::Gui(QWidget *parent): QDeclarativeView(parent)
     connect(this->windowControls, SIGNAL(maximize()), this, SLOT(onMaximize()));
     connect(this->windowControls, SIGNAL(close()), this, SLOT(onClose()));
 
+    connect(this->root, SIGNAL(viewPortSizeChanged(int, int)), this, SLOT(onViewPortSizeChanged(int, int)));
+
     connect(this->root, SIGNAL(mouseDoubleClicked(qreal, qreal, QVariant)), this, SLOT(onMouseDoubleClicked(qreal, qreal, QVariant)));
     connect(this->root, SIGNAL(mousePositionChanged(qreal, qreal, QVariant)), this, SLOT(onMousePositionChanged(qreal, qreal, QVariant)));
     connect(this->root, SIGNAL(mousePressed(qreal, qreal, QVariant)), this, SLOT(onMousePressed(qreal, qreal, QVariant)));
@@ -197,10 +199,9 @@ void Gui::setFrame(const QImage &frame)
     this->currentFrame++;
 }
 
-void Gui::resizeEvent(QResizeEvent *event)
+void Gui::onViewPortSizeChanged(int width, int height)
 {
-    QDeclarativeView::resizeEvent(event);
-    emit viewPortSizeChanged(this->windowBackground->childrenRect().size().toSize());
+    emit viewPortSizeChanged(QSize(width, height));
 }
 
 void Gui::onMouseDoubleClicked(qreal mouseX, qreal mouseY, QVariant pressedButtons)

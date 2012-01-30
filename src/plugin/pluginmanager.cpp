@@ -323,6 +323,8 @@ void PluginManager::movePlugin(int from, int to)
  */
 void PluginManager::resize(QSize size, QString deviceId)
 {
+    Q_UNUSED(deviceId)
+
     this->frameSize = size;
 
     for (int i = 0; i < this->activePlugins.size(); i++)
@@ -340,6 +342,8 @@ void PluginManager::resize(QSize size, QString deviceId)
  */
 QImage PluginManager::getFrame(const QImage &image, QString deviceId)
 {
+    Q_UNUSED(deviceId)
+
     QImage frame = image;
 
     for (int currentPlugin = 0; currentPlugin < this->activePlugins.size(); currentPlugin++)

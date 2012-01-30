@@ -55,6 +55,7 @@ class DefaultShell: public Shell
         void setFrame(const QImage &frame);
         void updateDevices(const QList<QVariant> &devices);
         void updatePlugins(const QList<QVariant> &plugins);
+        void setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton);
 
     private:
         Gui *gui;
