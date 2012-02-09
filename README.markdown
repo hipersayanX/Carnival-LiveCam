@@ -79,14 +79,14 @@ May be you can compile and use [Carnival LiveCam](https://github.com/hipersayanX
 
 ## What we have and what we need ##
 
-In principle, the base of the program is almost finished, so far there are only 3 candies available for trial, which give a small sample of what can be done with the program, a effect that shows how to integrate OpenSceneGraph with [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) for create 3D effects, one showing how to use OpenCV to create effects based on face detection, and finally one that shows how to perform simple 2D effects.
+In principle, the base of the program is almost finished, so far there are only 3 effects available for trial, which give a small sample of what can be done with the program, a effect that shows how to integrate OpenSceneGraph with [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) for create 3D effects, one showing how to use OpenCV to create effects based on face detection, and finally one that shows how to perform simple 2D effects.
 Then there are available a basic driver to capture images from your webcam, and another 2 to capture images from image files and video.
 And finally the shell designed in QML.
 From what we have left to do:
 
 * As a high priority is the creation of the webcam drivers for Mac OS X and Windows.
 * Design a mechanism to capture and display from multiple devices simultaneously, for example, that can show 3 webcams at the same time.
-* Ideally, at the time of release the version for end users, [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) must have at least 20 candies that provide different effects that users can apply to their videos.
+* Ideally, at the time of release the version for end users, [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) must have at least 20 effects that provide different effects that users can apply to their videos.
 It would be ideal to have more shells, such as a web interface, a plasmoid for KDE, etc..
 * So far [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) has no logo or artwork, or a website that identifies it. If you have ideas to share in these areas would be great if you join the development.
 * Any other idea that comes to mind.
