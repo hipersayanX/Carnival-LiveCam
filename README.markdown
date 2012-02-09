@@ -5,15 +5,15 @@
 ## Intro ##
 
 After a long time to be developing in the background, finally present my most ambitious project [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam).
-[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can capture images from multiple sources (webcams, video files, image files), and apply various effects such as effects of rain, fire, masks, 3D effects and 2D of all kinds. And also can take pictures and record video.  
-[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is still in an early stage of development, but it shows many of the features that are able to offer. Is the ideal time to join the the development.  
+[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can capture images from multiple sources (webcams, video files, image files), and apply various effects such as effects of rain, fire, masks, 3D effects and 2D of all kinds. And also can take pictures and record video.
+[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is still in an early stage of development, but it shows many of the features that are able to offer. Is the ideal time to join the the development.
 [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is licensed under GPLv3 and hosted on [github](https://github.com/).
 
 ## Basics ##
 
 The design of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is thought to be completely modular and is very easy to expand the program by using plugins based on QtPlugin system, so far the types of plugins available are:
 
-* __Candy__: This type of plugins are responsible for providing the graphics effects for [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam).
+* __Effect__: This type of plugins are responsible for providing the graphics effects for [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam).
 * __Drivers__: These plugins are used to add new capture devices. These are not drivers such as the operating system, these drivers do not work at the hardware level, but rather working on a top layer above the operating system drivers, for example these drivers capture images from webcam using OpenCV, or V4L2, but if you have not installed the drivers for your webcam then you can not capture images from your webcam using this driver.
 * __Shells__: A shell is a graphical interface or not with which the user can interact with  [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam), this interface may be based on Qt Widgets, QML, Web, command line, etc.. The concept of "shell" comes from the \*nix-like environments such as GNU/Linux where the user can choose the graphical environment with which interact with the computer. [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) also offers the same freedom.
 
@@ -24,25 +24,25 @@ At the bottom center of [Carnival LiveCam](https://github.com/hipersayanX/Carniv
 * Select the capture device.
 * Take a picture.
 * Record video.
-* Open the Candy Bar.
+* Open the Effect Bar.
 * Set the window to full screen.
 * Information about the program.
 
 ![Controls Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/controlsbar.png)
 
-On the right side of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can see the Candy Bar, here we can turn on the effects we want to apply to the video. The effects are activated or deactivated by simply clicking on the preview, the deactivated effects has a red box around, the activated has a green box. Each candy has 3 controls:
+On the right side of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can see the Effect Bar, here we can turn on the effects we want to apply to the video. The effects are activated or deactivated by simply clicking on the preview, the deactivated effects has a red box around, the activated has a green box. Each effect has 3 controls:
 
-* __Upper right__: This control displays if the candy requires or not 3D acceleration.
-* __Bottom left__: Displays information about the candy.
-* __Bottom right__: You can configure the candy. Only available in some candys.
+* __Upper right__: This control displays if the effect requires or not 3D acceleration.
+* __Bottom left__: Displays information about the effect.
+* __Bottom right__: You can configure the effect. Only available in some effects.
 
-We can also filter by the type of candy using the combobox at the top.
+We can also filter by the type of effect using the combobox at the top.
 
-![The Candy Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/cadybar.png)
+![The Effect Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/cadybar.png)
 
-Inside the candy bar we also have the _Candy Stack_, here we can change the order in which each effect is applied.
+Inside the effect bar we also have the _Effect Stack_, here we can change the order in which each effect is applied.
 
-![The Candy Stack](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/stackbar.png)
+![The Effect Stack](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/stackbar.png)
 
 Here we see one of the configuration dialogs of a driver in this case the driver of images. With a simple design intended for an _point&click_ experience.
 
@@ -79,9 +79,9 @@ May be you can compile and use [Carnival LiveCam](https://github.com/hipersayanX
 
 ## What we have and what we need ##
 
-In principle, the base of the program is almost finished, so far there are only 3 candies available for trial, which give a small sample of what can be done with the program, a candy that shows how to integrate OpenSceneGraph with [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) for create 3D effects, one showing how to use OpenCV to create effects based on face detection, and finally one that shows how to perform simple 2D effects.  
-Then there are available a basic driver to capture images from your webcam, and another 2 to capture images from image files and video.  
-And finally the shell designed in QML.  
+In principle, the base of the program is almost finished, so far there are only 3 candies available for trial, which give a small sample of what can be done with the program, a effect that shows how to integrate OpenSceneGraph with [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) for create 3D effects, one showing how to use OpenCV to create effects based on face detection, and finally one that shows how to perform simple 2D effects.
+Then there are available a basic driver to capture images from your webcam, and another 2 to capture images from image files and video.
+And finally the shell designed in QML.
 From what we have left to do:
 
 * As a high priority is the creation of the webcam drivers for Mac OS X and Windows.
@@ -93,7 +93,7 @@ It would be ideal to have more shells, such as a web interface, a plasmoid for K
 
 ## And finally... ##
 
-In general, if you know how to use Git then you know how to collaborate with the project. Just clone the repository and start working on your copy and when you have everything up and running do a push request.  
+In general, if you know how to use Git then you know how to collaborate with the project. Just clone the repository and start working on your copy and when you have everything up and running do a push request.
 Here I leave some links on how to use Git:
 
 * [Pro Git](http://progit.org/book/)

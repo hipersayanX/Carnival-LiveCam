@@ -21,7 +21,7 @@
  * QML shell plugin
  */
 
-#include <../include/defaultshell.h>
+#include "../include/defaultshell.h"
 
 QString DefaultShell::id()
 {

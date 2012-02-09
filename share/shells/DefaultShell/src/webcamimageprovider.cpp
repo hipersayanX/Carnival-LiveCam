@@ -21,8 +21,6 @@
  * QML shell plugin
  */
 
-#include <QtDebug>
-
 #include "../include/webcamimageprovider.h"
 
 WebcamImageProvider::WebcamImageProvider(QDeclarativeImageProvider::ImageType type): QDeclarativeImageProvider(type)

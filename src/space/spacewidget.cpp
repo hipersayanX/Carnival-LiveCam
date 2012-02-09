@@ -64,6 +64,33 @@ void SpaceWidget::setFrame(const QImage &frame)
     this->spaceControls.setGeometry(0, 0, frame.width(), frame.height());
 }
 
+void SpaceWidget::rescaleButtons(QSizeF spacesModel, QSize viewPort, qreal scale)
+{
+    qreal k = spacesModel.width() / (viewPort.width() * scale);
+
+    this->spaceControls.btnToggleMaximize->setBaseSize(k * this->m_toggleMaximizeButtonBaseSize);
+
+    this->spaceControls.btnToggleMaximize->setGeometry(this->spaceControls.btnToggleMaximize->geometry().x(),
+                                                       this->spaceControls.btnToggleMaximize->geometry().y(),
+                                                       k * this->m_toggleMaximizedButtonSize.width(),
+                                                       k * this->m_toggleMaximizedButtonSize.height());
+
+    this->spaceControls.btnToggleMaximize->setIconSize(k * this->m_toggleMaximizedButtonIconSize);
+    this->spaceControls.btnToggleMaximize->setMaximumSize(k * this->m_toggleMaximizedButtonMaximumSize);
+    this->spaceControls.btnToggleMaximize->setMinimumSize(k * this->m_toggleMaximizedButtonMinimumSize);
+
+    this->spaceControls.btnScaleAndRotate->setBaseSize(k * this->m_scaleAndRotateButtonBaseSize);
+
+    this->spaceControls.btnScaleAndRotate->setGeometry(this->spaceControls.btnScaleAndRotate->geometry().x(),
+                                                       this->spaceControls.btnScaleAndRotate->geometry().y(),
+                                                       k * this->m_scaleAndRotateButtonSize.width(),
+                                                       k * this->m_scaleAndRotateButtonSize.height());
+
+    this->spaceControls.btnScaleAndRotate->setIconSize(k * this->m_scaleAndRotateButtonIconSize);
+    this->spaceControls.btnScaleAndRotate->setMaximumSize(k * this->m_scaleAndRotateButtonMaximumSize);
+    this->spaceControls.btnScaleAndRotate->setMinimumSize(k * this->m_scaleAndRotateButtonMinimumSize);
+}
+
 bool SpaceWidget::editMode()
 {
     return this->m_editMode;
@@ -133,6 +160,12 @@ void SpaceWidget::setControlButtons(QPushButton *toggleMaximizedButton, QPushBut
         this->spaceControls.btnToggleMaximize->setStyleSheet(toggleMaximizedButton->styleSheet());
         this->spaceControls.btnToggleMaximize->setText(toggleMaximizedButton->text());
         this->spaceControls.btnToggleMaximize->setVisible(toggleMaximizedButton->isVisible());
+
+        this->m_toggleMaximizeButtonBaseSize = toggleMaximizedButton->baseSize();
+        this->m_toggleMaximizedButtonSize = toggleMaximizedButton->geometry().size();
+        this->m_toggleMaximizedButtonIconSize = toggleMaximizedButton->iconSize();
+        this->m_toggleMaximizedButtonMaximumSize = toggleMaximizedButton->maximumSize();
+        this->m_toggleMaximizedButtonMinimumSize = toggleMaximizedButton->minimumSize();
     }
 
     if (scaleAndRotateButton)
@@ -171,5 +204,11 @@ void SpaceWidget::setControlButtons(QPushButton *toggleMaximizedButton, QPushBut
         this->spaceControls.btnScaleAndRotate->setStyleSheet(scaleAndRotateButton->styleSheet());
         this->spaceControls.btnScaleAndRotate->setText(scaleAndRotateButton->text());
         this->spaceControls.btnScaleAndRotate->setVisible(scaleAndRotateButton->isVisible());
+
+        this->m_scaleAndRotateButtonBaseSize = scaleAndRotateButton->baseSize();
+        this->m_scaleAndRotateButtonSize = scaleAndRotateButton->geometry().size();
+        this->m_scaleAndRotateButtonIconSize = scaleAndRotateButton->iconSize();
+        this->m_scaleAndRotateButtonMaximumSize = scaleAndRotateButton->maximumSize();
+        this->m_scaleAndRotateButtonMinimumSize = scaleAndRotateButton->minimumSize();
     }
 }

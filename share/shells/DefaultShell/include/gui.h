@@ -42,14 +42,14 @@ class Gui: public QDeclarativeView
         QObject *root;
         QDeclarativeItem *bbxWebcams;
         QDeclarativeItem *iconBar;
-        QDeclarativeItem *candyBar;
-        QDeclarativeItem *candyView;
+        QDeclarativeItem *effectBar;
+        QDeclarativeItem *effectView;
         QDeclarativeItem *windowControls;
         QDeclarativeItem *windowBackground;
         QPoint windowPos0;
         QPoint mousePos0;
         QSize windowSize0;
-        char currentFrame;
+        uchar currentFrame;
 
     signals:
         void viewPortSizeChanged(QSize size);

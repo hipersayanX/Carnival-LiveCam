@@ -21,11 +21,11 @@
  * QML shell plugin
  */
 
-import QtQuick 1.0
+import QtQuick 1.1
 
 Rectangle
 {
-    id: recCandyView
+    id: recEffectView
     width: 152
     height: 384
     color: "#00000000"
@@ -37,44 +37,44 @@ Rectangle
     signal pluginDeactivated(string pluginId)
     signal pluginMoved(int from, int to)
 
-    function updateCandys(candys)
+    function updateEffects(effects)
     {
-        lsmCandys.clear()
+        lsmEffects.clear()
 
-        for (var candy in candys)
+        for (var effect in effects)
         {
-            var newCandy = {}
+            var newEffect = {}
 
-            for (var prop in candys[candy])
-                newCandy["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = candys[candy][prop]
+            for (var prop in effects[effect])
+                newEffect["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = effects[effect][prop]
 
-            lsmCandys.append(newCandy)
+            lsmEffects.append(newEffect)
         }
 
-        lsvCandys.currentIndex = 0
-        recCandyView.updateHeight()
+        lsvEffects.currentIndex = 0
+        recEffectView.updateHeight()
     }
 
     function updateHeight()
     {
-        if (lsvCandys.currentItem && lsvCandys.contentHeight < 0)
-            lsvCandys.contentHeight = lsvCandys.currentItem.children[0].height * lsvCandys.count
+        if (lsvEffects.currentItem && lsvEffects.contentHeight < 0)
+            lsvEffects.contentHeight = lsvEffects.currentItem.children[0].height * lsvEffects.count
 
-        recCandyView.height = lsvCandys.contentHeight
+        recEffectView.height = lsvEffects.contentHeight
     }
 
     function collapseAll()
     {
-        var prevIndex = lsvCandys.currentIndex
+        var prevIndex = lsvEffects.currentIndex
 
-        for (var candy = 0; candy < lsmCandys.count; candy++)
+        for (var effect = 0; effect < lsmEffects.count; effect++)
         {
-            lsvCandys.currentIndex = candy
-            lsvCandys.currentItem.children[0].isExpanded = false
-            lsvCandys.currentItem.children[0].anchors.horizontalCenterOffset = 0
+            lsvEffects.currentIndex = effect
+            lsvEffects.currentItem.children[0].isExpanded = false
+            lsvEffects.currentItem.children[0].anchors.horizontalCenterOffset = 0
         }
 
-        lsvCandys.currentIndex = prevIndex
+        lsvEffects.currentIndex = prevIndex
     }
 
     Slider
@@ -87,7 +87,7 @@ Rectangle
 
         function updateValue()
         {
-            var tmpNewMaxValue = Math.ceil(lsvCandys.contentHeight / lsvCandys.height - 1)
+            var tmpNewMaxValue = Math.ceil(lsvEffects.contentHeight / lsvEffects.height - 1)
 
             if (tmpNewMaxValue < sldScroll.minValue)
                 sldScroll.maxValue = sldScroll.minValue
@@ -107,7 +107,7 @@ Rectangle
             sldScroll.width = sldScroll.visible? 16: 0
         }
 
-        onBeginMove: recCandyView.collapseAll()
+        onBeginMove: recEffectView.collapseAll()
 
         onHeightChanged: updateValue()
 
@@ -115,14 +115,14 @@ Rectangle
 
         onValueChanged:
         {
-            var index = Math.ceil((value - sldScroll.minValue) * (lsvCandys.count - 1) / (sldScroll.maxValue - sldScroll.minValue))
-            lsvCandys.positionViewAtIndex(index, ListView.Beginning)
+            var index = Math.ceil((value - sldScroll.minValue) * (lsvEffects.count - 1) / (sldScroll.maxValue - sldScroll.minValue))
+            lsvEffects.positionViewAtIndex(index, ListView.Beginning)
         }
     }
 
     ListView
     {
-        id: lsvCandys
+        id: lsvEffects
         interactive: false
         snapMode: ListView.SnapToItem
         anchors.right: sldScroll.left
@@ -132,44 +132,44 @@ Rectangle
 
         function pluginIndex(pluginId)
         {
-            var prevIndex = lsvCandys.currentIndex
+            var prevIndex = lsvEffects.currentIndex
 
-            for (var candy = 0; candy < lsmCandys.count; candy++)
+            for (var effect = 0; effect < lsmEffects.count; effect++)
             {
-                lsvCandys.currentIndex = candy
+                lsvEffects.currentIndex = effect
 
-                if (lsvCandys.currentItem.children[0].pluginId == pluginId)
+                if (lsvEffects.currentItem.children[0].pluginId == pluginId)
                 {
-                    lsvCandys.currentIndex = prevIndex
+                    lsvEffects.currentIndex = prevIndex
 
-                    return candy
+                    return effect
                 }
             }
 
-            lsvCandys.currentIndex = prevIndex
+            lsvEffects.currentIndex = prevIndex
 
             return -1
         }
 
         model: ListModel
         {
-            id: lsmCandys
+            id: lsmEffects
         }
 
         delegate: Component
         {
             Rectangle
             {
-                width: recCandyView.width - sldScroll.width
-                height: cndCandy.height
+                width: recEffectView.width - sldScroll.width
+                height: cndEffect.height
                 color: "#00000000"
 
-                Candy
+                Effect
                 {
-                    id: cndCandy
-                    visible: recCandyView.showCategory == "All" || recCandyView.showCategory == cndCandy.category? true: false
-                    height: cndCandy.visible? 104: 0
-                    isStacked: recCandyView.isStackView
+                    id: cndEffect
+                    visible: recEffectView.showCategory == "All" || recEffectView.showCategory == cndEffect.category? true: false
+                    height: cndEffect.visible? 104: 0
+                    isStacked: recEffectView.isStackView
                     is3D: propIs3D
                     isActivated: propIsActivated
                     isConfigurable: propIsConfigurable
@@ -191,44 +191,44 @@ Rectangle
 
                     onBeginMove:
                     {
-                        oldIndex = lsvCandys.pluginIndex(cndCandy.pluginId)
-                        cndCandy.oldPositionY = mouseY
+                        oldIndex = lsvEffects.pluginIndex(cndEffect.pluginId)
+                        cndEffect.oldPositionY = mouseY
                     }
 
                     onMove:
                     {
-                        cndCandy.newIndex = Math.round((mouseY - cndCandy.oldPositionY) * (lsvCandys.count / lsvCandys.contentHeight) + cndCandy.oldIndex)
+                        cndEffect.newIndex = Math.round((mouseY - cndEffect.oldPositionY) * (lsvEffects.count / lsvEffects.contentHeight) + cndEffect.oldIndex)
 
-                        if (cndCandy.newIndex < 0)
-                            cndCandy.newIndex = 0
+                        if (cndEffect.newIndex < 0)
+                            cndEffect.newIndex = 0
 
-                        if (cndCandy.newIndex >= lsvCandys.count)
-                            cndCandy.newIndex = lsvCandys.count - 1
+                        if (cndEffect.newIndex >= lsvEffects.count)
+                            cndEffect.newIndex = lsvEffects.count - 1
 
-                        if (cndCandy.newIndex != cndCandy.oldIndex)
+                        if (cndEffect.newIndex != cndEffect.oldIndex)
                         {
-                            lsmCandys.move(cndCandy.oldIndex, cndCandy.newIndex, 1)
-                            recCandyView.pluginMoved(cndCandy.oldIndex, cndCandy.newIndex)
-                            cndCandy.oldIndex = cndCandy.newIndex
+                            lsmEffects.move(cndEffect.oldIndex, cndEffect.newIndex, 1)
+                            recEffectView.pluginMoved(cndEffect.oldIndex, cndEffect.newIndex)
+                            cndEffect.oldIndex = cndEffect.newIndex
                         }
                     }
 
                     onExpandedClicked:
                     {
-                        var expanded = cndCandy.isExpanded
-                        recCandyView.collapseAll()
-                        cndCandy.isExpanded = expanded
+                        var expanded = cndEffect.isExpanded
+                        recEffectView.collapseAll()
+                        cndEffect.isExpanded = expanded
 
-                        if (cndCandy.isExpanded)
-                            cndCandy.anchors.horizontalCenterOffset = - (cndCandy.width - cndCandy.originalContentWidth) / 2
+                        if (cndEffect.isExpanded)
+                            cndEffect.anchors.horizontalCenterOffset = - (cndEffect.width - cndEffect.originalContentWidth) / 2
                         else
-                            cndCandy.anchors.horizontalCenterOffset = 0
+                            cndEffect.anchors.horizontalCenterOffset = 0
                     }
 
-                    onConfigureClicked: recCandyView.pluginConfigureClicked(cndCandy.pluginId)
-                    onActivated: recCandyView.pluginActivated(cndCandy.pluginId)
-                    onDeactivated: recCandyView.pluginDeactivated(cndCandy.pluginId)
-                    Component.onCompleted: cndCandy.originalContentWidth = cndCandy.width
+                    onConfigureClicked: recEffectView.pluginConfigureClicked(cndEffect.pluginId)
+                    onActivated: recEffectView.pluginActivated(cndEffect.pluginId)
+                    onDeactivated: recEffectView.pluginDeactivated(cndEffect.pluginId)
+                    Component.onCompleted: cndEffect.originalContentWidth = cndEffect.width
                 }
             }
         }

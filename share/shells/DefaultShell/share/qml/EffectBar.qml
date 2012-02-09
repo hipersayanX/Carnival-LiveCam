@@ -21,15 +21,15 @@
  * QML shell plugin
  */
 
-import QtQuick 1.0
+import QtQuick 1.1
 
 Rectangle
 {
-    id: recCandyBar
+    id: recEffectBar
     width: 192
     height: 512
-    property variant candys: []
-    property variant candysStack: []
+    property variant effects: []
+    property variant effectsStack: []
 
     gradient: Gradient
     {
@@ -46,11 +46,11 @@ Rectangle
         }
     }
 
-    function updateCandys(candys)
+    function updateEffects(effects)
     {
-        recCandyBar.candys = candys
-        cdvCandys.updateCandys(recCandyBar.candys)
-        cbxCategory.updateOptions(recCandyBar.listCategories())
+        recEffectBar.effects = effects
+        cdvEffects.updateEffects(recEffectBar.effects)
+        cbxCategory.updateOptions(recEffectBar.listCategories())
     }
 
     function sortAlphaNoCase(a, b)
@@ -68,116 +68,116 @@ Rectangle
     {
         var categories = []
 
-        for (var candy in recCandyBar.candys)
-            if (categories.indexOf(recCandyBar.candys[candy].category) < 0)
-                categories.push(recCandyBar.candys[candy].category)
+        for (var effect in recEffectBar.effects)
+            if (categories.indexOf(recEffectBar.effects[effect].category) < 0)
+                categories.push(recEffectBar.effects[effect].category)
 
-        categories.sort(recCandyBar.sortAlphaNoCase)
+        categories.sort(recEffectBar.sortAlphaNoCase)
 
         return ["All"].concat(categories)
     }
 
-    CandyView
+    EffectView
     {
-        id: cdvCandys
-        objectName: "CandyView"
+        id: cdvEffects
+        objectName: "EffectView"
         showCategory: "All"
-        anchors.top: recCandyBarControls.bottom
+        anchors.top: recEffectBarControls.bottom
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.left: parent.left
 
         onPluginMoved:
         {
-            var newCandyStack = []
+            var newEffectStack = []
 
             if (from < to)
             {
                 if (from > 0)
-                    newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(0, from))
+                    newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(0, from))
 
-                newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(from + 1, to + 1))
-                newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(from, from + 1))
+                newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(from + 1, to + 1))
+                newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(from, from + 1))
 
-                if (to + 1 < recCandyBar.candysStack.length)
-                    newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(to + 1, recCandyBar.candysStack.length))
+                if (to + 1 < recEffectBar.effectsStack.length)
+                    newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(to + 1, recEffectBar.effectsStack.length))
             }
             else
             {
                 if (to > 0)
-                    newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(0, to))
+                    newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(0, to))
 
-                newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(from, from + 1))
-                newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(to, from))
+                newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(from, from + 1))
+                newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(to, from))
 
-                if (from + 1 < recCandyBar.candysStack.length)
-                    newCandyStack = newCandyStack.concat(recCandyBar.candysStack.slice(from + 1, recCandyBar.candysStack.length))
+                if (from + 1 < recEffectBar.effectsStack.length)
+                    newEffectStack = newEffectStack.concat(recEffectBar.effectsStack.slice(from + 1, recEffectBar.effectsStack.length))
             }
 
-            recCandyBar.candysStack = newCandyStack
+            recEffectBar.effectsStack = newEffectStack
         }
 
         onPluginActivated:
         {
-            var candys = []
+            var effects = []
 
-            for (var candy in recCandyBar.candys)
-                if (recCandyBar.candys[candy].pluginId == pluginId)
+            for (var effect in recEffectBar.effects)
+                if (recEffectBar.effects[effect].pluginId == pluginId)
                 {
                     var cand = {}
 
-                    for (var prop in recCandyBar.candys[candy])
+                    for (var prop in recEffectBar.effects[effect])
                         if (prop == "isActivated")
                             cand["isActivated"] = true
                         else
-                            cand[prop] = recCandyBar.candys[candy][prop]
+                            cand[prop] = recEffectBar.effects[effect][prop]
 
-                    candys = candys.concat([cand])
-                    recCandyBar.candysStack = recCandyBar.candysStack.concat([candys[candy]])
+                    effects = effects.concat([cand])
+                    recEffectBar.effectsStack = recEffectBar.effectsStack.concat([effects[effect]])
                 }
                 else
-                    candys = candys.concat([recCandyBar.candys[candy]])
+                    effects = effects.concat([recEffectBar.effects[effect]])
 
-            recCandyBar.candys = candys
+            recEffectBar.effects = effects
         }
 
         onPluginDeactivated:
         {
-            var candys = []
-            var candysStack = []
+            var effects = []
+            var effectsStack = []
 
-            for (var candy in recCandyBar.candys)
-                if (recCandyBar.candys[candy].pluginId == pluginId)
+            for (var effect in recEffectBar.effects)
+                if (recEffectBar.effects[effect].pluginId == pluginId)
                 {
                     var cand = {}
 
-                    for (var prop in recCandyBar.candys[candy])
+                    for (var prop in recEffectBar.effects[effect])
                         if (prop == "isActivated")
                             cand["isActivated"] = false
                         else
-                            cand[prop] = recCandyBar.candys[candy][prop]
+                            cand[prop] = recEffectBar.effects[effect][prop]
 
-                    candys = candys.concat([cand])
+                    effects = effects.concat([cand])
                 }
                 else
                 {
-                    candys = candys.concat([recCandyBar.candys[candy]])
+                    effects = effects.concat([recEffectBar.effects[effect]])
 
-                    if (recCandyBar.candys[candy].isActivated)
-                        candysStack = candysStack.concat([candys[candy]])
+                    if (recEffectBar.effects[effect].isActivated)
+                        effectsStack = effectsStack.concat([effects[effect]])
                 }
 
-            recCandyBar.candys = candys
-            recCandyBar.candysStack = candysStack
+            recEffectBar.effects = effects
+            recEffectBar.effectsStack = effectsStack
 
-            if (cdvCandys.isStackView)
-                cdvCandys.updateCandys(recCandyBar.candysStack)
+            if (cdvEffects.isStackView)
+                cdvEffects.updateEffects(recEffectBar.effectsStack)
         }
     }
 
     Rectangle
     {
-        id: recCandyBarControls
+        id: recEffectBarControls
         height: 100
         color: "#00000000"
         anchors.left: parent.left
@@ -185,9 +185,9 @@ Rectangle
 
         Rectangle
         {
-            id: recCandyBarControlsBackGround
-            width: recCandyBarControls.height
-            height: recCandyBarControls.width
+            id: recEffectBarControlsBackGround
+            width: recEffectBarControls.height
+            height: recEffectBarControls.width
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
             rotation: 90
@@ -216,17 +216,17 @@ Rectangle
 
         Spaces
         {
-            id: spcCandys
+            id: spcEffects
             anchors.bottom: cbxCategory.top
             anchors.bottomMargin: 8
             anchors.horizontalCenter: parent.horizontalCenter
 
-            Component.onCompleted: spcCandys.updateSpaces(["Candys", "Candy Stack"])
+            Component.onCompleted: spcEffects.updateSpaces(["Effects", "Effect Stack"])
 
             onSpaceSelected:
             {
-                cdvCandys.isStackView = index == 0? false: true
-                cdvCandys.updateCandys(index == 0? recCandyBar.candys: recCandyBar.candysStack)
+                cdvEffects.isStackView = index == 0? false: true
+                cdvEffects.updateEffects(index == 0? recEffectBar.effects: recEffectBar.effectsStack)
             }
         }
 
@@ -242,8 +242,8 @@ Rectangle
             anchors.right: parent.right
             anchors.left: parent.left
 
-            Component.onCompleted: cbxCategory.updateOptions(recCandyBar.listCategories())
-            onItemSelected: cdvCandys.showCategory = value
+            Component.onCompleted: cbxCategory.updateOptions(recEffectBar.listCategories())
+            onItemSelected: cdvEffects.showCategory = value
         }
     }
 }

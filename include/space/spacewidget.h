@@ -40,6 +40,7 @@ class SpaceWidget: public QWidget
         explicit SpaceWidget(QWidget *parent = 0);
         SpaceWidget(const QImage &frame);
         Q_INVOKABLE void setFrame(const QImage &frame);
+        Q_INVOKABLE void rescaleButtons(QSizeF spacesModel, QSize viewPort, qreal scale);
 
         Q_INVOKABLE void setControlButtons(QPushButton *toggleMaximizedButton = NULL,
                                            QPushButton *scaleAndRotateButton = NULL);
@@ -48,6 +49,18 @@ class SpaceWidget: public QWidget
 
     private:
         bool m_editMode;
+
+        QSize m_toggleMaximizeButtonBaseSize;
+        QSize m_toggleMaximizedButtonSize;
+        QSize m_toggleMaximizedButtonIconSize;
+        QSize m_toggleMaximizedButtonMaximumSize;
+        QSize m_toggleMaximizedButtonMinimumSize;
+
+        QSize m_scaleAndRotateButtonBaseSize;
+        QSize m_scaleAndRotateButtonSize;
+        QSize m_scaleAndRotateButtonIconSize;
+        QSize m_scaleAndRotateButtonMaximumSize;
+        QSize m_scaleAndRotateButtonMinimumSize;
 
     public slots:
         void setEditMode(bool value);

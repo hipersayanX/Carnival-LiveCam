@@ -21,7 +21,7 @@
  * QML shell plugin
  */
 
-import QtQuick 1.0
+import QtQuick 1.1
 
 Rectangle
 {
@@ -41,9 +41,15 @@ Rectangle
     property color borderColorNormal: "#00000000"
     property color borderColorHover: "#7f7fff"
     property color borderColorPressed: "#ffffff"
+    property bool moving: false
 
     signal clicked
     signal configure
+    signal enteredMove
+    signal beginMove(int mouseX, int mouseY)
+    signal move(int mouseX, int mouseY)
+    signal endMove
+    signal exitedMove
 
     Rectangle
     {
@@ -89,7 +95,7 @@ Rectangle
 
     Rectangle
     {
-        id: rectangle1
+        id: recHoverHighlight
         color: "#00000000"
         radius: 10
         anchors.fill: parent
@@ -104,10 +110,10 @@ Rectangle
         hoverEnabled: true
 
         onClicked: recDevice.clicked()
-        onEntered: rectangle1.border.color = recDevice.borderColorHover
-        onExited: rectangle1.border.color = recDevice.borderColorNormal
-        onPressed: rectangle1.border.color = recDevice.borderColorPressed
-        onReleased: rectangle1.border.color = recDevice.borderColorHover
+        onEntered: recHoverHighlight.border.color = recDevice.borderColorHover
+        onExited: recHoverHighlight.border.color = recDevice.borderColorNormal
+        onPressed: recHoverHighlight.border.color = recDevice.borderColorPressed
+        onReleased: recHoverHighlight.border.color = recDevice.borderColorHover
     }
 
     Button
@@ -121,12 +127,57 @@ Rectangle
         icon: "../images/icons/configure.svg"
         anchors.bottom: parent.bottom
         anchors.top: parent.top
-        anchors.right: parent.right
+        anchors.right: btnMove.left
 
         onClicked: recDevice.configure()
-        onEntered: rectangle1.border.color = recDevice.borderColorHover
-        onExited: rectangle1.border.color = recDevice.borderColorNormal
+        onEntered: recHoverHighlight.border.color = recDevice.borderColorHover
+        onExited: recHoverHighlight.border.color = recDevice.borderColorNormal
     }
 
+    Button
+    {
+        id: btnMove
+        visible: recDevice.isEnabled
+        width: recDevice.height - 4
+        anchors.rightMargin: 2
+        anchors.bottomMargin: 2
+        anchors.topMargin: 2
+        icon: "../images/icons/move.svg"
+        anchors.bottom: parent.bottom
+        anchors.top: parent.top
+        anchors.right: parent.right
 
+        onEntered:
+        {
+            recHoverHighlight.border.color = recDevice.borderColorHover
+            recDevice.enteredMove()
+        }
+
+        onExited:
+        {
+            recHoverHighlight.border.color = recDevice.borderColorNormal
+            recDevice.exitedMove()
+        }
+
+        onPressed:
+        {
+            recDevice.beginMove(btnMove.mouseX, btnMove.mouseY)
+            recDevice.moving = true
+        }
+
+        onPositionChanged:
+        {
+            if (recDevice.moving)
+                recDevice.move(btnMove.mouseX, btnMove.mouseY)
+        }
+
+        onReleased:
+        {
+            if (recDevice.moving)
+            {
+                recDevice.moving = false
+                recDevice.endMove()
+            }
+        }
+    }
 }

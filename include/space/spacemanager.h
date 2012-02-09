@@ -60,7 +60,12 @@ class SpaceManager: public QObject
         bool m_toggleMaximizedButtonVisible;
         bool m_scaleAndRotateButtonVisible;
         bool m_editMode;
+        bool m_snapping;
+        int m_nParts;
+        qreal m_snappingPT;
+        qreal m_snappingRT;
 
+        void updateButtonsSize();
         void sendHoverEvent(QWidget *receiver, const QPoint &position);
 
         QWidget *sendMouseEvent(QEvent::Type type,

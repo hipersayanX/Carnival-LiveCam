@@ -21,7 +21,7 @@
  * QML shell plugin
  */
 
-import QtQuick 1.0
+import QtQuick 1.1
 
 Rectangle
 {
@@ -86,6 +86,7 @@ Rectangle
     {
         id: imgBackground
         objectName: "WindowBackground"
+        cache: false
         smooth: true
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent

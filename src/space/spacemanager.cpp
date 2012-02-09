@@ -38,6 +38,10 @@ SpaceManager::SpaceManager(QObject *parent): QObject(parent)
     this->m_scaleAndRotateButton = NULL;
     this->m_editMode = false;
     this->oldReceiver = NULL;
+    this->m_snapping = false;
+    this->m_nParts = 1;
+    this->m_snappingPT = 0;
+    this->m_snappingRT = 0;
 }
 
 SpaceManager::~SpaceManager()
@@ -51,9 +55,6 @@ QImage SpaceManager::render()
     this->spaceModel.updateRect();
 
     QRectF modelRect = this->spaceModel.rect();
-
-    // frame delay!!!
-    qDebug() << rand();
 
     if (!modelRect.isValid())
     {
@@ -75,7 +76,6 @@ QImage SpaceManager::render()
         Space spaceItem = this->spaceModel.spaces()[space];
 
         this->proxySpacesWidgets[spaceItem.spaceId()]->setZValue(space);
-//        this->proxySpacesWidgets[spaceItem.spaceId()]->resetTransform();
         this->proxySpacesWidgets[spaceItem.spaceId()]->setTransformOriginPoint(this->proxySpacesWidgets[spaceItem.spaceId()]->rect().center());
         this->proxySpacesWidgets[spaceItem.spaceId()]->setRotation(180.0 * spaceItem.rotation() / M_PI);
         this->proxySpacesWidgets[spaceItem.spaceId()]->setScale(spaceItem.scale());
@@ -109,6 +109,20 @@ QPointF SpaceManager::mapViewPortToModel(const QPoint &pos, const QSize &viewpor
                     viewportSize.height() + this->spaceModel.rect().top());
 
     return posSpace;
+}
+
+void SpaceManager::updateButtonsSize()
+{
+    QRectF spaceModelRect = this->spaceModel.rect();
+
+    for (int space =0; space < this->spaceModel.spaces().count(); space++)
+    {
+        Space spaceItem = this->spaceModel.spaces()[space];
+
+        this->spacesWidgets[spaceItem.spaceId()]->rescaleButtons(spaceModelRect.size(),
+                                                     this->m_viewPortSize,
+                                                     spaceItem.scale());
+    }
 }
 
 void SpaceManager::sendHoverEvent(QWidget *receiver, const QPoint &position)
@@ -187,7 +201,7 @@ void SpaceManager::setSpace(QString spaceId, const QImage &frame)
     }
     else
     {
-        Space spaceItem = this->spaceModel.setSpace(spaceId, frame.size());
+        this->spaceModel.setSpace(spaceId, frame.size());
         this->spacesWidgets[spaceId] = new SpaceWidget(frame);
         this->spacesWidgets[spaceId]->setEditMode(this->m_editMode);
 
@@ -206,8 +220,6 @@ void SpaceManager::setSpace(QString spaceId, const QImage &frame)
             this->m_scaleAndRotateButton->setHidden(true);
 
         this->proxySpacesWidgets[spaceId] = this->mainSpace.addWidget(this->spacesWidgets[spaceId]);
-        this->proxySpacesWidgets[spaceId]->setPos(spaceItem.center().x() - spaceItem.size().width() / 2,
-                                                  spaceItem.center().y() - spaceItem.size().height() / 2);
     }
 }
 
@@ -244,7 +256,15 @@ void SpaceManager::updateSpaces(const QList<QVariant> &devices)
 
 void SpaceManager::setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT)
 {
-    this->spaceModel.setSnapping(snapping, nParts, snappingPT, snappingRT);
+    this->m_snapping = snapping;
+    this->m_nParts = nParts;
+    this->m_snappingPT = snappingPT;
+    this->m_snappingRT = snappingRT;
+
+    this->spaceModel.setSnapping(snapping,
+                                 nParts,
+                                 snappingPT * this->spaceModel.rect().width()/ this->m_viewPortSize.width(),
+                                 snappingRT);
 }
 
 QSize SpaceManager::viewPortSize()
@@ -260,6 +280,13 @@ bool SpaceManager::editMode()
 void SpaceManager::setViewPortSize(QSize size)
 {
     this->m_viewPortSize = size;
+
+    this->spaceModel.setSnapping(this->m_snapping,
+                                 this->m_nParts,
+                                 this->m_snappingPT * this->spaceModel.rect().width()/ this->m_viewPortSize.width(),
+                                 this->m_snappingRT);
+
+    this->updateButtonsSize();
 }
 
 void SpaceManager::setEditMode(bool value)
@@ -340,7 +367,10 @@ void SpaceManager::mouseMoveEvent(QMouseEvent *event)
                          Qt::NoModifier);
 
     if (this->scaleAndRotate)
+    {
         this->spaceModel.scaleAndRotateSpace(modelMousePos);
+        this->updateButtonsSize();
+    }
 
     if (this->move)
         this->spaceModel.moveSpace(modelMousePos);

@@ -111,9 +111,10 @@ void SpaceModel::selectSpace(QString spaceId)
         {
             this->m_spaces[space].setRef();
             this->m_spaces << this->m_spaces.takeAt(space);
+            this->m_spaces = this->removeDuplicates(this->m_spaces);
             this->m_currentSelectedSpace = this->m_spaces[space].spaceId();
 
-            return;
+            break;
         }
 }
 
@@ -127,9 +128,10 @@ void SpaceModel::selectSpace(QPointF point)
         {
             this->m_spaces[space].setRef();
             this->m_currentSelectedSpace = this->m_spaces[space].spaceId();
+            this->m_spaces = this->removeDuplicates(this->m_spaces);
             this->m_spaces << this->m_spaces.takeAt(space);
 
-            return;
+            break;
         }
 }
 
@@ -204,41 +206,6 @@ qreal SpaceModel::calculateAngle(QPointF point)
     return 0;
 }
 
-void SpaceModel::scaleSpace(QPointF to)
-{
-    QList<qreal> hLines, vLines;
-
-    if (!this->snapLines(hLines, vLines))
-        return;
-
-    for (int space = 0; space < this->m_spaces.count(); space++)
-        if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
-        {
-            this->m_spaces[space].resetStatus();
-            QPointF center = this->m_spaces[space].center();
-            QPointF pi = this->m_pointRef - center;
-            QPointF pf = to - center;
-            qreal factor = sqrt(pow(pf.x(), 2) + pow(pf.y(), 2)) / sqrt(pow(pi.x(), 2) + pow(pi.y(), 2));
-            this->m_spaces[space].setScale(factor, hLines, vLines);
-
-            break;
-        }
-}
-
-void SpaceModel::rotateSpace(QPointF to)
-{
-    for (int space = 0; space < this->m_spaces.count(); space++)
-        if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
-        {
-            this->m_spaces[space].resetStatus();
-            QPointF center = this->m_spaces[space].center();
-            qreal angle = this->calculateAngle(to - center) - this->calculateAngle(this->m_pointRef - center);
-            this->m_spaces[space].setRotation(this->m_spaces[space].rotation() + angle);
-
-            break;
-        }
-}
-
 void SpaceModel::scaleAndRotateSpace(QPointF to)
 {
     QList<qreal> hLines, vLines;
@@ -257,7 +224,9 @@ void SpaceModel::scaleAndRotateSpace(QPointF to)
             qreal factor = sqrt(pow(pf.x(), 2) + pow(pf.y(), 2)) / sqrt(pow(pi.x(), 2) + pow(pi.y(), 2));
             qreal angle = this->calculateAngle(to - center) - this->calculateAngle(this->m_pointRef - center);
 
-            this->m_spaces[space].scaleAndRotate(this->m_spaces[space].scale() * factor, this->m_spaces[space].rotation() + angle, hLines, vLines);
+            this->m_spaces[space].scaleAndRotate(this->m_spaces[space].scale() * factor,
+                                                 this->m_spaces[space].rotation() + angle,
+                                                 hLines, vLines);
 
             break;
         }

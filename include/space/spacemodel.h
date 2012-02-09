@@ -74,8 +74,6 @@ class SpaceModel: public QObject
 
     public slots:
         void updateRect();
-        void scaleSpace(QPointF to);
-        void rotateSpace(QPointF to);
         void scaleAndRotateSpace(QPointF to);
         void moveSpace(QPointF to);
         void setCurrentSelectedSpace(QString value);

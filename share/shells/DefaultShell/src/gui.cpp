@@ -112,14 +112,14 @@ Gui::Gui(QWidget *parent): QDeclarativeView(parent)
     connect(bbxWebcams, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     connect(bbxWebcams, SIGNAL(configureDevice(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
 
-    this->candyBar = this->root->findChild<QDeclarativeItem *>("CandyBar");
+    this->effectBar = this->root->findChild<QDeclarativeItem *>("EffectBar");
 
-    this->candyView = this->root->findChild<QDeclarativeItem *>("CandyView");
+    this->effectView = this->root->findChild<QDeclarativeItem *>("EffectView");
 
-    connect(this->candyView, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
-    connect(this->candyView, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    connect(this->candyView, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
-    connect(this->candyView, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
+    connect(this->effectView, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
+    connect(this->effectView, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
+    connect(this->effectView, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
+    connect(this->effectView, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
 }
 
 void Gui::iconClicked(int index)
@@ -184,18 +184,18 @@ void Gui::onDeviceConfigureClicked(QString deviceId)
 
 void Gui::updateDevices(const QList<QVariant> &devices)
 {
-    QMetaObject::invokeMethod(this->bbxWebcams, "updateDevices", Q_ARG(QVariant, devices));
+    this->bbxWebcams->setProperty("devices", devices);
 }
 
 void Gui::updatePlugins(const QList<QVariant> &plugins)
 {
-    QMetaObject::invokeMethod(this->candyBar, "updateCandys", Q_ARG(QVariant, plugins));
+    QMetaObject::invokeMethod(this->effectBar, "updateEffects", Q_ARG(QVariant, plugins));
 }
 
 void Gui::setFrame(const QImage &frame)
 {
     this->webcamImageProvider->setFrame(frame);
-    this->windowBackground->setProperty("source", "image://webcam/" + QString(this->currentFrame));;
+    this->windowBackground->setProperty("source", "image://webcam/" + QString::number(this->currentFrame));
     this->currentFrame++;
 }
 

@@ -21,11 +21,11 @@
  * QML shell plugin
  */
 
-import QtQuick 1.0
+import QtQuick 1.1
 
 Rectangle
 {
-    id: recCandy
+    id: recEffect
     width: 136
     height: 104
     color: "#000000"
@@ -95,14 +95,14 @@ Rectangle
         anchors.right: parent.right
         anchors.rightMargin: 4
         anchors.verticalCenter: parent.verticalCenter
-        border.color: recCandy.isActivated? "#00ff00": "#ff0000"
+        border.color: recEffect.isActivated? "#00ff00": "#ff0000"
 
         Image
         {
             id: imgPluginThumbnail
             opacity: 0.75
             anchors.fill: parent
-            source: recCandy.thumbnail
+            source: recEffect.thumbnail
 
             MouseArea
             {
@@ -114,13 +114,13 @@ Rectangle
 
                 onClicked:
                 {
-                    recCandy.isActivated = !recCandy.isActivated
-                    recPluginThumbnail.border.color = recCandy.isActivated? "#00ff00": "#ff0000"
+                    recEffect.isActivated = !recEffect.isActivated
+                    recPluginThumbnail.border.color = recEffect.isActivated? "#00ff00": "#ff0000"
 
-                    if (recCandy.isActivated)
-                        recCandy.activated()
+                    if (recEffect.isActivated)
+                        recEffect.activated()
                     else
-                        recCandy.deactivated()
+                        recEffect.deactivated()
                 }
             }
 
@@ -137,7 +137,7 @@ Rectangle
                 {
                     id: txtIs3D
                     color: "#ffffff"
-                    text: recCandy.is3D? "3D": "2D"
+                    text: recEffect.is3D? "3D": "2D"
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     anchors.fill: parent
@@ -153,8 +153,8 @@ Rectangle
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 icon: "../images/icons/configure.svg"
-                visible: recCandy.isConfigurable && recCandy.isActivated
-                onClicked: recCandy.configureClicked()
+                visible: recEffect.isConfigurable && recEffect.isActivated
+                onClicked: recEffect.configureClicked()
                 onEntered: imgPluginThumbnail.opacity = 1
                 onExited: imgPluginThumbnail.opacity = 0.75
             }
@@ -170,9 +170,9 @@ Rectangle
 
                 onClicked:
                 {
-                    recCandy.isExpanded = !recCandy.isExpanded
+                    recEffect.isExpanded = !recEffect.isExpanded
 
-                    recCandy.expandedClicked()
+                    recEffect.expandedClicked()
                 }
 
                 onEntered: imgPluginThumbnail.opacity = 1
@@ -186,41 +186,41 @@ Rectangle
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: 0.01
-                visible: recCandy.isStacked && recCandy.isActivated
+                visible: recEffect.isStacked && recEffect.isActivated
 
-                //onClicked: recCandy.move(btnMove.mouseX, btnMove.mouseY)
+                //onClicked: recEffect.move(btnMove.mouseX, btnMove.mouseY)
 
                 onEntered:
                 {
                     imgPluginThumbnail.opacity = 1
                     btnMove.opacity = 1
-                    recCandy.enteredMove()
+                    recEffect.enteredMove()
                 }
 
                 onExited:
                 {
                     btnMove.opacity = 0.01
-                    recCandy.exitedMove()
+                    recEffect.exitedMove()
                 }
 
                 onPressed:
                 {
-                    recCandy.beginMove(btnMove.mouseX, btnMove.mouseY)
-                    recCandy.moving = true
+                    recEffect.beginMove(btnMove.mouseX, btnMove.mouseY)
+                    recEffect.moving = true
                 }
 
                 onPositionChanged:
                 {
-                    if (recCandy.moving)
-                        recCandy.move(btnMove.mouseX, btnMove.mouseY)
+                    if (recEffect.moving)
+                        recEffect.move(btnMove.mouseX, btnMove.mouseY)
                 }
 
                 onReleased:
                 {
-                    if (recCandy.moving)
+                    if (recEffect.moving)
                     {
-                        recCandy.moving = false
-                        recCandy.endMove()
+                        recEffect.moving = false
+                        recEffect.endMove()
                     }
                 }
             }
@@ -242,7 +242,7 @@ Rectangle
         {
             id: txtName
             color: "#ffffff"
-            text: recCandy.name
+            text: recEffect.name
             font.bold: true
             anchors.top: parent.top
             anchors.topMargin: 4
@@ -254,7 +254,7 @@ Rectangle
         {
             id: txtVersion
             color: "#ffffff"
-            text: "(" + recCandy.version + ")"
+            text: "(" + recEffect.version + ")"
             verticalAlignment: Text.AlignVCenter
             anchors.left: txtName.right
             anchors.leftMargin: 4
@@ -265,7 +265,7 @@ Rectangle
         {
             id: txtSummary
             color: "#ffffff"
-            text: qsTr(recCandy.summary)
+            text: qsTr(recEffect.summary)
             anchors.leftMargin: 4
             anchors.right: parent.right
             anchors.topMargin: 8
@@ -288,7 +288,7 @@ Rectangle
         {
             id: txtCategory
             color: "#ffffff"
-            text: qsTr(recCandy.category)
+            text: qsTr(recEffect.category)
             anchors.leftMargin: 4
             verticalAlignment: Text.AlignVCenter
             anchors.left: imgCategory.right
@@ -309,7 +309,7 @@ Rectangle
         {
             id: txtLicense
             color: "#ffffff"
-            text: recCandy.license
+            text: recEffect.license
             anchors.left: imgLicense.right
             anchors.leftMargin: 4
             anchors.verticalCenter: imgLicense.verticalCenter
@@ -332,7 +332,7 @@ Rectangle
         {
             id: txtAuthor
             color: "#ffffff"
-            text: recCandy.author
+            text: recEffect.author
             anchors.left: imgAuthor.right
             anchors.leftMargin: 4
             anchors.verticalCenter: imgAuthor.verticalCenter
@@ -342,16 +342,16 @@ Rectangle
         Button
         {
             id: btnWeb
-            width: recCandy.website != ""? 64 / 3: 0
+            width: recEffect.website != ""? 64 / 3: 0
             height: 64 / 3
             backSecondColor: "#00000000"
             backFirstColor: "#00000000"
-            anchors.leftMargin: recCandy.website != ""? 4: 0
+            anchors.leftMargin: recEffect.website != ""? 4: 0
             anchors.left: txtAuthor.right
             anchors.verticalCenter: imgAuthor.verticalCenter
             icon: "../images/icons/web.svg"
-            onClicked: Qt.openUrlExternally(recCandy.website)
-            visible: recCandy.website != ""
+            onClicked: Qt.openUrlExternally(recEffect.website)
+            visible: recEffect.website != ""
         }
 
         Button
@@ -365,8 +365,8 @@ Rectangle
             anchors.left: btnWeb.right
             anchors.verticalCenter: imgAuthor.verticalCenter
             icon: "../images/icons/mail.svg"
-            onClicked: Qt.openUrlExternally(recCandy.mail)
-            visible: recCandy.mail != ""
+            onClicked: Qt.openUrlExternally(recEffect.mail)
+            visible: recEffect.mail != ""
         }
     }
 
@@ -375,13 +375,13 @@ Rectangle
         State
         {
             name: "onExpanded"
-            when: recCandy.isExpanded == true
+            when: recEffect.isExpanded == true
 
             PropertyChanges
             {
-                target: recCandy
+                target: recEffect
                 width: 350
-                height: recCandy.maxHeight1 > recCandy.maxHeight2? recCandy.maxHeight1: recCandy.maxHeight2
+                height: recEffect.maxHeight1 > recEffect.maxHeight2? recEffect.maxHeight1: recEffect.maxHeight2
             }
 
             PropertyChanges

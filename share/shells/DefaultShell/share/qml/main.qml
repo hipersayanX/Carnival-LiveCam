@@ -21,7 +21,7 @@
  * QML shell plugin
  */
 
-import QtQuick 1.0
+import QtQuick 1.1
 
 Window
 {
@@ -30,7 +30,7 @@ Window
     width: 640
     height: 480
     color: "#e6000000"
-    property bool showCandyBar: false
+    property bool showEffectBar: false
 
     onMousePressed:
     {
@@ -38,11 +38,11 @@ Window
         about.visible = false
     }
 
-    CandyBar
+    EffectBar
     {
-        id: cdbCandyBar
-        objectName: "CandyBar"
-        visible: wdgMainWidget.showCandyBar
+        id: cdbEffectBar
+        objectName: "EffectBar"
+        visible: wdgMainWidget.showEffectBar
         anchors.rightMargin: 1
         anchors.bottomMargin: 1
         anchors.topMargin: 1
@@ -59,7 +59,7 @@ Window
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
 
-        Component.onCompleted: updateItems({"Set a Device": "../images/icons/webcam.svg", "Take a Picture": "../images/icons/picture.svg", "Record Video": "../images/icons/video.svg", "Candy Bar": "../images/icons/effects.svg", "Edit Spaces": "../images/icons/spaces.svg", "Fullscreen": "../images/icons/fullscreen.svg", "About": "../images/icons/about.svg"})
+        Component.onCompleted: updateItems({"Set a Device": "../images/icons/webcam.svg", "Take a Picture": "../images/icons/picture.svg", "Record Video": "../images/icons/video.svg", "Apply Effects": "../images/icons/effects.svg", "Edit Spaces": "../images/icons/spaces.svg", "Fullscreen": "../images/icons/fullscreen.svg", "About": "../images/icons/about.svg"})
 
         onEntered: iconbar.opacity = 1
         onExited: iconbar.opacity = 0.5
@@ -91,7 +91,7 @@ Window
                 {
                     about.visible = false
                     webcams.visible = false
-                    wdgMainWidget.showCandyBar = !wdgMainWidget.showCandyBar
+                    wdgMainWidget.showEffectBar = !wdgMainWidget.showEffectBar
                 }
                 break
 
@@ -99,7 +99,7 @@ Window
                 {
                     about.visible = false
                     webcams.visible = false
-                    wdgMainWidget.showCandyBar = false
+                    wdgMainWidget.showEffectBar = false
                 }
                 break
 
@@ -119,7 +119,7 @@ Window
                 {
                     webcams.visible = false
                     about.visible = !about.visible
-                    wdgMainWidget.showCandyBar = false
+                    wdgMainWidget.showEffectBar = false
                 }
                 break
 
@@ -127,14 +127,14 @@ Window
                 {
                     about.visible = false
                     webcams.visible = false
-                    wdgMainWidget.showCandyBar = false
+                    wdgMainWidget.showEffectBar = false
                 }
                 break
             }
         }
     }
 
-    ButtonBox
+    Devices
     {
         id: webcams
         anchors.bottomMargin: 5
