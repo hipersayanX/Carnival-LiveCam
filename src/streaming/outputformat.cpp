@@ -65,9 +65,9 @@ OutputFormat::OutputFormat(const OutputFormat &object):
 /*!
   \fn OutputFormat::OutputFormat(QString suffix,
                                  QString vcodec,
-                                 int vbitrate,
+                                 qint32 vbitrate,
                                  QString acodec,
-                                 int abitrate,
+                                 qint32 abitrate,
                                  QString oformat,
                                  bool sameq)
 
@@ -81,9 +81,9 @@ OutputFormat::OutputFormat(const OutputFormat &object):
  */
 OutputFormat::OutputFormat(QString suffix,
                            QString vcodec,
-                           int vbitrate,
+                           qint32 vbitrate,
                            QString acodec,
-                           int abitrate,
+                           qint32 abitrate,
                            QString oformat,
                            bool sameq):
     m_suffix(suffix),
@@ -118,7 +118,7 @@ OutputFormat& OutputFormat::operator =(const OutputFormat &other)
 }
 
 /*!
-  \fn QStringList OutputFormat::toStringList(int fps, int width, int height)
+  \fn QStringList OutputFormat::toStringList(qint32 fps, qint32 width, qint32 height)
 
   \param fps Frames Per Second.
   \param width Width of the output frame.
@@ -126,7 +126,7 @@ OutputFormat& OutputFormat::operator =(const OutputFormat &other)
 
   \return Returns a string list of output parameters.
  */
-QStringList OutputFormat::toStringList(int fps, int width, int height)
+QStringList OutputFormat::toStringList(qint32 fps, qint32 width, qint32 height)
 {
     QStringList arguments;
 
@@ -169,7 +169,7 @@ QString OutputFormat::vcodec()
 
   \brief Video bitrate.
  */
-int OutputFormat::vbitrate()
+qint32 OutputFormat::vbitrate()
 {
     return this->m_vbitrate;
 }
@@ -189,7 +189,7 @@ QString OutputFormat::acodec()
 
   \brief Audio bitrate.
  */
-int OutputFormat::abitrate()
+qint32 OutputFormat::abitrate()
 {
     return this->m_abitrate;
 }
@@ -239,13 +239,13 @@ void OutputFormat::setVcodec(QString value)
 }
 
 /*!
-  \fn void OutputFormat::setVbitrate(int value)
+  \fn void OutputFormat::setVbitrate(qint32 value)
 
   \param value Video bitrate.
 
   \brief Set the video bitrate.
  */
-void OutputFormat::setVbitrate(int value)
+void OutputFormat::setVbitrate(qint32 value)
 {
     this->m_vbitrate = value;
 }
@@ -263,13 +263,13 @@ void OutputFormat::setAcodec(QString value)
 }
 
 /*!
-  \fn void OutputFormat::setAbitrate(int value)
+  \fn void OutputFormat::setAbitrate(qint32 value)
 
   \param value Audio bitrate.
 
   \brief Set the audio bitrate.
  */
-void OutputFormat::setAbitrate(int value)
+void OutputFormat::setAbitrate(qint32 value)
 {
     this->m_abitrate = value;
 }

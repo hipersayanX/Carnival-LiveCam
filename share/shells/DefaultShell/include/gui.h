@@ -60,23 +60,26 @@ class Gui: public QDeclarativeView
         void toggleEditMode();
         void takePicture();
         void startStopRecord();
+        void enabledDeviceMoved(qint32 from, qint32 to);
         void deviceEnable(QString deviceId);
         void deviceDisable(QString deviceId);
         void pluginActivated(QString pluginId);
         void pluginDeactivated(QString pluginId);
-        void pluginMoved(int from, int to);
+        void pluginMoved(qint32 from, qint32 to);
         void pluginConfigureClicked(QString pluginId);
         void deviceConfigureClicked(QString deviceId);
         void closed();
 
     public slots:
         void setFrame(const QImage &frame);
-        void updateDevices(const QList<QVariant> &devices);
+        void moveDevice(qint32 from, qint32 to);
+        void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
 
     private slots:
         void onViewPortSizeChanged(int width, int height);
         void iconClicked(int index=0);
+        void onEnabledDeviceMoved(int from, int to);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);
         void onPluginActivated(QString pluginId);

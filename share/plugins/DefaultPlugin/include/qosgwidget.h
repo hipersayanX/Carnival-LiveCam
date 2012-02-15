@@ -40,7 +40,7 @@ class QOSGWidget: public QGLWidget
         QImage webcam_image;
 
     private:
-        float cow_rot;
+        qreal cow_rot;
 
         osg::ref_ptr<osgViewer::Viewer> viewer;
         osg::observer_ptr<osgViewer::GraphicsWindowEmbedded> window;
@@ -49,7 +49,7 @@ class QOSGWidget: public QGLWidget
         osg::ref_ptr<osg::Group> group;
 
         void initializeGL();
-        void resizeGL(int width, int height);
+        void resizeGL(qint32 width, qint32 height);
         void paintGL();
 
         osg::ref_ptr<osg::TextureRectangle> convertQImageToOsgTexture(const QImage &qimage);

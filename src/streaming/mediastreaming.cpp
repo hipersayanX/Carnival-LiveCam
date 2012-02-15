@@ -250,17 +250,17 @@ QStringList MediaStreaming::outputParameters(QString filename)
 }
 
 /*!
-  \fn void MediaStreaming::setFPS(int fps)
+  \fn void MediaStreaming::setFPS(qint32 fps)
 
   \param fps Frames Per Second.
 
   \brief Set the recording FPS.
  */
-void MediaStreaming::setFPS(int fps)
+void MediaStreaming::setFPS(qint32 fps)
 {
     this->fps = fps;
 
-    this->timerRecord.setInterval((int)round(1000.0f / (qreal)fps));
+    this->timerRecord.setInterval((qint32)round(1000.0f / (qreal)fps));
 }
 
 /*!

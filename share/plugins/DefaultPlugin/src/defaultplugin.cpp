@@ -88,7 +88,7 @@ void DefaultPlugin::begin()
     glWidget = new QOSGWidget();
 }
 
-void DefaultPlugin::resize(int width, int height)
+void DefaultPlugin::resize(qint32 width, qint32 height)
 {
     glWidget->resize(width, height);
 }

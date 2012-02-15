@@ -220,15 +220,25 @@ bool DeviceManager::deviceEnable(QString deviceId)
     if (!this->devicesInfo.contains(deviceId))
         return false;
 
-    this->driverManager.load(this->devicesInfo[deviceId].driverId());
-    Driver *driver = this->driverManager.driver(this->devicesInfo[deviceId].driverId());
+    QString driverId = this->devicesInfo[deviceId].driverId();
+    bool firstDevice = !this->driverManager.isLoaded(driverId);
 
-    if (this->driverConfigs.contains(this->devicesInfo[deviceId].driverId()))
-        driver->setConfigs(this->driverConfigs[this->devicesInfo[deviceId].driverId()]);
+    this->driverManager.load(driverId);
+    Driver *driver = this->driverManager.driver(driverId);
 
-    driver->begin();
+    if (firstDevice)
+    {
+        if (this->driverConfigs.contains(driverId))
+            driver->setConfigs(this->driverConfigs[driverId]);
+
+        driver->begin();
+    }
+
     driver->enableDevice(deviceId);
-    connect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
+
+    if (firstDevice)
+        connect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
+
     this->m_activeDevices << deviceId;
     this->devicesInfo[deviceId].setIsEnabled(true);
 
@@ -250,16 +260,32 @@ bool DeviceManager::deviceDisable(QString deviceId)
     if (!this->devicesInfo.contains(deviceId))
         return false;
 
-    Driver *driver = this->driverManager.driver(this->devicesInfo[deviceId].driverId());
+    QString driverId = this->devicesInfo[deviceId].driverId();
+
+    if(!this->driverManager.isLoaded(driverId))
+        return false;
+
+    bool lastDevice = this->driverManager.activeDrivers().count() == 1;
+
+    Driver *driver = this->driverManager.driver(driverId);
 
     if (!driver)
         return false;
 
-    this->driverConfigs[this->devicesInfo[deviceId].driverId()] = driver->configs();
-    disconnect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
+    if (lastDevice)
+    {
+        this->driverConfigs[driverId] = driver->configs();
+        disconnect(driver, SIGNAL(devicesModified()), this, SLOT(onDevicesModified()));
+    }
+
     driver->disableDevice(deviceId);
-    driver->end();
-    this->driverManager.unload(this->devicesInfo[deviceId].driverId());
+
+    if (lastDevice)
+    {
+        driver->end();
+        this->driverManager.unload(driverId);
+    }
+
     this->m_activeDevices.removeOne(deviceId);
     this->devicesInfo[deviceId].setIsEnabled(false);
 

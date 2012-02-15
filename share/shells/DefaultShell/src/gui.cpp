@@ -108,6 +108,7 @@ Gui::Gui(QWidget *parent): QDeclarativeView(parent)
 
     this->bbxWebcams = this->root->findChild<QDeclarativeItem *>("bbxWebcams");
 
+    connect(bbxWebcams, SIGNAL(enabledDeviceMoved(int, int)), this, SLOT(onEnabledDeviceMoved(int, int)));
     connect(bbxWebcams, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
     connect(bbxWebcams, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     connect(bbxWebcams, SIGNAL(configureDevice(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
@@ -147,6 +148,11 @@ void Gui::iconClicked(int index)
     }
 }
 
+void Gui::onEnabledDeviceMoved(int from, int to)
+{
+    emit enabledDeviceMoved(from, to);
+}
+
 void Gui::onDeviceEnable(QString deviceId)
 {
     emit deviceEnable(deviceId);
@@ -182,8 +188,9 @@ void Gui::onDeviceConfigureClicked(QString deviceId)
     emit deviceConfigureClicked(deviceId);
 }
 
-void Gui::updateDevices(const QList<QVariant> &devices)
+void Gui::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
 {
+    this->bbxWebcams->setProperty("activeDevices", activeSpaces);
     this->bbxWebcams->setProperty("devices", devices);
 }
 
@@ -197,6 +204,11 @@ void Gui::setFrame(const QImage &frame)
     this->webcamImageProvider->setFrame(frame);
     this->windowBackground->setProperty("source", "image://webcam/" + QString::number(this->currentFrame));
     this->currentFrame++;
+}
+
+void Gui::moveDevice(qint32 from, qint32 to)
+{
+    QMetaObject::invokeMethod(this->bbxWebcams, "moveDevice", Q_ARG(QVariant, from), Q_ARG(QVariant, to));
 }
 
 void Gui::onViewPortSizeChanged(int width, int height)
@@ -313,10 +325,10 @@ void Gui::onBeginResizeTopLeft()
 
 void Gui::onResizeTopLeft()
 {
-    int dpx = QCursor::pos().x() - this->mousePos0.x();
-    int dpy = QCursor::pos().y() - this->mousePos0.y();
-    int dsx = -dpx;
-    int dsy = -dpy;
+    qint32 dpx = QCursor::pos().x() - this->mousePos0.x();
+    qint32 dpy = QCursor::pos().y() - this->mousePos0.y();
+    qint32 dsx = -dpx;
+    qint32 dsy = -dpy;
 
     if (this->size().width() == this->minimumSize().width())
         dpx = 0;
@@ -349,9 +361,9 @@ void Gui::onBeginResizeBottomLeft()
 
 void Gui::onResizeBottomLeft()
 {
-    int dpx = QCursor::pos().x() - this->mousePos0.x();
-    int dsx = -dpx;
-    int dsy = QCursor::pos().y() - this->mousePos0.y();
+    qint32 dpx = QCursor::pos().x() - this->mousePos0.x();
+    qint32 dsx = -dpx;
+    qint32 dsy = QCursor::pos().y() - this->mousePos0.y();
 
     if (this->size().width() == this->minimumSize().width())
         dpx = 0;
@@ -381,8 +393,8 @@ void Gui::onBeginResizeBottomRight()
 
 void Gui::onResizeBottomRight()
 {
-    int dsx = QCursor::pos().x() - this->mousePos0.x();
-    int dsy = QCursor::pos().y() - this->mousePos0.y();
+    qint32 dsx = QCursor::pos().x() - this->mousePos0.x();
+    qint32 dsy = QCursor::pos().y() - this->mousePos0.y();
 
     this->setGeometry(this->windowPos0.x(),
                       this->windowPos0.y(),
@@ -409,8 +421,8 @@ void Gui::onBeginResizeLeft()
 
 void Gui::onResizeLeft()
 {
-    int dp = QCursor::pos().x() - this->mousePos0.x();
-    int ds = -dp;
+    qint32 dp = QCursor::pos().x() - this->mousePos0.x();
+    qint32 ds = -dp;
 
     if (this->size().width() == this->minimumSize().width())
         dp = 0;
@@ -461,8 +473,8 @@ void Gui::onBeginResizeTop()
 
 void Gui::onResizeTop()
 {
-    int dp = QCursor::pos().y() - this->mousePos0.y();
-    int ds = -dp;
+    qint32 dp = QCursor::pos().y() - this->mousePos0.y();
+    qint32 ds = -dp;
 
     if (this->size().height() == this->minimumSize().height())
         dp = 0;

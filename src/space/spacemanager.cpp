@@ -42,6 +42,8 @@ SpaceManager::SpaceManager(QObject *parent): QObject(parent)
     this->m_nParts = 1;
     this->m_snappingPT = 0;
     this->m_snappingRT = 0;
+
+    connect(&this->spaceModel, SIGNAL(spaceMoved(qint32, qint32)), this, SLOT(onSpaceMoved(qint32, qint32)));
 }
 
 SpaceManager::~SpaceManager()
@@ -71,7 +73,7 @@ QImage SpaceManager::render()
 
     QPainter mainPainter(&mainFrame);
 
-    for (int space = 0; space < this->spaceModel.spaces().count(); space++)
+    for (qint32 space = 0; space < this->spaceModel.spaces().count(); space++)
     {
         Space spaceItem = this->spaceModel.spaces()[space];
 
@@ -111,11 +113,21 @@ QPointF SpaceManager::mapViewPortToModel(const QPoint &pos, const QSize &viewpor
     return posSpace;
 }
 
+QStringList SpaceManager::activeSpaces()
+{
+    QStringList spaces;
+
+    foreach (Space space, this->spaceModel.spaces())
+        spaces << space.spaceId();
+
+    return spaces;
+}
+
 void SpaceManager::updateButtonsSize()
 {
     QRectF spaceModelRect = this->spaceModel.rect();
 
-    for (int space =0; space < this->spaceModel.spaces().count(); space++)
+    for (qint32 space =0; space < this->spaceModel.spaces().count(); space++)
     {
         Space spaceItem = this->spaceModel.spaces()[space];
 
@@ -192,6 +204,11 @@ QWidget *SpaceManager::sendMouseEvent(QEvent::Type type,
     return controlWidget;
 }
 
+void SpaceManager::onSpaceMoved(qint32 from, qint32 to)
+{
+    emit spaceMoved(from, to);
+}
+
 void SpaceManager::setSpace(QString spaceId, const QImage &frame)
 {
     if (this->spacesWidgets.contains(spaceId))
@@ -254,7 +271,12 @@ void SpaceManager::updateSpaces(const QList<QVariant> &devices)
         this->removeSpace(orphanDevice);
 }
 
-void SpaceManager::setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT)
+void SpaceManager::moveSpace(qint32 from, qint32 to)
+{
+    this->spaceModel.moveSpace(from, to);
+}
+
+void SpaceManager::setSnapping(bool snapping, qint32 nParts, qreal snappingPT, qreal snappingRT)
 {
     this->m_snapping = snapping;
     this->m_nParts = nParts;

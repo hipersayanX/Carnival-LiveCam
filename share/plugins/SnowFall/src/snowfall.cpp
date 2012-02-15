@@ -102,7 +102,7 @@ void SnowFall::begin()
     this->config.setSnow(this->snow);
 }
 
-void SnowFall::resize(int width, int height)
+void SnowFall::resize(qint32 width, qint32 height)
 {
     this->snow->resize(width, height);
 }

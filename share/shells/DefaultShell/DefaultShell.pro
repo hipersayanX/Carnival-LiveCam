@@ -62,12 +62,12 @@ OTHER_FILES += \
     share/images/pixmaps/thumbnail-128x96.png \
     share/images/pixmaps/windowcontrols.svg \
     share/qml/Button.qml \
-    share/qml/ButtonBox.qml \
     share/qml/Effect.qml \
     share/qml/EffectBar.qml \
     share/qml/EffectView.qml \
     share/qml/ComboBox.qml \
     share/qml/Device.qml \
+    share/qml/Devices.qml \
     share/qml/DialogBox.qml \
     share/qml/IconBar.qml \
     share/qml/ListWidget.qml \

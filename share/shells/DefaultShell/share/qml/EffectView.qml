@@ -161,14 +161,14 @@ Rectangle
             Rectangle
             {
                 width: recEffectView.width - sldScroll.width
-                height: cndEffect.height
+                height: effEffect.height
                 color: "#00000000"
 
                 Effect
                 {
-                    id: cndEffect
-                    visible: recEffectView.showCategory == "All" || recEffectView.showCategory == cndEffect.category? true: false
-                    height: cndEffect.visible? 104: 0
+                    id: effEffect
+                    visible: recEffectView.showCategory == "All" || recEffectView.showCategory == effEffect.category? true: false
+                    height: effEffect.visible? 104: 0
                     isStacked: recEffectView.isStackView
                     is3D: propIs3D
                     isActivated: propIsActivated
@@ -191,44 +191,44 @@ Rectangle
 
                     onBeginMove:
                     {
-                        oldIndex = lsvEffects.pluginIndex(cndEffect.pluginId)
-                        cndEffect.oldPositionY = mouseY
+                        effEffect.oldIndex = lsvEffects.pluginIndex(effEffect.pluginId)
+                        effEffect.oldPositionY = mouseY
                     }
 
                     onMove:
                     {
-                        cndEffect.newIndex = Math.round((mouseY - cndEffect.oldPositionY) * (lsvEffects.count / lsvEffects.contentHeight) + cndEffect.oldIndex)
+                        effEffect.newIndex = Math.round((mouseY - effEffect.oldPositionY) * (lsvEffects.count / lsvEffects.contentHeight) + effEffect.oldIndex)
 
-                        if (cndEffect.newIndex < 0)
-                            cndEffect.newIndex = 0
+                        if (effEffect.newIndex < 0)
+                            effEffect.newIndex = 0
 
-                        if (cndEffect.newIndex >= lsvEffects.count)
-                            cndEffect.newIndex = lsvEffects.count - 1
+                        if (effEffect.newIndex >= lsvEffects.count)
+                            effEffect.newIndex = lsvEffects.count - 1
 
-                        if (cndEffect.newIndex != cndEffect.oldIndex)
+                        if (effEffect.newIndex != effEffect.oldIndex)
                         {
-                            lsmEffects.move(cndEffect.oldIndex, cndEffect.newIndex, 1)
-                            recEffectView.pluginMoved(cndEffect.oldIndex, cndEffect.newIndex)
-                            cndEffect.oldIndex = cndEffect.newIndex
+                            lsmEffects.move(effEffect.oldIndex, effEffect.newIndex, 1)
+                            recEffectView.pluginMoved(effEffect.oldIndex, effEffect.newIndex)
+                            effEffect.oldIndex = effEffect.newIndex
                         }
                     }
 
                     onExpandedClicked:
                     {
-                        var expanded = cndEffect.isExpanded
+                        var expanded = effEffect.isExpanded
                         recEffectView.collapseAll()
-                        cndEffect.isExpanded = expanded
+                        effEffect.isExpanded = expanded
 
-                        if (cndEffect.isExpanded)
-                            cndEffect.anchors.horizontalCenterOffset = - (cndEffect.width - cndEffect.originalContentWidth) / 2
+                        if (effEffect.isExpanded)
+                            effEffect.anchors.horizontalCenterOffset = - (effEffect.width - effEffect.originalContentWidth) / 2
                         else
-                            cndEffect.anchors.horizontalCenterOffset = 0
+                            effEffect.anchors.horizontalCenterOffset = 0
                     }
 
-                    onConfigureClicked: recEffectView.pluginConfigureClicked(cndEffect.pluginId)
-                    onActivated: recEffectView.pluginActivated(cndEffect.pluginId)
-                    onDeactivated: recEffectView.pluginDeactivated(cndEffect.pluginId)
-                    Component.onCompleted: cndEffect.originalContentWidth = cndEffect.width
+                    onConfigureClicked: recEffectView.pluginConfigureClicked(effEffect.pluginId)
+                    onActivated: recEffectView.pluginActivated(effEffect.pluginId)
+                    onDeactivated: recEffectView.pluginDeactivated(effEffect.pluginId)
+                    Component.onCompleted: effEffect.originalContentWidth = effEffect.width
                 }
             }
         }

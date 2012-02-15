@@ -32,78 +32,78 @@ class Snow: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(int width READ width WRITE setWidth RESET resetWidth)
-    Q_PROPERTY(int height READ height WRITE setHeight RESET resetHeight)
-    Q_PROPERTY(int nFlakes READ nFlakes WRITE setNFlakes RESET resetNFlakes)
-    Q_PROPERTY(float acceleration READ acceleration WRITE setAcceleration RESET resetAcceleration)
-    Q_PROPERTY(float direction READ direction WRITE setDirection RESET resetDirection)
-    Q_PROPERTY(float randFactor READ randFactor WRITE setRandFactor RESET resetRandFactor)
-    Q_PROPERTY(int border READ border WRITE setBorder RESET resetBorder)
-    Q_PROPERTY(float minZ READ minZ WRITE setMinZ RESET resetMinZ)
-    Q_PROPERTY(float maxZ READ maxZ WRITE setMaxZ RESET resetMaxZ)
-    Q_PROPERTY(float minScale READ minScale WRITE setMinScale RESET resetMinScale)
-    Q_PROPERTY(float maxScale READ maxScale WRITE setMaxScale RESET resetMaxScale)
+    Q_PROPERTY(qint32 width READ width WRITE setWidth RESET resetWidth)
+    Q_PROPERTY(qint32 height READ height WRITE setHeight RESET resetHeight)
+    Q_PROPERTY(qint32 nFlakes READ nFlakes WRITE setNFlakes RESET resetNFlakes)
+    Q_PROPERTY(qreal acceleration READ acceleration WRITE setAcceleration RESET resetAcceleration)
+    Q_PROPERTY(qreal direction READ direction WRITE setDirection RESET resetDirection)
+    Q_PROPERTY(qreal randFactor READ randFactor WRITE setRandFactor RESET resetRandFactor)
+    Q_PROPERTY(qint32 border READ border WRITE setBorder RESET resetBorder)
+    Q_PROPERTY(qreal minZ READ minZ WRITE setMinZ RESET resetMinZ)
+    Q_PROPERTY(qreal maxZ READ maxZ WRITE setMaxZ RESET resetMaxZ)
+    Q_PROPERTY(qreal minScale READ minScale WRITE setMinScale RESET resetMinScale)
+    Q_PROPERTY(qreal maxScale READ maxScale WRITE setMaxScale RESET resetMaxScale)
 
     public:
         explicit Snow(QObject *parent = 0);
 
-        Snow(int width,
-             int height,
-             int nFlakes,
-             float acceleration,
-             float direction,
-             float randFactor,
-             int border,
-             float minZ,
-             float maxZ,
-             float minScale,
-             float maxScale);
+        Snow(qint32 width,
+             qint32 height,
+             qint32 nFlakes,
+             qreal acceleration,
+             qreal direction,
+             qreal randFactor,
+             qint32 border,
+             qreal minZ,
+             qreal maxZ,
+             qreal minScale,
+             qreal maxScale);
 
-        int width();
-        int height();
-        int nFlakes();
-        float acceleration();
-        float direction();
-        float randFactor();
-        int border();
-        float minZ();
-        float maxZ();
-        float minScale();
-        float maxScale();
+        qint32 width();
+        qint32 height();
+        qint32 nFlakes();
+        qreal acceleration();
+        qreal direction();
+        qreal randFactor();
+        qint32 border();
+        qreal minZ();
+        qreal maxZ();
+        qreal minScale();
+        qreal maxScale();
 
         QImage render(const QImage &frame);
 
     private:
-        int m_width;
-        int m_height;
-        int m_nFlakes;
-        float m_acceleration;
-        float m_direction;
-        float m_randFactor;
-        int m_border;
-        float m_minZ;
-        float m_maxZ;
-        float m_minScale;
-        float m_maxScale;
+        qint32 m_width;
+        qint32 m_height;
+        qint32 m_nFlakes;
+        qreal m_acceleration;
+        qreal m_direction;
+        qreal m_randFactor;
+        qint32 m_border;
+        qreal m_minZ;
+        qreal m_maxZ;
+        qreal m_minScale;
+        qreal m_maxScale;
         QList<QImage> flakes;
         QList<SnowFlake> snowFlakes;
 
     public slots:
         void updateFlakes();
-        void resize(int width, int height);
+        void resize(qint32 width, qint32 height);
         void reset();
         void next();
-        void setWidth(int value);
-        void setHeight(int value);
-        void setNFlakes(int value);
-        void setAcceleration(float value);
-        void setDirection(float value);
-        void setRandFactor(float value);
-        void setBorder(int value);
-        void setMinZ(float value);
-        void setMaxZ(float value);
-        void setMinScale(float value);
-        void setMaxScale(float value);
+        void setWidth(qint32 value);
+        void setHeight(qint32 value);
+        void setNFlakes(qint32 value);
+        void setAcceleration(qreal value);
+        void setDirection(qreal value);
+        void setRandFactor(qreal value);
+        void setBorder(qint32 value);
+        void setMinZ(qreal value);
+        void setMaxZ(qreal value);
+        void setMinScale(qreal value);
+        void setMaxScale(qreal value);
         void resetWidth();
         void resetHeight();
         void resetNFlakes();

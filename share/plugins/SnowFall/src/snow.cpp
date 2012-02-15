@@ -45,17 +45,17 @@ Snow::Snow(QObject *parent): QObject(parent)
     this->updateFlakes();
 }
 
-Snow::Snow(int width,
-           int height,
-           int nFlakes,
-           float acceleration,
-           float direction,
-           float randFactor,
-           int border,
-           float minZ,
-           float maxZ,
-           float minScale,
-           float maxScale):
+Snow::Snow(qint32 width,
+           qint32 height,
+           qint32 nFlakes,
+           qreal acceleration,
+           qreal direction,
+           qreal randFactor,
+           qint32 border,
+           qreal minZ,
+           qreal maxZ,
+           qreal minScale,
+           qreal maxScale):
     m_width(width),
     m_height(height),
     m_nFlakes(nFlakes),
@@ -71,57 +71,57 @@ Snow::Snow(int width,
     this->updateFlakes();
 }
 
-int Snow::width()
+qint32 Snow::width()
 {
     return this->m_width;
 }
 
-int Snow::height()
+qint32 Snow::height()
 {
     return this->m_height;
 }
 
-int Snow::nFlakes()
+qint32 Snow::nFlakes()
 {
     return this->m_nFlakes;
 }
 
-float Snow::acceleration()
+qreal Snow::acceleration()
 {
     return this->m_acceleration;
 }
 
-float Snow::direction()
+qreal Snow::direction()
 {
     return this->m_direction;
 }
 
-float Snow::randFactor()
+qreal Snow::randFactor()
 {
     return this->m_randFactor;
 }
 
-int Snow::border()
+qint32 Snow::border()
 {
     return this->m_border;
 }
 
-float Snow::minZ()
+qreal Snow::minZ()
 {
     return this->m_minZ;
 }
 
-float Snow::maxZ()
+qreal Snow::maxZ()
 {
     return this->m_maxZ;
 }
 
-float Snow::minScale()
+qreal Snow::minScale()
 {
     return this->m_minScale;
 }
 
-float Snow::maxScale()
+qreal Snow::maxScale()
 {
     return this->m_maxScale;
 }
@@ -130,7 +130,7 @@ void Snow::updateFlakes()
 {
     this->flakes.clear();
 
-    for (int imgFlake = 0; imgFlake < 4; imgFlake++)
+    for (qint32 imgFlake = 0; imgFlake < 4; imgFlake++)
         this->flakes << QImage("share/plugins/SnowFall/share/flakes/flake" + QString::number(imgFlake) + ".png");
 }
 
@@ -141,7 +141,7 @@ QImage Snow::render(const QImage &frame)
 
     painter.begin(&tmpFrame);
 
-    for (int flake = 0; flake < this->m_nFlakes; flake++)
+    for (qint32 flake = 0; flake < this->m_nFlakes; flake++)
         painter.drawImage(this->snowFlakes[flake].x(),
                           this->snowFlakes[flake].y(),
                           this->snowFlakes[flake].flake().scaled(this->snowFlakes[flake].width(), this->snowFlakes[flake].height()));
@@ -152,7 +152,7 @@ QImage Snow::render(const QImage &frame)
     return tmpFrame;
 }
 
-void Snow::resize(int width, int height)
+void Snow::resize(qint32 width, qint32 height)
 {
     this->m_width = width;
     this->m_height = height;
@@ -164,7 +164,7 @@ void Snow::reset()
 {
     this->snowFlakes.clear();
 
-    for (int flake = 0; flake < this->m_nFlakes; flake++)
+    for (qint32 flake = 0; flake < this->m_nFlakes; flake++)
         this->snowFlakes << SnowFlake(0,
                                       0,
                                       0,
@@ -186,61 +186,61 @@ void Snow::reset()
 
 void Snow::next()
 {
-    for (int flake = 0; flake < this->m_nFlakes; flake++)
+    for (qint32 flake = 0; flake < this->m_nFlakes; flake++)
         this->snowFlakes[flake].next();
 }
 
-void Snow::setWidth(int value)
+void Snow::setWidth(qint32 value)
 {
     this->m_width = value;
 }
 
-void Snow::setHeight(int value)
+void Snow::setHeight(qint32 value)
 {
     this->m_height = value;
 }
 
-void Snow::setNFlakes(int value)
+void Snow::setNFlakes(qint32 value)
 {
     this->m_nFlakes = value;
 }
 
-void Snow::setAcceleration(float value)
+void Snow::setAcceleration(qreal value)
 {
     this->m_acceleration = value;
 }
 
-void Snow::setDirection(float value)
+void Snow::setDirection(qreal value)
 {
     this->m_direction = value;
 }
 
-void Snow::setRandFactor(float value)
+void Snow::setRandFactor(qreal value)
 {
     this->m_randFactor = value;
 }
 
-void Snow::setBorder(int value)
+void Snow::setBorder(qint32 value)
 {
     this->m_border = value;
 }
 
-void Snow::setMinZ(float value)
+void Snow::setMinZ(qreal value)
 {
     this->m_minZ = value;
 }
 
-void Snow::setMaxZ(float value)
+void Snow::setMaxZ(qreal value)
 {
     this->m_maxZ = value;
 }
 
-void Snow::setMinScale(float value)
+void Snow::setMinScale(qreal value)
 {
     this->m_minScale = value;
 }
 
-void Snow::setMaxScale(float value)
+void Snow::setMaxScale(qreal value)
 {
     this->m_maxScale = value;
 }

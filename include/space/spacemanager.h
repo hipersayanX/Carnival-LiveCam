@@ -42,6 +42,7 @@ class SpaceManager: public QObject
         ~SpaceManager();
         Q_INVOKABLE QImage render();
         Q_INVOKABLE QPointF mapViewPortToModel(const QPoint &pos, const QSize &viewportSize);
+        Q_INVOKABLE QStringList activeSpaces();
 
         QSize viewPortSize();
         bool editMode();
@@ -61,7 +62,7 @@ class SpaceManager: public QObject
         bool m_scaleAndRotateButtonVisible;
         bool m_editMode;
         bool m_snapping;
-        int m_nParts;
+        qint32 m_nParts;
         qreal m_snappingPT;
         qreal m_snappingRT;
 
@@ -74,11 +75,18 @@ class SpaceManager: public QObject
                                 Qt::MouseButtons buttons,
                                 Qt::KeyboardModifiers modifiers);
 
+    signals:
+        void spaceMoved(qint32 from, qint32 to);
+
+    private slots:
+        void onSpaceMoved(qint32 from, qint32 to);
+
     public slots:
         void setSpace(QString spaceId, const QImage &frame);
         void removeSpace(QString spaceId);
         void updateSpaces(const QList<QVariant> &devices);
-        void setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT);
+        void moveSpace(qint32 from, qint32 to);
+        void setSnapping(bool snapping, qint32 nParts, qreal snappingPT, qreal snappingRT);
         void setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);
         void setViewPortSize(QSize size);
         void setEditMode(bool value);

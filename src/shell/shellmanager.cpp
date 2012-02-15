@@ -241,11 +241,12 @@ bool ShellManager::enableShell(QString shellId)
     connect(this->activeShell, SIGNAL(mouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
     connect(this->activeShell, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     connect(this->activeShell, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
+    connect(this->activeShell, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
     connect(this->activeShell, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
     connect(this->activeShell, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     connect(this->activeShell, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
     connect(this->activeShell, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    connect(this->activeShell, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
+    connect(this->activeShell, SIGNAL(pluginMoved(qint32, qint32)), this, SLOT(onPluginMoved(qint32, qint32)));
     connect(this->activeShell, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
     connect(this->activeShell, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
     connect(this->activeShell, SIGNAL(closed()), this, SLOT(onClosed()));
@@ -278,11 +279,12 @@ bool ShellManager::disableShell(QString shellId)
     disconnect(this->activeShell, SIGNAL(mouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
     disconnect(this->activeShell, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     disconnect(this->activeShell, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
+    disconnect(this->activeShell, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
     disconnect(this->activeShell, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
     disconnect(this->activeShell, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     disconnect(this->activeShell, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
     disconnect(this->activeShell, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    disconnect(this->activeShell, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
+    disconnect(this->activeShell, SIGNAL(pluginMoved(qint32, qint32)), this, SLOT(onPluginMoved(qint32, qint32)));
     disconnect(this->activeShell, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
     disconnect(this->activeShell, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
     disconnect(this->activeShell, SIGNAL(closed()), this, SLOT(onClosed()));
@@ -330,9 +332,9 @@ void ShellManager::setFrame(const QImage &frame)
 
   \brief Updates the devices list.
  */
-void ShellManager::updateDevices(const QList<QVariant> &devices)
+void ShellManager::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
 {
-    this->activeShell->updateDevices(devices);
+    this->activeShell->updateDevices(devices, activeSpaces);
 }
 
 /*!
@@ -345,6 +347,11 @@ void ShellManager::updateDevices(const QList<QVariant> &devices)
 void ShellManager::updatePlugins(const QList<QVariant> &plugins)
 {
     this->activeShell->updatePlugins(plugins);
+}
+
+void ShellManager::moveDevice(qint32 from, qint32 to)
+{
+    this->activeShell->moveDevice(from, to);
 }
 
 void ShellManager::setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton)
@@ -406,6 +413,11 @@ void ShellManager::onStartStopRecord()
     emit startStopRecord();
 }
 
+void ShellManager::onEnabledDeviceMoved(qint32 from, qint32 to)
+{
+    emit enabledDeviceMoved(from, to);
+}
+
 void ShellManager::onDeviceEnable(QString deviceId)
 {
     emit deviceEnable(deviceId);
@@ -447,14 +459,14 @@ void ShellManager::onPluginDeactivated(QString pluginId)
 /*!
   \internal
 
-  \fn void ShellManager::onPluginMoved(int from, int to)
+  \fn void ShellManager::onPluginMoved(qint32 from, qint32 to)
 
   \param from The old index position of the plugin.
   \param to The new index position of the plugin.
 
   \brief This slot is called when the user changes the index of a plugin.
  */
-void ShellManager::onPluginMoved(int from, int to)
+void ShellManager::onPluginMoved(qint32 from, qint32 to)
 {
     emit pluginMoved(from, to);
 }

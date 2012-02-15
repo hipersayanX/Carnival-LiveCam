@@ -49,7 +49,7 @@ class DefaultPlugin: public QObject, public Plugin
         bool isConfigurable();
 
         void begin();
-        void resize(int width, int height);
+        void resize(qint32 width, qint32 height);
         QImage render(const QImage &image);
         void end();
 

@@ -184,7 +184,7 @@ bool PluginManager::enablePlugin(QString pluginId)
 }
 
 /*!
-  \fn bool PluginManager::enablePlugin(QString id, int index)
+  \fn bool PluginManager::enablePlugin(QString id, qint32 index)
 
   \param id Unique plugin identifier.
   \param index The index to insert the plugin.
@@ -194,7 +194,7 @@ bool PluginManager::enablePlugin(QString pluginId)
 
   \brief Try to activate the plugin \b id and insert it to \b index.
  */
-bool PluginManager::enablePlugin(QString pluginId, int index)
+bool PluginManager::enablePlugin(QString pluginId, qint32 index)
 {
     this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
 
@@ -237,7 +237,7 @@ bool PluginManager::disablePlugin(QString pluginId)
 {
     bool isEnabled = false;
 
-    for (int i = 0; i < this->activePlugins.size(); i++)
+    for (qint32 i = 0; i < this->activePlugins.size(); i++)
         if (this->activePlugins[i]->id() == pluginId)
         {
             this->pluginConfigs[pluginId] = this->activePlugins[i]->configs();
@@ -259,7 +259,7 @@ bool PluginManager::disablePlugin(QString pluginId)
 }
 
 /*!
-  \fn bool PluginManager::disablePlugin(int index)
+  \fn bool PluginManager::disablePlugin(qint32 index)
 
   \param index Index of the plugin in the stack.
 
@@ -268,7 +268,7 @@ bool PluginManager::disablePlugin(QString pluginId)
 
   \brief Try to desactivate the plugin at \b index.
  */
-bool PluginManager::disablePlugin(int index)
+bool PluginManager::disablePlugin(qint32 index)
 {
     if (index < 0 || index >= this->activePlugins.size())
         return false;
@@ -292,7 +292,7 @@ bool PluginManager::disablePlugin(int index)
  */
 void PluginManager::configurePlugin(QString pluginId)
 {
-    for (int i = 0; i < this->activePlugins.size(); i++)
+    for (qint32 i = 0; i < this->activePlugins.size(); i++)
         if (this->activePlugins[i]->id() == pluginId)
         {
             this->activePlugins[i]->configure();
@@ -302,14 +302,14 @@ void PluginManager::configurePlugin(QString pluginId)
 }
 
 /*!
-  \fn void PluginManager::movePlugin(int from, int to)
+  \fn void PluginManager::movePlugin(qint32 from, qint32 to)
 
   \param from The old index position of the plugin.
   \param to The new index position of the plugin.
 
   \brief Move a plugin from a index to another.
  */
-void PluginManager::movePlugin(int from, int to)
+void PluginManager::movePlugin(qint32 from, qint32 to)
 {
     this->activePlugins.move(from, to);
 }
@@ -327,7 +327,7 @@ void PluginManager::resize(QSize size, QString deviceId)
 
     this->frameSize = size;
 
-    for (int i = 0; i < this->activePlugins.size(); i++)
+    for (qint32 i = 0; i < this->activePlugins.size(); i++)
         this->activePlugins[i]->resize(size.width(), size.height());
 }
 
@@ -346,7 +346,7 @@ QImage PluginManager::getFrame(const QImage &image, QString deviceId)
 
     QImage frame = image;
 
-    for (int currentPlugin = 0; currentPlugin < this->activePlugins.size(); currentPlugin++)
+    for (qint32 currentPlugin = 0; currentPlugin < this->activePlugins.size(); currentPlugin++)
         frame = this->activePlugins[currentPlugin]->render(frame);
 
     return frame;

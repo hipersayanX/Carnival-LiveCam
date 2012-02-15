@@ -43,7 +43,7 @@ void QOSGWidget::initializeGL()
     window = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width(), height());
 }
 
-void QOSGWidget::resizeGL(int width, int height)
+void QOSGWidget::resizeGL(qint32 width, qint32 height)
 {
     if (window.valid())
     {

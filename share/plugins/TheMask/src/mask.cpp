@@ -41,7 +41,7 @@ Mask::Mask(QString fileName)
 
 QImage Mask::render(const QImage &frame)
 {
-    float scale = 4;
+    qreal scale = 4;
     QImage smallFrame(frame.scaled(frame.width() / scale, frame.height() / scale));
     cv::Mat matFrame = cv::Mat(smallFrame.height(), smallFrame.width(), CV_8UC3, (uchar *) smallFrame.bits(), smallFrame.bytesPerLine());
     std::vector<cv::Rect> vecFaces;

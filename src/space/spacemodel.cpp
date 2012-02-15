@@ -36,20 +36,20 @@ SpaceModel::SpaceModel(QObject *parent): QObject(parent)
     this->m_snappingRT = 0;
 }
 
-void SpaceModel::setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT)
+void SpaceModel::setSnapping(bool snapping, qint32 nParts, qreal snappingPT, qreal snappingRT)
 {
     this->m_snapping = snapping;
     this->m_nParts = nParts;
     this->m_snappingPT = snappingPT;
     this->m_snappingRT = snappingRT;
 
-    for (int space = 0; space < this->m_spaces.count(); space++)
+    for (qint32 space = 0; space < this->m_spaces.count(); space++)
         this->m_spaces[space].setSnapping(snapping, nParts, snappingPT, snappingRT);
 }
 
 Space SpaceModel::setSpace(QString spaceId, QSizeF size)
 {
-    for (int mspace = 0; mspace < this->m_spaces.count(); mspace++)
+    for (qint32 mspace = 0; mspace < this->m_spaces.count(); mspace++)
         if (this->m_spaces[mspace].spaceId() == spaceId)
         {
             this->m_spaces[mspace].setSize(size);
@@ -106,13 +106,14 @@ void SpaceModel::selectSpace(QString spaceId)
 {
     this->m_currentSelectedSpace = "";
 
-    for (int space = this->m_spaces.count() - 1; space >= 0; space--)
+    for (qint32 space = this->m_spaces.count() - 1; space >= 0; space--)
         if (this->m_spaces[space].spaceId() == spaceId)
         {
             this->m_spaces[space].setRef();
             this->m_spaces << this->m_spaces.takeAt(space);
             this->m_spaces = this->removeDuplicates(this->m_spaces);
             this->m_currentSelectedSpace = this->m_spaces[space].spaceId();
+            emit spaceMoved(space, this->m_spaces.count() - 1);
 
             break;
         }
@@ -123,13 +124,14 @@ void SpaceModel::selectSpace(QPointF point)
     this->m_pointRef = point;
     this->m_currentSelectedSpace = "";
 
-    for (int space = this->m_spaces.count() - 1; space >= 0; space--)
+    for (qint32 space = this->m_spaces.count() - 1; space >= 0; space--)
         if (this->m_spaces[space].contains(point))
         {
             this->m_spaces[space].setRef();
             this->m_currentSelectedSpace = this->m_spaces[space].spaceId();
             this->m_spaces = this->removeDuplicates(this->m_spaces);
             this->m_spaces << this->m_spaces.takeAt(space);
+            emit spaceMoved(space, this->m_spaces.count() - 1);
 
             break;
         }
@@ -172,7 +174,7 @@ void SpaceModel::toggleMaximizedSpace()
     if (!this->snapLines(hLines, vLines))
         return;
 
-    for (int space = 0; space < this->m_spaces.count(); space++)
+    for (qint32 space = 0; space < this->m_spaces.count(); space++)
         if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].toggleMaximized(hLines, vLines);
@@ -183,7 +185,7 @@ void SpaceModel::toggleMaximizedSpace()
 
 bool SpaceModel::isMaximized(QString spaceId)
 {
-    for (int space = 0; space < this->m_spaces.count(); space++)
+    for (qint32 space = 0; space < this->m_spaces.count(); space++)
         if (this->m_spaces[space].spaceId() == spaceId)
             return this->m_spaces[space].maximized();
 
@@ -213,7 +215,7 @@ void SpaceModel::scaleAndRotateSpace(QPointF to)
     if (!this->snapLines(hLines, vLines))
         return;
 
-    for (int space = 0; space < this->m_spaces.count(); space++)
+    for (qint32 space = 0; space < this->m_spaces.count(); space++)
         if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].resetStatus();
@@ -239,7 +241,7 @@ void SpaceModel::moveSpace(QPointF to)
     if (!this->snapLines(hLines, vLines))
         return;
 
-    for (int space = 0; space < this->m_spaces.count(); space++)
+    for (qint32 space = 0; space < this->m_spaces.count(); space++)
         if (this->m_spaces[space].spaceId() == this->m_currentSelectedSpace)
         {
             this->m_spaces[space].resetStatus();
@@ -247,6 +249,11 @@ void SpaceModel::moveSpace(QPointF to)
 
             break;
         }
+}
+
+void SpaceModel::moveSpace(qint32 from, qint32 to)
+{
+    this->m_spaces.move(from, to);
 }
 
 void SpaceModel::updateRect()
@@ -281,7 +288,7 @@ bool SpaceModel::snapping()
     return this->m_snapping;
 }
 
-int SpaceModel::nParts()
+qint32 SpaceModel::nParts()
 {
     return this->m_nParts;
 }
@@ -316,7 +323,7 @@ void SpaceModel::setSnapping(bool value)
     this->m_snapping = value;
 }
 
-void SpaceModel::setNParts(int value)
+void SpaceModel::setNParts(qint32 value)
 {
     this->m_nParts = value;
 }

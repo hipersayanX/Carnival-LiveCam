@@ -161,7 +161,7 @@ void Config::setFiles(QStringList files)
 {
     this->lswVideos->addItems(files);
 
-    for (int i = 0; i < this->lswVideos->count(); i++)
+    for (qint32 i = 0; i < this->lswVideos->count(); i++)
     {
         QString thumbnail = this->makeThumbnail(this->m_videoDevices->at(i));
         QStringList arguments;

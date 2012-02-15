@@ -44,11 +44,11 @@ class PluginManager: public QObject
 
     public slots:
         bool disablePlugin(QString pluginId);
-        bool disablePlugin(int index);
+        bool disablePlugin(qint32 index);
         bool enablePlugin(QString pluginId);
-        bool enablePlugin(QString pluginId, int index);
+        bool enablePlugin(QString pluginId, qint32 index);
         void configurePlugin(QString pluginId);
-        void movePlugin(int from, int to);
+        void movePlugin(qint32 from, qint32 to);
 
     private:
         QSize frameSize;

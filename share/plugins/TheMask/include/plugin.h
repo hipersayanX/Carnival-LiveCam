@@ -160,7 +160,7 @@ class Plugin
 
           \brief This function is called on frame size changed.
          */
-        virtual void resize(int width, int height) = 0;
+        virtual void resize(qint32 width, qint32 height) = 0;
 
         /*!
           \fn QImage Plugin::render(const QImage &image)

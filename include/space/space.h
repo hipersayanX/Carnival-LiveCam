@@ -32,7 +32,7 @@ class Space: public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString spaceId READ spaceId WRITE setSpaceId RESET resetSpaceId)
-    Q_PROPERTY(int nParts READ nParts WRITE setNParts RESET resetNParts)
+    Q_PROPERTY(qint32 nParts READ nParts WRITE setNParts RESET resetNParts)
     Q_PROPERTY(qreal scale READ scale WRITE setScale RESET resetScale)
     Q_PROPERTY(QPointF center READ center WRITE setCenter RESET resetCenter)
     Q_PROPERTY(QSizeF size READ size WRITE setSize RESET resetSize)
@@ -61,7 +61,7 @@ class Space: public QObject
         Q_INVOKABLE QPointF pos();
 
         QString spaceId();
-        int nParts();
+        qint32 nParts();
         qreal scale();
         QPointF center();
         QSizeF size();
@@ -74,7 +74,7 @@ class Space: public QObject
     private:
         QList<qreal> m_snapAngles;
         QString m_spaceId;
-        int m_nParts;
+        qint32 m_nParts;
         QPointF m_center;
         QPointF m_CenterRef;
         QSizeF m_size;
@@ -94,11 +94,11 @@ class Space: public QObject
 
     public slots:
         void setSpaceId(QString value);
-        void setNParts(int value);
+        void setNParts(qint32 value);
         void setCenter(QPointF value);
         void setSize(QSizeF value);
         void setSnapping(bool value);
-        void setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT);
+        void setSnapping(bool snapping, qint32 nParts, qreal snappingPT, qreal snappingRT);
         void setSnappingPT(qreal value);
         void setSnappingRT(qreal value);
         void setScale(qreal value);

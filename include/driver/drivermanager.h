@@ -37,15 +37,16 @@ class DriverManager: public QObject
     public:
         explicit DriverManager(QObject *parent = 0);
         Q_INVOKABLE QStringList captureDrivers();
+        Q_INVOKABLE QStringList activeDrivers();
         Q_INVOKABLE bool isLoaded(QString driverId);
         Q_INVOKABLE Driver *driver(QString driverId);
         Q_INVOKABLE bool load(QString driverId);
         Q_INVOKABLE bool unload(QString driverId);
 
      private:
-        QPluginLoader driverLoader;
-        QHash<QString, Driver *> activeDrivers;
-        QHash<QString, DriverInfo> driversInfo;
+        QPluginLoader m_driverLoader;
+        QHash<QString, Driver *> m_activeDrivers;
+        QHash<QString, DriverInfo> m_driversInfo;
 };
 
 #endif // DRIVERMANAGER_H

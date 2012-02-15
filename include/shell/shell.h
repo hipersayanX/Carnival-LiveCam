@@ -205,13 +205,13 @@ class Shell: public QObject
         virtual void setFrame(const QImage &frame) = 0;
 
         /*!
-          \fn void Shell::updateDevices(const QList<QVariant> &devices)
+          \fn void Shell::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
 
           \param devices Devices info list.
 
           \brief Set the devices to be selected by the user in the GUI.
          */
-        virtual void updateDevices(const QList<QVariant> &devices) = 0;
+        virtual void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces) = 0;
 
         /*!
           \fn void Shell::updatePlugins(const QList<QVariant> &plugins)
@@ -223,6 +223,7 @@ class Shell: public QObject
         virtual void updatePlugins(const QList<QVariant> &plugins) = 0;
 
         virtual void setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton) = 0;
+        virtual void moveDevice(qint32 from, qint32 to) = 0;
 
     signals:
         void viewPortSizeChanged(QSize size);
@@ -231,6 +232,7 @@ class Shell: public QObject
         void mousePressed(QMouseEvent *event);
         void mouseReleased(QMouseEvent *event);
         void toggleEditMode();
+        void enabledDeviceMoved(qint32 from, qint32 to);
 
         /*!
           \fn void Shell::takePicture()
@@ -268,14 +270,14 @@ class Shell: public QObject
         void pluginDeactivated(QString pluginId);
 
         /*!
-          \fn void Shell::pluginMoved(int from, int to)
+          \fn void Shell::pluginMoved(qint32 from, qint32 to)
 
           \param from The old index position of the plugin.
           \param to The new index position of the plugin.
 
           \brief This signal is emited when the user changes the index of a plugin.
          */
-        void pluginMoved(int from, int to);
+        void pluginMoved(qint32 from, qint32 to);
 
         /*!
           \fn void Shell::pluginConfigureClicked(QString pluginId)

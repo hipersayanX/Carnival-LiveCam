@@ -53,9 +53,10 @@ class DefaultShell: public Shell
 
     public slots:
         void setFrame(const QImage &frame);
-        void updateDevices(const QList<QVariant> &devices);
+        void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
         void setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton);
+        void moveDevice(qint32 from, qint32 to);
 
     private:
         Gui *gui;
@@ -69,11 +70,12 @@ class DefaultShell: public Shell
         void onToggleEditMode();
         void onTakePicture();
         void onStartStopRecord();
+        void onEnabledDeviceMoved(qint32 from, qint32 to);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);
         void onPluginActivated(QString pluginId);
         void onPluginDeactivated(QString pluginId);
-        void onPluginMoved(int from, int to);
+        void onPluginMoved(qint32 from, qint32 to);
         void onPluginConfigureClicked(QString pluginId);
         void onDeviceConfigureClicked(QString deviceId);
         void onClosed();

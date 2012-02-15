@@ -38,7 +38,7 @@ class MediaStreaming: public QObject
     public:
         explicit MediaStreaming(QObject *parent = 0);
 
-        Q_INVOKABLE void setFPS(int fps);
+        Q_INVOKABLE void setFPS(qint32 fps);
         Q_INVOKABLE void addOutputFormat(const OutputFormat &outputformat);
         Q_INVOKABLE QStringList supportedSuffix();
         Q_INVOKABLE bool isRecording();
@@ -61,7 +61,7 @@ class MediaStreaming: public QObject
         void setFrame(QImage frame);
 
     private:
-        int fps;
+        qint32 fps;
         bool recording;
         QTimer timerCapture;
         QTimer timerRecord;
@@ -71,7 +71,7 @@ class MediaStreaming: public QObject
         QString videoPipeFilename;
         QProcess ffmpeg;
         QHash<QString, OutputFormat> outputFormats;
-        QHash<int, QString> qtToFFmpegPixFMT;
+        QHash<qint32, QString> qtToFFmpegPixFMT;
 
         QString saveFile(QString filters);
         QStringList outputParameters(QString filename);

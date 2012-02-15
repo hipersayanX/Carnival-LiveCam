@@ -141,7 +141,7 @@ void Config::setFiles(QStringList files)
 {
     this->lswImages->addItems(files);
 
-    for (int i = 0; i < this->lswImages->count(); i++)
+    for (qint32 i = 0; i < this->lswImages->count(); i++)
     {
         this->lswImages->item(i)->setIcon(QIcon(this->m_imageDevices->at(i)));
         this->lswImages->item(i)->setText("");

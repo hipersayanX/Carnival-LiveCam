@@ -173,7 +173,7 @@ void Space::toggleMaximized(const QList<qreal> &hLines, const QList<qreal> &vLin
         this->resetStatus();
 }
 
-void Space::setSnapping(bool snapping, int nParts, qreal snappingPT, qreal snappingRT)
+void Space::setSnapping(bool snapping, qint32 nParts, qreal snappingPT, qreal snappingRT)
 {
     this->m_snapping = snapping;
     this->m_nParts = nParts;
@@ -430,7 +430,7 @@ QString Space::spaceId()
     return this->m_spaceId;
 }
 
-int Space::nParts()
+qint32 Space::nParts()
 {
     return this->m_nParts;
 }
@@ -480,7 +480,7 @@ void Space::setSpaceId(QString value)
     this->m_spaceId = value;
 }
 
-void Space::setNParts(int value)
+void Space::setNParts(qint32 value)
 {
     this->m_nParts = value;
 }

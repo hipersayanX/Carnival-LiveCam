@@ -74,22 +74,22 @@ SnowFlake::SnowFlake(const SnowFlake &object):
     this->reset();
 }
 
-SnowFlake::SnowFlake(int x,
-                     int y,
-                     float z,
-                     int t,
-                     int width,
-                     int height,
-                     int minX,
-                     int minY,
-                     float minZ,
-                     int maxX,
-                     int maxY,
-                     float maxZ,
-                     float acceleration,
-                     float direction,
-                     float scale,
-                     float randFactor,
+SnowFlake::SnowFlake(qint32 x,
+                     qint32 y,
+                     qreal z,
+                     qint32 t,
+                     qint32 width,
+                     qint32 height,
+                     qint32 minX,
+                     qint32 minY,
+                     qreal minZ,
+                     qint32 maxX,
+                     qint32 maxY,
+                     qreal maxZ,
+                     qreal acceleration,
+                     qreal direction,
+                     qreal scale,
+                     qreal randFactor,
                      const QImage &flake):
     m_x(x),
     m_y(y),
@@ -138,82 +138,82 @@ SnowFlake& SnowFlake::operator =(const SnowFlake &other)
     return *this;
 }
 
-int SnowFlake::x()
+qint32 SnowFlake::x()
 {
     return this->m_x;
 }
 
-int SnowFlake::y()
+qint32 SnowFlake::y()
 {
     return this->m_y;
 }
 
-float SnowFlake::z()
+qreal SnowFlake::z()
 {
     return this->m_z;
 }
 
-int SnowFlake::t()
+qint32 SnowFlake::t()
 {
     return this->m_t;
 }
 
-int SnowFlake::width()
+qint32 SnowFlake::width()
 {
     return this->m_width;
 }
 
-int SnowFlake::height()
+qint32 SnowFlake::height()
 {
     return this->m_height;
 }
 
-int SnowFlake::minX()
+qint32 SnowFlake::minX()
 {
     return this->m_minX;
 }
 
-int SnowFlake::minY()
+qint32 SnowFlake::minY()
 {
     return this->m_minY;
 }
 
-float SnowFlake::minZ()
+qreal SnowFlake::minZ()
 {
     return this->m_minZ;
 }
 
-int SnowFlake::maxX()
+qint32 SnowFlake::maxX()
 {
     return this->m_maxX;
 }
 
-int SnowFlake::maxY()
+qint32 SnowFlake::maxY()
 {
     return this->m_maxY;
 }
 
-float SnowFlake::maxZ()
+qreal SnowFlake::maxZ()
 {
     return this->m_maxZ;
 }
 
-float SnowFlake::acceleration()
+qreal SnowFlake::acceleration()
 {
     return this->m_acceleration;
 }
 
-float SnowFlake::direction()
+qreal SnowFlake::direction()
 {
     return this->m_direction;
 }
 
-float SnowFlake::scale()
+qreal SnowFlake::scale()
 {
     return this->m_scale;
 }
 
-float SnowFlake::randFactor()
+qreal SnowFlake::randFactor()
 {
     return this->m_randFactor;
 }
@@ -223,18 +223,18 @@ QImage SnowFlake::flake()
     return this->m_flake;
 }
 
-float SnowFlake::randPercent()
+qreal SnowFlake::randPercent()
 {
-    return 2 * this->m_randFactor * (float) rand() / (float) RAND_MAX - this->m_randFactor + 1;
+    return 2 * this->m_randFactor * (qreal) rand() / (qreal) RAND_MAX - this->m_randFactor + 1;
 }
 
 void SnowFlake::reset()
 {
-    this->x0 = (float) rand() * (this->m_maxX - this->m_minX) / (float) RAND_MAX + this->m_minX;
+    this->x0 = (qreal) rand() * (this->m_maxX - this->m_minX) / (qreal) RAND_MAX + this->m_minX;
     this->y0 = this->m_minY;
     this->m_x = this->x0;
     this->m_y = this->m_minY;
-    this->m_z = (float) rand() * (this->m_maxZ - this->m_minZ) / (float) RAND_MAX + this->m_minZ;
+    this->m_z = (qreal) rand() * (this->m_maxZ - this->m_minZ) / (qreal) RAND_MAX + this->m_minZ;
     this->m_t = 0;
     this->m_width = this->m_z * this->m_scale * this->m_flake.width();
     this->m_height = this->m_z * this->m_scale * this->m_flake.height();
@@ -242,7 +242,7 @@ void SnowFlake::reset()
 
 void SnowFlake::step()
 {
-    float angle = M_PI * this->m_direction / 180.0;
+    qreal angle = M_PI * this->m_direction / 180.0;
 
     this->m_x = this->x0 + this->randPercent() * this->m_z * this->m_acceleration * this->m_t * this->m_t * sin(angle) / 2;
     this->m_y = this->y0 + this->m_z * this->m_acceleration * this->m_t * this->m_t * cos(angle) / 2;
@@ -260,82 +260,82 @@ void SnowFlake::next()
         this->reset();
 }
 
-void SnowFlake::setX(int value)
+void SnowFlake::setX(qint32 value)
 {
     this->m_x = value;
 }
 
-void SnowFlake::setY(int value)
+void SnowFlake::setY(qint32 value)
 {
     this->m_y = value;
 }
 
-void SnowFlake::setZ(float value)
+void SnowFlake::setZ(qreal value)
 {
     this->m_z = value;
 }
 
-void SnowFlake::setT(int value)
+void SnowFlake::setT(qint32 value)
 {
     this->m_t = value;
 }
 
-void SnowFlake::setWidth(int value)
+void SnowFlake::setWidth(qint32 value)
 {
     this->m_width = value;
 }
 
-void SnowFlake::setHeight(int value)
+void SnowFlake::setHeight(qint32 value)
 {
     this->m_height = value;
 }
 
-void SnowFlake::setMinX(int value)
+void SnowFlake::setMinX(qint32 value)
 {
     this->m_minX = value;
 }
 
-void SnowFlake::setMinY(int value)
+void SnowFlake::setMinY(qint32 value)
 {
     this->m_minY = value;
 }
 
-void SnowFlake::setMinZ(float value)
+void SnowFlake::setMinZ(qreal value)
 {
     this->m_minZ = value;
 }
 
-void SnowFlake::setMaxX(int value)
+void SnowFlake::setMaxX(qint32 value)
 {
     this->m_maxX = value;
 }
 
-void SnowFlake::setMaxY(int value)
+void SnowFlake::setMaxY(qint32 value)
 {
     this->m_maxY = value;
 }
 
-void SnowFlake::setMaxZ(float value)
+void SnowFlake::setMaxZ(qreal value)
 {
     this->m_maxZ = value;
 }
 
-void SnowFlake::setAcceleration(float value)
+void SnowFlake::setAcceleration(qreal value)
 {
     this->m_acceleration = value;
 }
 
-void SnowFlake::setDirection(float value)
+void SnowFlake::setDirection(qreal value)
 {
     this->m_direction = value;
 }
 
-void SnowFlake::setScale(float value)
+void SnowFlake::setScale(qreal value)
 {
     this->m_scale = value;
 }
 
-void SnowFlake::setRandFactor(float value)
+void SnowFlake::setRandFactor(qreal value)
 {
     this->m_randFactor = value;
 }

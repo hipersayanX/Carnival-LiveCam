@@ -90,11 +90,12 @@ void DefaultShell::begin()
     connect(this->gui, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
     connect(this->gui, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
     connect(this->gui, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
+    connect(this->gui, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
     connect(this->gui, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
     connect(this->gui, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
     connect(this->gui, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
     connect(this->gui, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    connect(this->gui, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
+    connect(this->gui, SIGNAL(pluginMoved(qint32, qint32)), this, SLOT(onPluginMoved(qint32, qint32)));
     connect(this->gui, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
     connect(this->gui, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
     connect(this->gui, SIGNAL(closed()), this, SLOT(onClosed()));
@@ -135,9 +136,9 @@ void DefaultShell::setFrame(const QImage &frame)
     this->gui->setFrame(frame);
 }
 
-void DefaultShell::updateDevices(const QList<QVariant> &devices)
+void DefaultShell::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
 {
-    this->gui->updateDevices(devices);
+    this->gui->updateDevices(devices, activeSpaces);
 }
 
 void DefaultShell::updatePlugins(const QList<QVariant> &plugins)
@@ -180,6 +181,11 @@ void DefaultShell::setControlButtons(QPushButton *toggleMaximizedButton, QPushBu
     scaleAndRotateButton->setStyleSheet(style);
 }
 
+void DefaultShell::moveDevice(qint32 from, qint32 to)
+{
+    this->gui->moveDevice(from, to);
+}
+
 void DefaultShell::onViewPortSizeChanged(QSize size)
 {
     emit viewPortSizeChanged(size);
@@ -220,6 +226,11 @@ void DefaultShell::onStartStopRecord()
     emit startStopRecord();
 }
 
+void DefaultShell::onEnabledDeviceMoved(qint32 from, qint32 to)
+{
+    emit enabledDeviceMoved(from, to);
+}
+
 void DefaultShell::onDeviceEnable(QString deviceId)
 {
     emit deviceEnable(deviceId);
@@ -240,7 +251,7 @@ void DefaultShell::onPluginDeactivated(QString pluginId)
     emit pluginDeactivated(pluginId);
 }
 
-void DefaultShell::onPluginMoved(int from, int to)
+void DefaultShell::onPluginMoved(qint32 from, qint32 to)
 {
     emit pluginMoved(from, to);
 }

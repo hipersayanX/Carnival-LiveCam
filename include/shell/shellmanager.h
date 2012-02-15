@@ -53,9 +53,10 @@ class ShellManager: public QObject
         bool disableShell(QString shellId);
         void configureShell(QString shellId);
         void setFrame(const QImage &frame);
-        void updateDevices(const QList<QVariant> &devices);
+        void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
         void setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);
+        void moveDevice(qint32 from, qint32 to);
 
     private slots:
         void onToggleEditMode();
@@ -66,11 +67,12 @@ class ShellManager: public QObject
         void onMouseReleased(QMouseEvent *event);
         void onTakePicture();
         void onStartStopRecord();
+        void onEnabledDeviceMoved(qint32 from, qint32 to);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);
         void onPluginActivated(QString pluginId);
         void onPluginDeactivated(QString pluginId);
-        void onPluginMoved(int from, int to);
+        void onPluginMoved(qint32 from, qint32 to);
         void onPluginConfigureClicked(QString pluginId);
         void onDeviceConfigureClicked(QString deviceId);
         void onClosed();
@@ -82,6 +84,7 @@ class ShellManager: public QObject
         void mousePositionChanged(QMouseEvent *event);
         void mousePressed(QMouseEvent *event);
         void mouseReleased(QMouseEvent *event);
+        void enabledDeviceMoved(qint32 from, qint32 to);
 
         /*!
           \fn void ShellManager::takePicture()
@@ -119,14 +122,14 @@ class ShellManager: public QObject
         void pluginDeactivated(QString pluginId);
 
         /*!
-          \fn void ShellManager::pluginMoved(int from, int to)
+          \fn void ShellManager::pluginMoved(qint32 from, qint32 to)
 
           \param from The old index position of the plugin.
           \param to The new index position of the plugin.
 
           \brief This signal is emited when the user changes the index of a plugin.
          */
-        void pluginMoved(int from, int to);
+        void pluginMoved(qint32 from, qint32 to);
 
         /*!
           \fn void ShellManager::pluginConfigureClicked(QString pluginId)

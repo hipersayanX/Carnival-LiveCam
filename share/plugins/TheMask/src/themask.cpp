@@ -89,7 +89,7 @@ void TheMask::begin()
 //    this->mask = new Mask("share/plugins/TheMask/share/masks/guyfawkes.png");
 }
 
-void TheMask::resize(int width, int height)
+void TheMask::resize(qint32 width, qint32 height)
 {
     Q_UNUSED(width)
     Q_UNUSED(height)

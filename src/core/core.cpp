@@ -51,11 +51,12 @@ Core::Core(QObject *parent): QObject(parent)
     this->shellManager.setControlButtons(&this->toggleMaximizedButton, &this->scaleAndRotateButton);
     this->spaceManager.setControlButtons(&this->toggleMaximizedButton, &this->scaleAndRotateButton);
 
+    connect(&this->spaceManager, SIGNAL(spaceMoved(qint32, qint32)), &this->shellManager, SLOT(moveDevice(qint32, qint32)));
     connect(&this->deviceManager, SIGNAL(devicesModified()), this, SLOT(devicesModified()));
 
     this->shellManager.widget()->show();
 
-    this->shellManager.updateDevices(this->deviceManager.devicesInfoList());
+    this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
     this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
 
     connect(&this->shellManager, SIGNAL(deviceEnable(QString)), this, SLOT(deviceEnable(QString)));
@@ -67,7 +68,7 @@ Core::Core(QObject *parent): QObject(parent)
 
     connect(&this->shellManager, SIGNAL(pluginActivated(QString)), &this->pluginManager, SLOT(enablePlugin(QString)));
     connect(&this->shellManager, SIGNAL(pluginDeactivated(QString)), &this->pluginManager, SLOT(disablePlugin(QString)));
-    connect(&this->shellManager, SIGNAL(pluginMoved(int, int)), &this->pluginManager, SLOT(movePlugin(int, int)));
+    connect(&this->shellManager, SIGNAL(pluginMoved(qint32, qint32)), &this->pluginManager, SLOT(movePlugin(qint32, qint32)));
     connect(&this->shellManager, SIGNAL(pluginConfigureClicked(QString)), &this->pluginManager, SLOT(configurePlugin(QString)));
 
     connect(&this->shellManager, SIGNAL(takePicture()), &this->mediaStreaming, SLOT(takePicture()));
@@ -75,6 +76,7 @@ Core::Core(QObject *parent): QObject(parent)
 
     connect(&this->shellManager, SIGNAL(deviceConfigureClicked(QString)), &this->deviceManager, SLOT(configure(QString)));
 
+    connect(&this->shellManager, SIGNAL(enabledDeviceMoved(qint32, qint32)), &this->spaceManager, SLOT(moveSpace(qint32, qint32)));
     connect(&this->shellManager, SIGNAL(viewPortSizeChanged(QSize)), &this->spaceManager, SLOT(setViewPortSize(QSize)));
     connect(&this->shellManager, SIGNAL(toggleEditMode()), &this->spaceManager, SLOT(toggleEditMode()));
     connect(&this->shellManager, SIGNAL(mouseDoubleClicked(QMouseEvent *)), &this->spaceManager, SLOT(mouseDoubleClickEvent(QMouseEvent *)));
@@ -94,8 +96,8 @@ Core::Core(QObject *parent): QObject(parent)
  */
 void Core::devicesModified()
 {
-    this->shellManager.updateDevices(this->deviceManager.devicesInfoList());
     this->spaceManager.updateSpaces(this->deviceManager.devicesInfoList());
+    this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
 }
 
 /*!

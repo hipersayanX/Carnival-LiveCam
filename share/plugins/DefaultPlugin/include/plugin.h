@@ -153,14 +153,14 @@ class Plugin
         virtual void begin() = 0;
 
         /*!
-          \fn void Plugin::resize(int width, int height)
+          \fn void Plugin::resize(qint32 width, qint32 height)
 
           \param width New width of the frame.
           \param height New height of the frame.
 
           \brief This function is called on frame size changed.
          */
-        virtual void resize(int width, int height) = 0;
+        virtual void resize(qint32 width, qint32 height) = 0;
 
         /*!
           \fn QImage Plugin::render(const QImage &image)

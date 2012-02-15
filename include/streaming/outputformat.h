@@ -31,43 +31,43 @@ class OutputFormat: public QObject
 
     Q_PROPERTY(QString suffix READ suffix WRITE setSuffix RESET resetSuffix)
     Q_PROPERTY(QString vcodec READ vcodec WRITE setVcodec RESET resetVcodec)
-    Q_PROPERTY(int vbitrate READ vbitrate WRITE setVbitrate RESET resetVbitrate)
+    Q_PROPERTY(qint32 vbitrate READ vbitrate WRITE setVbitrate RESET resetVbitrate)
     Q_PROPERTY(QString acodec READ acodec WRITE setAcodec RESET resetAcodec)
-    Q_PROPERTY(int abitrate READ abitrate WRITE setAbitrate RESET resetAbitrate)
+    Q_PROPERTY(qint32 abitrate READ abitrate WRITE setAbitrate RESET resetAbitrate)
     Q_PROPERTY(QString oformat READ oformat WRITE setOformat RESET resetOformat)
     Q_PROPERTY(bool sameq READ sameq WRITE setSameq RESET resetSameq)
 
     public:
         explicit OutputFormat(QObject *parent = 0);
         explicit OutputFormat(const OutputFormat &object);
-        OutputFormat(QString suffix, QString vcodec, int vbitrate, QString acodec, int abitrate, QString oformat, bool sameq);
+        OutputFormat(QString suffix, QString vcodec, qint32 vbitrate, QString acodec, qint32 abitrate, QString oformat, bool sameq);
         OutputFormat& operator =(const OutputFormat &other);
 
-        Q_INVOKABLE QStringList toStringList(int fps, int width, int height);
+        Q_INVOKABLE QStringList toStringList(qint32 fps, qint32 width, qint32 height);
 
         QString suffix();
         QString vcodec();
-        int vbitrate();
+        qint32 vbitrate();
         QString acodec();
-        int abitrate();
+        qint32 abitrate();
         QString oformat();
         bool sameq();
 
     private:
         QString m_suffix;
         QString m_vcodec;
-        int m_vbitrate;
+        qint32 m_vbitrate;
         QString m_acodec;
-        int m_abitrate;
+        qint32 m_abitrate;
         QString m_oformat;
         bool m_sameq;
 
     public slots:
         void setSuffix(QString value);
         void setVcodec(QString value);
-        void setVbitrate(int value);
+        void setVbitrate(qint32 value);
         void setAcodec(QString value);
-        void setAbitrate(int value);
+        void setAbitrate(qint32 value);
         void setOformat(QString value);
         void setSameq(bool value);
         void resetSuffix();

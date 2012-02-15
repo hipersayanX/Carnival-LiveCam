@@ -32,27 +32,56 @@ Rectangle
 
     property real markSize: 8
     property variant devices: []
+    property variant activeDevices: []
 
+    signal enabledDeviceMoved(int from, int to)
     signal deviceEnable(string deviceId)
     signal deviceDisable(string deviceId)
     signal configureDevice(string deviceId)
     signal escapePressed
+
+    function moveDevice(from, to)
+    {
+        var iTo = lsvEnabledDevices.count - to - 1
+        var iFrom = lsvEnabledDevices.count - from - 1
+        var activeDevices = recDevices.activeDevices.slice()
+
+        activeDevices.splice(iTo, 0, activeDevices.splice(iFrom, 1)[0])
+        recDevices.activeDevices = activeDevices
+
+        var devices = recDevices.devices.slice()
+
+        recDevices.devices = []
+        recDevices.devices = devices
+    }
 
     onDevicesChanged:
     {
         lsmDisabledDevices.clear()
         lsmEnabledDevices.clear()
 
+        for (var activeDevice in recDevices.activeDevices)
+            for (var aDevice in recDevices.devices)
+                if (recDevices.devices[aDevice].deviceId == recDevices.activeDevices[activeDevice])
+                {
+                    var newActiveDevice = {}
+
+                    for (var prop in recDevices.devices[aDevice])
+                        newActiveDevice["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = recDevices.devices[aDevice][prop]
+
+                    lsmEnabledDevices.append(newActiveDevice)
+
+                    break
+                }
+
         for (var device in recDevices.devices)
         {
             var newDevice = {}
 
-            for (var prop in recDevices.devices[device])
+            for (prop in recDevices.devices[device])
                 newDevice["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = recDevices.devices[device][prop]
 
-            if (recDevices.devices[device]["isEnabled"])
-                lsmEnabledDevices.append(newDevice)
-            else
+            if (!recDevices.devices[device]["isEnabled"])
                 lsmDisabledDevices.append(newDevice)
         }
 
@@ -131,6 +160,27 @@ Rectangle
             interactive: false
             Keys.onEscapePressed: recDevices.escapePressed()
 
+            function deviceIndex(deviceId)
+            {
+                var prevIndex = lsvEnabledDevices.currentIndex
+
+                for (var device = 0; device < lsmEnabledDevices.count; device++)
+                {
+                    lsvEnabledDevices.currentIndex = device
+
+                    if (lsvEnabledDevices.currentItem.deviceId == deviceId)
+                    {
+                        lsvEnabledDevices.currentIndex = prevIndex
+
+                        return device
+                    }
+                }
+
+                lsvEnabledDevices.currentIndex = prevIndex
+
+                return -1
+            }
+
             model: ListModel
             {
                 id: lsmEnabledDevices
@@ -148,6 +198,9 @@ Rectangle
                     summary: propSummary
                     icon: propIcon
                     isConfigurable: propIsConfigurable
+                    property real oldIndex: 0
+                    property real newIndex: 0
+                    property real oldPositionY: 0
 
                     onConfigure: recDevices.configureDevice(dvcEnabledDevice.deviceId)
 
@@ -166,7 +219,40 @@ Rectangle
                         }
 
                         recDevices.deviceDisable(dvcEnabledDevice.deviceId)
+
+                        var activeDevices = recDevices.activeDevices.slice()
+
+                        activeDevices.splice(activeDevices.indexOf(dvcDisabledDevice.deviceId), 1)
+                        recDevices.activeDevices = activeDevices
+
                         recDevices.devices = devices
+                    }
+
+                    onBeginMove:
+                    {
+                        dvcEnabledDevice.oldIndex = lsvEnabledDevices.deviceIndex(dvcEnabledDevice.deviceId)
+                        dvcEnabledDevice.oldPositionY = mouseY
+                    }
+
+                    onMove:
+                    {
+                        dvcEnabledDevice.newIndex = Math.round((mouseY - dvcEnabledDevice.oldPositionY) * (lsvEnabledDevices.count / lsvEnabledDevices.contentHeight) + dvcEnabledDevice.oldIndex)
+
+                        if (dvcEnabledDevice.newIndex < 0)
+                            dvcEnabledDevice.newIndex = 0
+
+                        if (dvcEnabledDevice.newIndex >= lsvEnabledDevices.count)
+                            dvcEnabledDevice.newIndex = lsvEnabledDevices.count - 1
+
+                        if (dvcEnabledDevice.newIndex != dvcEnabledDevice.oldIndex)
+                        {
+                            lsmEnabledDevices.move(dvcEnabledDevice.oldIndex, dvcEnabledDevice.newIndex, 1)
+
+                            recDevices.enabledDeviceMoved(lsvEnabledDevices.count - dvcEnabledDevice.oldIndex - 1,
+                                                          lsvEnabledDevices.count - dvcEnabledDevice.newIndex - 1)
+
+                            dvcEnabledDevice.oldIndex = dvcEnabledDevice.newIndex
+                        }
                     }
                 }
             }
@@ -219,18 +305,32 @@ Rectangle
                     onClicked:
                     {
                         var devices = []
+                        var index = -1
 
                         for (var d in recDevices.devices)
                         {
                             var device = {}
 
+                            if (recDevices.devices[d].deviceId == dvcDisabledDevice.deviceId)
+                                index = d
+
                             for (var prop in recDevices.devices[d])
-                                device[prop] = (recDevices.devices[d].deviceId == dvcDisabledDevice.deviceId && prop == "isEnabled")? true: recDevices.devices[d][prop]
+                                device[prop] = (recDevices.devices[d].deviceId == dvcDisabledDevice.deviceId &&
+                                                prop == "isEnabled")? true: recDevices.devices[d][prop]
 
                             devices.push(device)
                         }
 
+                        if (index >= 0)
+                            devices.unshift(devices.splice(index, 1)[0])
+
                         recDevices.deviceEnable(dvcDisabledDevice.deviceId)
+
+                        var activeDevices = recDevices.activeDevices.slice()
+
+                        activeDevices.splice(0, 0, dvcDisabledDevice.deviceId)
+                        recDevices.activeDevices = activeDevices
+
                         recDevices.devices = devices
                     }
                 }
