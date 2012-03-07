@@ -68,6 +68,9 @@ Rectangle
 
     function updateHeight()
     {
+        if (!lsvOptions.currentItem)
+            return;
+
         lsvOptions.contentHeight = lsvOptions.currentItem.children[0].height * lsvOptions.count
 
         if (lsvOptions.contentHeight <= recListWidget.maxHeight)

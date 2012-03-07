@@ -37,25 +37,22 @@ class PluginManager: public QObject
 
     public:
         explicit PluginManager(QObject *parent = 0);
-        Q_INVOKABLE QImage getFrame(const QImage &image, QString deviceId);
-        Q_INVOKABLE void resize(QSize size, QString deviceId);
+        Q_INVOKABLE QImage render(QString deviceId, const QImage &image);
         Q_INVOKABLE QList<QVariant> pluginsInfoList();
-        Q_INVOKABLE void applyTo(QString pluginId, QString deviceId, bool apply);
 
     public slots:
-        bool disablePlugin(QString pluginId);
-        bool disablePlugin(qint32 index);
-        bool enablePlugin(QString pluginId);
-        bool enablePlugin(QString pluginId, qint32 index);
+        bool setEffect(QString pluginId, QString spaceId, QSize frameSize);
+        bool unsetEffect(QString pluginId, QString spaceId);
         void configurePlugin(QString pluginId);
-        void movePlugin(qint32 from, qint32 to);
+        void movePlugin(QString spaceId, qint32 from, qint32 to);
 
     private:
-        QSize frameSize;
         QPluginLoader pluginLoader;
         QList<Plugin *> activePlugins;
         QHash<QString, PluginInfo> pluginsInfo;
         QHash<QString, QVariant> pluginConfigs;
+
+        void applyTo(QString pluginId, QString deviceId, bool apply);
 };
 
 #endif // PLUGINMANAGER_H

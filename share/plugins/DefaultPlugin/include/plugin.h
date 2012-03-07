@@ -152,6 +152,9 @@ class Plugin
          */
         virtual void begin() = 0;
 
+        virtual void addSpace(QString spaceId, QSize frameSize) = 0;
+        virtual void removeSpace(QString spaceId) = 0;
+
         /*!
           \fn void Plugin::resize(qint32 width, qint32 height)
 
@@ -160,7 +163,7 @@ class Plugin
 
           \brief This function is called on frame size changed.
          */
-        virtual void resize(qint32 width, qint32 height) = 0;
+//        virtual void resize(qint32 width, qint32 height) = 0;
 
         /*!
           \fn QImage Plugin::render(const QImage &image)
@@ -171,7 +174,7 @@ class Plugin
 
           \brief This function receives a frame and applies an effect on it.
          */
-        virtual QImage render(const QImage &image) = 0;
+        virtual QImage render(QString spaceId, const QImage &image) = 0;
 
         /*!
           \fn void Plugin::end()

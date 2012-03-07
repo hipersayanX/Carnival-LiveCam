@@ -222,7 +222,7 @@ Rectangle
 
                         var activeDevices = recDevices.activeDevices.slice()
 
-                        activeDevices.splice(activeDevices.indexOf(dvcDisabledDevice.deviceId), 1)
+                        activeDevices.splice(activeDevices.indexOf(dvcEnabledDevice.deviceId), 1)
                         recDevices.activeDevices = activeDevices
 
                         recDevices.devices = devices

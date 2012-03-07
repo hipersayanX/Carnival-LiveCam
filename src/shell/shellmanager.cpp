@@ -244,9 +244,9 @@ bool ShellManager::enableShell(QString shellId)
     connect(this->activeShell, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
     connect(this->activeShell, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
     connect(this->activeShell, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
-    connect(this->activeShell, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
-    connect(this->activeShell, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    connect(this->activeShell, SIGNAL(pluginMoved(qint32, qint32)), this, SLOT(onPluginMoved(qint32, qint32)));
+    connect(this->activeShell, SIGNAL(setEffect(QString, QString)), this, SLOT(onSetEffect(QString, QString)));
+    connect(this->activeShell, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
+    connect(this->activeShell, SIGNAL(pluginMoved(QString, qint32, qint32)), this, SLOT(onPluginMoved(QString, qint32, qint32)));
     connect(this->activeShell, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
     connect(this->activeShell, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
     connect(this->activeShell, SIGNAL(closed()), this, SLOT(onClosed()));
@@ -282,9 +282,9 @@ bool ShellManager::disableShell(QString shellId)
     disconnect(this->activeShell, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
     disconnect(this->activeShell, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
     disconnect(this->activeShell, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
-    disconnect(this->activeShell, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
-    disconnect(this->activeShell, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    disconnect(this->activeShell, SIGNAL(pluginMoved(qint32, qint32)), this, SLOT(onPluginMoved(qint32, qint32)));
+    disconnect(this->activeShell, SIGNAL(setEffect(QString, QString)), this, SLOT(onSetEffect(QString, QString)));
+    disconnect(this->activeShell, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
+    disconnect(this->activeShell, SIGNAL(pluginMoved(QString, qint32, qint32)), this, SLOT(onPluginMoved(QString, qint32, qint32)));
     disconnect(this->activeShell, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
     disconnect(this->activeShell, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
     disconnect(this->activeShell, SIGNAL(closed()), this, SLOT(onClosed()));
@@ -437,9 +437,9 @@ void ShellManager::onDeviceDisable(QString deviceId)
 
   \brief This slot is called when the user activate a plugin.
  */
-void ShellManager::onPluginActivated(QString pluginId)
+void ShellManager::onSetEffect(QString pluginId, QString spaceId)
 {
-    emit pluginActivated(pluginId);
+    emit setEffect(pluginId, spaceId);
 }
 
 /*!
@@ -451,9 +451,9 @@ void ShellManager::onPluginActivated(QString pluginId)
 
   \brief This slot is called when the user deactivate a plugin.
  */
-void ShellManager::onPluginDeactivated(QString pluginId)
+void ShellManager::onUnsetEffect(QString pluginId, QString spaceId)
 {
-    emit pluginDeactivated(pluginId);
+    emit unsetEffect(pluginId, spaceId);
 }
 
 /*!
@@ -466,9 +466,9 @@ void ShellManager::onPluginDeactivated(QString pluginId)
 
   \brief This slot is called when the user changes the index of a plugin.
  */
-void ShellManager::onPluginMoved(qint32 from, qint32 to)
+void ShellManager::onPluginMoved(QString spaceId, qint32 from, qint32 to)
 {
-    emit pluginMoved(from, to);
+    emit pluginMoved(spaceId, from, to);
 }
 
 /*!

@@ -32,6 +32,7 @@ Rectangle
     width: 640
     height: 480
     color: "#000000"
+
     property bool resizing: false
     property real borderSize: 8
 

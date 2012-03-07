@@ -43,7 +43,7 @@ Core::Core(QObject *parent): QObject(parent)
 {
     this->shellManager.setShell("shell.DefaultShell");
     this->deviceManager.deviceEnable("/dev/video0");
-//    this->pluginManager.resize(this->deviceManager.frameSize('/dev/video0'));
+
     this->spaceManager.setSpace("/dev/video0", QImage());
     this->spaceManager.setViewPortSize(this->shellManager.viewPortSize("shell.DefaultShell"));
     this->spaceManager.setSnapping(true, 24, 10, 3.0 * M_PI / 180.0);
@@ -66,9 +66,9 @@ Core::Core(QObject *parent): QObject(parent)
     this->mediaStreaming.addOutputFormat(OutputFormat("ogv", "libtheora", 500000, "libvorbis", 128000, "ogg", false));
     this->mediaStreaming.addOutputFormat(OutputFormat("webm", "libvpx", 500000, "libvorbis", 128000, "webm", false));
 
-    connect(&this->shellManager, SIGNAL(pluginActivated(QString)), &this->pluginManager, SLOT(enablePlugin(QString)));
-    connect(&this->shellManager, SIGNAL(pluginDeactivated(QString)), &this->pluginManager, SLOT(disablePlugin(QString)));
-    connect(&this->shellManager, SIGNAL(pluginMoved(qint32, qint32)), &this->pluginManager, SLOT(movePlugin(qint32, qint32)));
+    connect(&this->shellManager, SIGNAL(setEffect(QString, QString)), this, SLOT(setEffect(QString, QString)));
+    connect(&this->shellManager, SIGNAL(unsetEffect(QString, QString)), this, SLOT(unsetEffect(QString, QString)));
+    connect(&this->shellManager, SIGNAL(pluginMoved(QString, qint32, qint32)), &this->pluginManager, SLOT(movePlugin(QString, qint32, qint32)));
     connect(&this->shellManager, SIGNAL(pluginConfigureClicked(QString)), &this->pluginManager, SLOT(configurePlugin(QString)));
 
     connect(&this->shellManager, SIGNAL(takePicture()), &this->mediaStreaming, SLOT(takePicture()));
@@ -112,14 +112,12 @@ void Core::devicesModified()
 void Core::deviceEnable(QString deviceId)
 {
     this->deviceManager.deviceEnable(deviceId);
-//    this->pluginManager.resize(this->deviceManager.frameSize());
     this->spaceManager.setSpace(deviceId, QImage());
 }
 
 void Core::deviceDisable(QString deviceId)
 {
     this->deviceManager.deviceDisable(deviceId);
-//    this->pluginManager.resize(this->deviceManager.frameSize());
     this->spaceManager.removeSpace(deviceId);
 }
 
@@ -132,12 +130,14 @@ void Core::deviceDisable(QString deviceId)
  */
 void Core::captureFrame()
 {
-    // Capture a frame from DeviceManager, send it to PluginManager to apply the effects,
-    // and return the frame whit the effects applied.
-    /*QImage frame = this->pluginManager.getFrame(this->deviceManager.captureFrame());*/
-
     foreach (QString deviceId, this->deviceManager.activeDevices())
-        this->spaceManager.setSpace(deviceId, this->deviceManager.captureFrame(deviceId));
+    {
+        // Capture a frame from DeviceManager, send it to PluginManager to apply the effects,
+        // and return the frame whit the effects applied.
+        QImage frame = this->pluginManager.render(deviceId, this->deviceManager.captureFrame(deviceId));
+
+        this->spaceManager.setSpace(deviceId, frame);
+    }
 
     QImage frame = this->spaceManager.render();
 
@@ -146,4 +146,14 @@ void Core::captureFrame()
 
     // And send it to the current shell.
     this->shellManager.setFrame(frame);
+}
+
+void Core::setEffect(QString pluginId, QString spaceId)
+{
+    this->pluginManager.setEffect(pluginId, spaceId, this->deviceManager.frameSize(spaceId));
+}
+
+void Core::unsetEffect(QString pluginId, QString spaceId)
+{
+    this->pluginManager.unsetEffect(pluginId, spaceId);
 }

@@ -27,7 +27,7 @@ Window
 {
     id: wdgMainWidget
     radius: 15
-    width: 640
+    width: 800
     height: 480
     color: "#e6000000"
     property bool showEffectBar: false

@@ -135,6 +135,7 @@ QList<QVariant> PluginManager::pluginsInfoList()
     return pluginList;
 }
 
+// < !!!
 void PluginManager::applyTo(QString pluginId, QString deviceId, bool apply)
 {
     QStringList applyToList = this->pluginsInfo[pluginId].applyTo();
@@ -147,17 +148,7 @@ void PluginManager::applyTo(QString pluginId, QString deviceId, bool apply)
     this->pluginsInfo[pluginId].setApplyTo(applyToList);
 }
 
-/*!
-  \fn bool PluginManager::enablePlugin(QString id)
-
-  \param id Unique plugin identifier.
-
-  \retval true if the plugin is active.
-  \retval false if the plugin is inactive.
-
-  \brief Try to activate the plugin id.
- */
-bool PluginManager::enablePlugin(QString pluginId)
+bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize)
 {
     this->pluginLoader.setFileName(pluginsInfo[pluginId].fileName());
 
@@ -178,62 +169,20 @@ bool PluginManager::enablePlugin(QString pluginId)
         plugin->setConfigs(this->pluginConfigs[pluginId]);
 
     plugin->begin();
-    plugin->resize(this->frameSize.width(), this->frameSize.height());
+
+    for (qint32 i = 0; i < this->activePlugins.size(); i++)
+        if (this->activePlugins[i]->id() == pluginId)
+        {
+            this->activePlugins[i]->addSpace(pluginId, spaceId, frameSize);
+            this->applyTo(pluginId, spaceId, true);
+
+            break;
+        }
 
     return true;
 }
 
-/*!
-  \fn bool PluginManager::enablePlugin(QString id, qint32 index)
-
-  \param id Unique plugin identifier.
-  \param index The index to insert the plugin.
-
-  \retval true if the plugin is active.
-  \retval false if the plugin is inactive.
-
-  \brief Try to activate the plugin \b id and insert it to \b index.
- */
-bool PluginManager::enablePlugin(QString pluginId, qint32 index)
-{
-    this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
-
-    if (!this->pluginLoader.load())
-        return false;
-
-    QObject *pluginInstance = this->pluginLoader.instance();
-
-    if (!pluginInstance)
-        return false;
-
-    Plugin *plugin = qobject_cast<Plugin *>(pluginInstance);
-
-    if (!plugin)
-        return false;
-
-    this->pluginsInfo[pluginId].setIsEnabled(true);
-    this->activePlugins.insert(index, plugin);
-
-    if (this->pluginConfigs.contains(pluginId))
-        plugin->setConfigs(this->pluginConfigs[pluginId]);
-
-    plugin->begin();
-    plugin->resize(this->frameSize.width(), this->frameSize.height());
-
-    return true;
-}
-
-/*!
-  \fn bool PluginManager::disablePlugin(QString id)
-
-  \param id Unique plugin identifier.
-
-  \retval true if the plugin is inactive.
-  \retval false if the plugin is active.
-
-  \brief Try to desactivate the device id.
- */
-bool PluginManager::disablePlugin(QString pluginId)
+bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
 {
     bool isEnabled = false;
 
@@ -255,33 +204,18 @@ bool PluginManager::disablePlugin(QString pluginId)
     this->pluginsInfo[pluginId].setIsEnabled(false);
     this->pluginLoader.unload();
 
-    return true;
-}
+    for (qint32 i = 0; i < this->activePlugins.size(); i++)
+        if (this->activePlugins[i]->id() == pluginId)
+        {
+            this->activePlugins[i]->removeSpace(pluginId, spaceId, frameSize);
+            this->applyTo(pluginId, spaceId, false);
 
-/*!
-  \fn bool PluginManager::disablePlugin(qint32 index)
-
-  \param index Index of the plugin in the stack.
-
-  \retval true if the plugin is inactive.
-  \retval false if the plugin is active.
-
-  \brief Try to desactivate the plugin at \b index.
- */
-bool PluginManager::disablePlugin(qint32 index)
-{
-    if (index < 0 || index >= this->activePlugins.size())
-        return false;
-
-    this->pluginConfigs[this->activePlugins[index]->id()] = this->activePlugins[index]->configs();
-    this->activePlugins[index]->end();
-    this->pluginsInfo[this->activePlugins[index]->id()].setIsEnabled(false);
-    this->pluginLoader.setFileName(this->pluginsInfo[activePlugins[index]->id()].fileName());
-    this->pluginLoader.unload();
-    this->activePlugins.removeAt(index);
+            break;
+        }
 
     return true;
 }
+// > !!!
 
 /*!
   \fn void PluginManager::configurePlugin(QString id)
@@ -309,26 +243,9 @@ void PluginManager::configurePlugin(QString pluginId)
 
   \brief Move a plugin from a index to another.
  */
-void PluginManager::movePlugin(qint32 from, qint32 to)
+void PluginManager::movePlugin(QString spaceId, qint32 from, qint32 to)
 {
-    this->activePlugins.move(from, to);
-}
-
-/*!
-  \fn void PluginManager::resize(QSize size)
-
-  \param size The new size of the frame.
-
-  \brief This method updates the frame size for all plugins.
- */
-void PluginManager::resize(QSize size, QString deviceId)
-{
-    Q_UNUSED(deviceId)
-
-    this->frameSize = size;
-
-    for (qint32 i = 0; i < this->activePlugins.size(); i++)
-        this->activePlugins[i]->resize(size.width(), size.height());
+    this->activePlugins.move(spaceId, from, to);
 }
 
 /*!
@@ -340,14 +257,12 @@ void PluginManager::resize(QSize size, QString deviceId)
 
   \brief Applies all plugin effects to a frame.
  */
-QImage PluginManager::getFrame(const QImage &image, QString deviceId)
+QImage PluginManager::render(QString deviceId, const QImage &image)
 {
-    Q_UNUSED(deviceId)
-
     QImage frame = image;
 
-    for (qint32 currentPlugin = 0; currentPlugin < this->activePlugins.size(); currentPlugin++)
-        frame = this->activePlugins[currentPlugin]->render(frame);
+    for (qint32 plugin = 0; plugin < this->activePlugins.size(); plugin++)
+        frame = this->activePlugins[plugin]->render(deviceId, frame);
 
     return frame;
 }

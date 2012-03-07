@@ -47,6 +47,8 @@ class Core: public QObject
         QPushButton scaleAndRotateButton;
 
     private slots:
+        void setEffect(QString pluginId, QString spaceId);
+        void unsetEffect(QString pluginId, QString spaceId);
         void devicesModified();
         void deviceEnable(QString deviceId);
         void deviceDisable(QString deviceId);

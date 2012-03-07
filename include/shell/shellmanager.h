@@ -70,9 +70,9 @@ class ShellManager: public QObject
         void onEnabledDeviceMoved(qint32 from, qint32 to);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);
-        void onPluginActivated(QString pluginId);
-        void onPluginDeactivated(QString pluginId);
-        void onPluginMoved(qint32 from, qint32 to);
+        void onSetEffect(QString pluginId, QString spaceId);
+        void onUnsetEffect(QString pluginId, QString spaceId);
+        void onPluginMoved(QString spaceId, qint32 from, qint32 to);
         void onPluginConfigureClicked(QString pluginId);
         void onDeviceConfigureClicked(QString deviceId);
         void onClosed();
@@ -110,7 +110,7 @@ class ShellManager: public QObject
 
           \brief This signal is emited when the user activate a plugin.
          */
-        void pluginActivated(QString pluginId);
+        void setEffect(QString pluginId, QString spaceId);
 
         /*!
           \fn void ShellManager::pluginDeactivated(QString pluginId)
@@ -119,7 +119,7 @@ class ShellManager: public QObject
 
           \brief This signal is emited when the user deactivate a plugin.
          */
-        void pluginDeactivated(QString pluginId);
+        void unsetEffect(QString pluginId, QString spaceId);
 
         /*!
           \fn void ShellManager::pluginMoved(qint32 from, qint32 to)
@@ -129,7 +129,7 @@ class ShellManager: public QObject
 
           \brief This signal is emited when the user changes the index of a plugin.
          */
-        void pluginMoved(qint32 from, qint32 to);
+        void pluginMoved(QString spaceId, qint32 from, qint32 to);
 
         /*!
           \fn void ShellManager::pluginConfigureClicked(QString pluginId)

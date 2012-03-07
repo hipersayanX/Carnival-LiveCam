@@ -18,4 +18,4 @@ done
 
 cd $basedir
 
-doxygen Doxyfile
+doxygen Doxyfile.cfg

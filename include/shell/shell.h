@@ -258,7 +258,7 @@ class Shell: public QObject
 
           \brief This signal is emited when the user activate a plugin.
          */
-        void pluginActivated(QString pluginId);
+        void setEffect(QString pluginId, QString spaceId);
 
         /*!
           \fn void Shell::pluginDeactivated(QString pluginId)
@@ -267,7 +267,7 @@ class Shell: public QObject
 
           \brief This signal is emited when the user deactivate a plugin.
          */
-        void pluginDeactivated(QString pluginId);
+        void unsetEffect(QString pluginId, QString spaceId);
 
         /*!
           \fn void Shell::pluginMoved(qint32 from, qint32 to)
@@ -277,7 +277,7 @@ class Shell: public QObject
 
           \brief This signal is emited when the user changes the index of a plugin.
          */
-        void pluginMoved(qint32 from, qint32 to);
+        void pluginMoved(QString spaceId, qint32 from, qint32 to);
 
         /*!
           \fn void Shell::pluginConfigureClicked(QString pluginId)
