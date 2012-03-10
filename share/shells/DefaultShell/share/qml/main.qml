@@ -38,17 +38,16 @@ Window
         about.visible = false
     }
 
-    EffectBar
+    Effects
     {
-        id: cdbEffectBar
-        objectName: "EffectBar"
-        visible: wdgMainWidget.showEffectBar
-        anchors.rightMargin: 1
-        anchors.bottomMargin: 1
-        anchors.topMargin: 1
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        id: cdbEffects
+        opacity: 0.95
+        anchors.bottom: iconbar.top
         anchors.right: parent.right
+        anchors.left: parent.left
+        anchors.top: parent.top
+        objectName: "Effects"
+        visible: wdgMainWidget.showEffectBar
     }
 
     IconBar
@@ -140,11 +139,12 @@ Window
         anchors.bottomMargin: 5
         anchors.rightMargin: -(webcams.width + iconbar.iconSize) / 2
         anchors.right: iconbar.left
-        objectName: "bbxWebcams"
+        objectName: "Devices"
         opacity: 0.95
         visible: false
         anchors.bottom: iconbar.top
         onEscapePressed: visible = false
+        onDevicesChanged: cdbEffects.devices = webcams.devices
     }
 
     WindowControls

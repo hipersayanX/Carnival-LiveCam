@@ -170,6 +170,14 @@ QSize ShellManager::viewPortSize(QString shellId)
     return QSize();
 }
 
+QString ShellManager::showPreview(QString shellId)
+{
+    if (this->activeShellId == shellId || shellId == "")
+        return this->activeShell->showPreview();
+
+    return "";
+}
+
 /*!
   \fn bool ShellManager::setShell(QString id)
 
@@ -323,6 +331,11 @@ void ShellManager::configureShell(QString shellId)
 void ShellManager::setFrame(const QImage &frame)
 {
     this->activeShell->setFrame(frame);
+}
+
+void ShellManager::setPreview(const QImage &frame)
+{
+    this->activeShell->setPreview(frame);
 }
 
 /*!

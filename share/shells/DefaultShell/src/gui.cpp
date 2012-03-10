@@ -104,23 +104,27 @@ Gui::Gui(QWidget *parent): QDeclarativeView(parent)
     connect(this->root, SIGNAL(exitedResizeBottom()), this, SLOT(onExitedResizeBottom()));
 
     this->iconBar = this->root->findChild<QDeclarativeItem *>("IconBar");
+
     connect(this->iconBar, SIGNAL(clicked(int)), this, SLOT(iconClicked(int)));
 
-    this->bbxWebcams = this->root->findChild<QDeclarativeItem *>("bbxWebcams");
+    this->devices = this->root->findChild<QDeclarativeItem *>("Devices");
 
-    connect(bbxWebcams, SIGNAL(enabledDeviceMoved(int, int)), this, SLOT(onEnabledDeviceMoved(int, int)));
-    connect(bbxWebcams, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
-    connect(bbxWebcams, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
-    connect(bbxWebcams, SIGNAL(configureDevice(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
+    connect(devices, SIGNAL(enabledDeviceMoved(int, int)), this, SLOT(onEnabledDeviceMoved(int, int)));
+    connect(devices, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
+    connect(devices, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
+    connect(devices, SIGNAL(configureDevice(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
 
-    this->effectBar = this->root->findChild<QDeclarativeItem *>("EffectBar");
+    this->effects = this->root->findChild<QDeclarativeItem *>("Effects");
 
-    this->effectView = this->root->findChild<QDeclarativeItem *>("EffectView");
+    connect(this->effects, SIGNAL(setEffect(QString, QString)), this, SLOT(onSetEffect(QString, QString)));
+    connect(this->effects, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
+    connect(this->effects, SIGNAL(pluginMoved(QString, int, int)), this, SLOT(onPluginMoved(QString, int, int)));
+    connect(this->effects, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
+}
 
-    connect(this->effectView, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
-    connect(this->effectView, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    connect(this->effectView, SIGNAL(pluginMoved(int, int)), this, SLOT(onPluginMoved(int, int)));
-    connect(this->effectView, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
+QString Gui::showPreview()
+{
+    return this->effects->isVisible()? this->effects->property("currentDeviceId").toString(): "";
 }
 
 void Gui::iconClicked(int index)
@@ -163,19 +167,19 @@ void Gui::onDeviceDisable(QString deviceId)
     emit deviceDisable(deviceId);
 }
 
-void Gui::onPluginActivated(QString pluginId)
+void Gui::onSetEffect(QString pluginId, QString spaceId)
 {
-    emit pluginActivated(pluginId);
+    emit setEffect(pluginId, spaceId);
 }
 
-void Gui::onPluginDeactivated(QString pluginId)
+void Gui::onUnsetEffect(QString pluginId, QString spaceId)
 {
-    emit pluginDeactivated(pluginId);
+    emit unsetEffect(pluginId, spaceId);
 }
 
-void Gui::onPluginMoved(int from, int to)
+void Gui::onPluginMoved(QString spaceId, int from, int to)
 {
-    emit pluginMoved(from, to);
+    emit pluginMoved(spaceId, from, to);
 }
 
 void Gui::onPluginConfigureClicked(QString pluginId)
@@ -190,13 +194,13 @@ void Gui::onDeviceConfigureClicked(QString deviceId)
 
 void Gui::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
 {
-    this->bbxWebcams->setProperty("activeDevices", activeSpaces);
-    this->bbxWebcams->setProperty("devices", devices);
+    this->devices->setProperty("activeDevices", activeSpaces);
+    this->devices->setProperty("devices", devices);
 }
 
 void Gui::updatePlugins(const QList<QVariant> &plugins)
 {
-    QMetaObject::invokeMethod(this->effectBar, "updateEffects", Q_ARG(QVariant, plugins));
+    this->effects->setProperty("effects", plugins);
 }
 
 void Gui::setFrame(const QImage &frame)
@@ -206,9 +210,16 @@ void Gui::setFrame(const QImage &frame)
     this->currentFrame++;
 }
 
+void Gui::setPreview(const QImage &frame)
+{
+    this->webcamImageProvider->setFrame(frame);
+    this->effects->setProperty("preview", "image://webcam/" + QString::number(this->currentFrame));
+    this->currentFrame++;
+}
+
 void Gui::moveDevice(qint32 from, qint32 to)
 {
-    QMetaObject::invokeMethod(this->bbxWebcams, "moveDevice", Q_ARG(QVariant, from), Q_ARG(QVariant, to));
+    QMetaObject::invokeMethod(this->devices, "moveDevice", Q_ARG(QVariant, from), Q_ARG(QVariant, to));
 }
 
 void Gui::onViewPortSizeChanged(int width, int height)

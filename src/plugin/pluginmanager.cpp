@@ -135,87 +135,107 @@ QList<QVariant> PluginManager::pluginsInfoList()
     return pluginList;
 }
 
-// < !!!
-void PluginManager::applyTo(QString pluginId, QString deviceId, bool apply)
+Plugin *PluginManager::plugin(QString pluginId)
 {
-    QStringList applyToList = this->pluginsInfo[pluginId].applyTo();
+    foreach (Plugin *pluginPtr, this->activePlugins)
+        if (pluginPtr->id() == pluginId)
+            return pluginPtr;
 
-    if (applyToList.contains(deviceId) && !apply)
-        applyToList.removeOne(deviceId);
-    else if (!applyToList.contains(deviceId) && apply)
-        applyToList << deviceId;
-
-    this->pluginsInfo[pluginId].setApplyTo(applyToList);
+    return NULL;
 }
 
 bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize)
 {
-    this->pluginLoader.setFileName(pluginsInfo[pluginId].fileName());
+    Plugin *plugin;
 
-    QObject *pluginInstance = this->pluginLoader.instance();
+    if (this->pluginsInfo[pluginId].isEnabled())
+        plugin = this->plugin(pluginId);
+    else
+    {
+        this->pluginLoader.setFileName(pluginsInfo[pluginId].fileName());
 
-    if (!pluginInstance)
-        return false;
+        QObject *pluginInstance = this->pluginLoader.instance();
 
-    Plugin *plugin = qobject_cast<Plugin *>(pluginInstance);
+        if (!pluginInstance)
+            return false;
 
-    if (!plugin)
-        return false;
+        plugin = qobject_cast<Plugin *>(pluginInstance);
 
-    this->pluginsInfo[pluginId].setIsEnabled(true);
-    this->activePlugins << plugin;
+        if (!plugin)
+            return false;
 
-    if (this->pluginConfigs.contains(pluginId))
-        plugin->setConfigs(this->pluginConfigs[pluginId]);
+        this->pluginsInfo[pluginId].setIsEnabled(true);
+        this->activePlugins << plugin;
 
-    plugin->begin();
+        if (this->pluginConfigs.contains(pluginId))
+            plugin->setConfigs(this->pluginConfigs[pluginId]);
 
-    for (qint32 i = 0; i < this->activePlugins.size(); i++)
-        if (this->activePlugins[i]->id() == pluginId)
-        {
-            this->activePlugins[i]->addSpace(pluginId, spaceId, frameSize);
-            this->applyTo(pluginId, spaceId, true);
+        plugin->begin();
+    }
 
-            break;
-        }
+    plugin->addSpace(spaceId, frameSize);
+
+    if (this->devices.contains(spaceId))
+        this->devices[spaceId] << pluginId;
+    else
+    {
+        QStringList devicesList;
+
+        devicesList << pluginId;
+        this->devices[spaceId] = devicesList;
+    }
+
+    QStringList applyToList = this->pluginsInfo[pluginId].applyTo();
+
+    if (!applyToList.contains(spaceId))
+    {
+        applyToList << spaceId;
+        this->pluginsInfo[pluginId].setApplyTo(applyToList);
+    }
 
     return true;
 }
 
 bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
 {
-    bool isEnabled = false;
-
-    for (qint32 i = 0; i < this->activePlugins.size(); i++)
-        if (this->activePlugins[i]->id() == pluginId)
-        {
-            this->pluginConfigs[pluginId] = this->activePlugins[i]->configs();
-            this->activePlugins[i]->end();
-            this->activePlugins.removeAt(i);
-            isEnabled = true;
-
-            break;
-        }
-
-    if (!isEnabled)
+    if (!this->pluginsInfo[pluginId].isEnabled())
         return false;
 
-    this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
-    this->pluginsInfo[pluginId].setIsEnabled(false);
-    this->pluginLoader.unload();
+    Plugin *plugin = this->plugin(pluginId);
 
-    for (qint32 i = 0; i < this->activePlugins.size(); i++)
-        if (this->activePlugins[i]->id() == pluginId)
-        {
-            this->activePlugins[i]->removeSpace(pluginId, spaceId, frameSize);
-            this->applyTo(pluginId, spaceId, false);
+    if (!plugin)
+        return false;
 
-            break;
-        }
+    if (this->devices.contains(spaceId))
+    {
+        this->devices[spaceId].removeOne(pluginId);
+
+        if (this->devices[spaceId].isEmpty())
+            this->devices.remove(spaceId);
+    }
+
+    plugin->removeSpace(spaceId);
+
+    QStringList applyToList = this->pluginsInfo[pluginId].applyTo();
+
+    if (applyToList.contains(spaceId))
+    {
+        applyToList.removeOne(spaceId);
+        this->pluginsInfo[pluginId].setApplyTo(applyToList);
+    }
+
+    if (this->pluginsInfo[pluginId].applyTo().isEmpty())
+    {
+        this->pluginConfigs[pluginId] = plugin->configs();
+        plugin->end();
+        this->activePlugins.removeOne(plugin);
+        this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
+        this->pluginsInfo[pluginId].setIsEnabled(false);
+        this->pluginLoader.unload();
+    }
 
     return true;
 }
-// > !!!
 
 /*!
   \fn void PluginManager::configurePlugin(QString id)
@@ -226,13 +246,12 @@ bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
  */
 void PluginManager::configurePlugin(QString pluginId)
 {
-    for (qint32 i = 0; i < this->activePlugins.size(); i++)
-        if (this->activePlugins[i]->id() == pluginId)
-        {
-            this->activePlugins[i]->configure();
+    Plugin *plugin = this->plugin(pluginId);
 
-            break;
-        }
+    if (!plugin)
+        return;
+
+    plugin->configure();
 }
 
 /*!
@@ -245,7 +264,8 @@ void PluginManager::configurePlugin(QString pluginId)
  */
 void PluginManager::movePlugin(QString spaceId, qint32 from, qint32 to)
 {
-    this->activePlugins.move(spaceId, from, to);
+    if (this->devices.contains(spaceId))
+        this->devices[spaceId].move(from, to);
 }
 
 /*!
@@ -261,8 +281,18 @@ QImage PluginManager::render(QString deviceId, const QImage &image)
 {
     QImage frame = image;
 
-    for (qint32 plugin = 0; plugin < this->activePlugins.size(); plugin++)
-        frame = this->activePlugins[plugin]->render(deviceId, frame);
+    if (!this->devices.contains(deviceId))
+        return frame;
+
+    foreach (QString pluginId, this->devices[deviceId])
+    {
+        Plugin *plugin = this->plugin(pluginId);
+
+        if (!plugin)
+            continue;
+
+        frame = plugin->render(deviceId, frame);
+    }
 
     return frame;
 }

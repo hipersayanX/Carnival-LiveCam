@@ -49,10 +49,11 @@ class PluginManager: public QObject
     private:
         QPluginLoader pluginLoader;
         QList<Plugin *> activePlugins;
+        QHash<QString, QStringList> devices;
         QHash<QString, PluginInfo> pluginsInfo;
         QHash<QString, QVariant> pluginConfigs;
 
-        void applyTo(QString pluginId, QString deviceId, bool apply);
+        Plugin *plugin(QString pluginId);
 };
 
 #endif // PLUGINMANAGER_H

@@ -136,6 +136,9 @@ void Core::captureFrame()
         // and return the frame whit the effects applied.
         QImage frame = this->pluginManager.render(deviceId, this->deviceManager.captureFrame(deviceId));
 
+        if (this->shellManager.showPreview() == deviceId)
+            this->shellManager.setPreview(frame);
+
         this->spaceManager.setSpace(deviceId, frame);
     }
 

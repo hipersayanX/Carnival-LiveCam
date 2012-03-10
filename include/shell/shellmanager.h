@@ -38,7 +38,8 @@ class ShellManager: public QObject
         ~ShellManager();
         Q_INVOKABLE QList<QVariant> shellsInfoList();
         Q_INVOKABLE QWidget *widget(QString shellId = "");
-        Q_INVOKABLE QSize viewPortSize(QString shellId);
+        Q_INVOKABLE QSize viewPortSize(QString shellId = "");
+        Q_INVOKABLE QString showPreview(QString shellId = "");
 
     private:
         QPluginLoader shellLoader;
@@ -53,6 +54,7 @@ class ShellManager: public QObject
         bool disableShell(QString shellId);
         void configureShell(QString shellId);
         void setFrame(const QImage &frame);
+        void setPreview(const QImage &frame);
         void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
         void setControlButtons(QPushButton *toggleMaximizedButton = NULL, QPushButton *scaleAndRotateButton = NULL);

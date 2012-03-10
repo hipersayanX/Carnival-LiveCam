@@ -194,6 +194,8 @@ class Shell: public QObject
 
         virtual QSize viewPortSize() = 0;
 
+        virtual QString showPreview() = 0;
+
     public slots:
         /*!
           \fn void Shell::setFrame(const QImage &frame)
@@ -203,6 +205,8 @@ class Shell: public QObject
           \brief Set the frame to be showed in the GUI.
          */
         virtual void setFrame(const QImage &frame) = 0;
+
+        virtual void setPreview(const QImage &frame) = 0;
 
         /*!
           \fn void Shell::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
@@ -258,7 +262,7 @@ class Shell: public QObject
 
           \brief This signal is emited when the user activate a plugin.
          */
-        void pluginActivated(QString pluginId);
+        void setEffect(QString pluginId, QString spaceId);
 
         /*!
           \fn void Shell::pluginDeactivated(QString pluginId)
@@ -267,7 +271,7 @@ class Shell: public QObject
 
           \brief This signal is emited when the user deactivate a plugin.
          */
-        void pluginDeactivated(QString pluginId);
+        void unsetEffect(QString pluginId, QString spaceId);
 
         /*!
           \fn void Shell::pluginMoved(qint32 from, qint32 to)
@@ -277,7 +281,7 @@ class Shell: public QObject
 
           \brief This signal is emited when the user changes the index of a plugin.
          */
-        void pluginMoved(qint32 from, qint32 to);
+        void pluginMoved(QString spaceId, qint32 from, qint32 to);
 
         /*!
           \fn void Shell::pluginConfigureClicked(QString pluginId)

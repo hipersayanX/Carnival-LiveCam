@@ -50,9 +50,11 @@ class DefaultShell: public Shell
         void setConfigs(QVariant configs);
         QWidget *widget();
         QSize viewPortSize();
+        QString showPreview();
 
     public slots:
         void setFrame(const QImage &frame);
+        void setPreview(const QImage &frame);
         void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
         void setControlButtons(QPushButton *toggleMaximizedButton, QPushButton *scaleAndRotateButton);
@@ -73,9 +75,9 @@ class DefaultShell: public Shell
         void onEnabledDeviceMoved(qint32 from, qint32 to);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);
-        void onPluginActivated(QString pluginId);
-        void onPluginDeactivated(QString pluginId);
-        void onPluginMoved(qint32 from, qint32 to);
+        void onSetEffect(QString pluginId, QString spaceId);
+        void onUnsetEffect(QString pluginId, QString spaceId);
+        void onPluginMoved(QString spaceId, qint32 from, qint32 to);
         void onPluginConfigureClicked(QString pluginId);
         void onDeviceConfigureClicked(QString deviceId);
         void onClosed();

@@ -32,18 +32,58 @@ Rectangle
     radius: 2 * recEffects.borderSize
     border.width: 1
     border.color: "#7f7f7f"
+
+    property variant devices: []
     property variant effects: []
     property variant effectsStack: []
-
+    property variant selected: []
     property real borderSize: 8
+    property string currentDeviceId: ""
 
-    Component.onCompleted:
+    signal setEffect(string pluginId, string spaceId)
+    signal unsetEffect(string pluginId, string spaceId)
+    signal pluginMoved(string spaceId, int from, int to)
+    signal pluginConfigureClicked(string pluginId)
+
+    function sortAlphaNoCase(a, b)
     {
-        var effects = []
+        if (a.toLowerCase() < b.toLowerCase())
+            return -1
+
+        if (a.toLowerCase() > b.toLowerCase())
+            return 1
+
+        return 0;
+    }
+
+    function listCategories()
+    {
+        var categories = []
+
+        for (var effect in recEffects.effects)
+            if (categories.indexOf(recEffects.effects[effect].category) < 0)
+                categories.push(recEffects.effects[effect].category)
+
+        categories.sort(recEffects.sortAlphaNoCase)
+
+        return ["All"].concat(categories)
+    }
+
+    onDevicesChanged:
+    {
+        var devices = []
+
+        for (var device in recEffects.devices)
+            if (recEffects.devices[device].isEnabled)
+                devices.push(recEffects.devices[device].summary)
+
+        devices.sort(recEffects.sortAlphaNoCase)
+        cbxDevice.updateOptions(devices)
     }
 
     onEffectsChanged:
-    {/*
+    {
+        cbxEffectsCategory.updateOptions(recEffects.listCategories())
         lsmEffects.clear()
 
         for (var effect in effects)
@@ -56,13 +96,84 @@ Rectangle
             lsmEffects.append(newEffect)
         }
 
-        lsvEffects.currentIndex = 0
-        recEffectView.updateHeight()*/
+        grvEffects.currentIndex = 0
+    }
+
+    Component
+    {
+        id: cmpEffectDelegate
+
+        Item
+        {
+            Rectangle
+            {
+                x: 10
+                y: 10
+                width: 128
+                height: 96
+                color: "#000000"
+                border.color: (recEffects.selected.indexOf(propPluginId) != -1)? "#7f7fff": "#00000000"
+                border.width: 8
+
+                Image
+                {
+                    anchors.fill: parent
+                    source: propThumbnail
+                    opacity: 0.75
+
+                    Rectangle
+                    {
+                        id: recIs3D
+                        width: 20
+                        height: 20
+                        color: "#000000"
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+
+                        Text
+                        {
+                            id: txtIs3D
+                            color: "#ffffff"
+                            text: propIs3D? "3D": "2D"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                            font.bold: true
+                        }
+                    }
+                }
+
+                MouseArea
+                {
+                    anchors.fill: parent
+
+                    onClicked:
+                    {
+                    }
+
+                    onEntered:
+                    {
+                    }
+
+                    onExited:
+                    {
+                    }
+
+                    onPressed:
+                    {
+                    }
+
+                    onReleased:
+                    {
+                    }
+                }
+            }
+        }
     }
 
     Rectangle
     {
-        id: rectangle1
+        id: recEffectsContainer
         color: "#00000000"
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 16
@@ -110,101 +221,11 @@ Rectangle
                 cellWidth: 136
                 cellHeight: 104
 
-                delegate: Item
-                {
-                    Rectangle
-                    {
-                        x: 10
-                        y: 10
-                        width: 128
-                        height: 96
-                        color: "#000000"
-                        border.color: propIsSelected? "#7f7fff": "#00000000"
-                        border.width: 8
-
-                        Image
-                        {
-                            anchors.fill: parent
-                            source: propThumbnail
-                            opacity: 0.75
-
-                            Rectangle
-                            {
-                                id: recIs3D
-                                width: 20
-                                height: 20
-                                color: "#000000"
-                                anchors.right: parent.right
-                                anchors.top: parent.top
-
-                                Text
-                                {
-                                    id: txtIs3D
-                                    color: "#ffffff"
-                                    text: propIs3D? "3D": "2D"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    anchors.fill: parent
-                                    font.bold: true
-                                }
-                            }
-                        }
-
-                        MouseArea
-                        {
-                            anchors.fill: parent
-
-                            onClicked:
-                            {
-                            }
-
-                            onEntered:
-                            {
-                            }
-
-                            onExited:
-                            {
-                            }
-
-                            onPressed:
-                            {
-                            }
-
-                            onReleased:
-                            {
-                            }
-                        }
-                    }
-                }
+                delegate: cmpEffectDelegate
 
                 model: ListModel
                 {
-                    ListElement
-                    {
-                        propPluginId: "plugin 1"
-                        propThumbnail: "/home/hipersayan_x/Carnival-LiveCam/share/plugins/DefaultPlugin/share/thumbnail-128x96.png"
-                        propIs3D: true
-                        propIsActivated: false
-                        propIsSelected: true
-                    }
-
-                    ListElement
-                    {
-                        propPluginId: "plugin 2"
-                        propThumbnail: "/home/hipersayan_x/Carnival-LiveCam/share/plugins/SnowFall/share/thumbnail-128x96.png"
-                        propIs3D: false
-                        propIsActivated: false
-                        propIsSelected: true
-                    }
-
-                    ListElement
-                    {
-                        propPluginId: "plugin 3"
-                        propThumbnail: "/home/hipersayan_x/Carnival-LiveCam/share/plugins/TheMask/share/thumbnail-128x96.png"
-                        propIs3D: true
-                        propIsActivated: true
-                        propIsSelected: false
-                    }
+                    id: lsmEffects
                 }
             }
 
@@ -273,68 +294,22 @@ Rectangle
             {
                 id: lsvStack
                 clip: true
-                anchors.right: slider1.left
+                anchors.right: sldStack.left
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.top: parent.top
 
-                delegate: Item
-                {
-                    x: 5
-                    height: 40
-
-                    Row
-                    {
-                        id: row1
-                        spacing: 10
-
-                        Rectangle
-                        {
-                            width: 40
-                            height: 40
-                            color: colorCode
-                        }
-
-                        Text
-                        {
-                            text: name
-                            anchors.verticalCenter: parent.verticalCenter
-                            font.bold: true
-                        }
-                    }
-                }
+                delegate: cmpEffectDelegate
 
                 model: ListModel
                 {
-                    ListElement
-                    {
-                        name: "Grey"
-                        colorCode: "grey"
-                    }
-
-                    ListElement
-                    {
-                        name: "Red"
-                        colorCode: "red"
-                    }
-
-                    ListElement
-                    {
-                        name: "Blue"
-                        colorCode: "blue"
-                    }
-
-                    ListElement
-                    {
-                        name: "Green"
-                        colorCode: "green"
-                    }
+                    id: lsmStack
                 }
             }
 
-            Slider {
-                id: slider1
-                x: 118
+            Slider
+            {
+                id: sldStack
                 anchors.bottom: parent.bottom
                 anchors.top: parent.top
                 anchors.right: parent.right
@@ -394,7 +369,6 @@ Rectangle
         {
             id: txtName
             color: "#ffffff"
-            text: "Nombre"
             anchors.left: parent.left
             anchors.top: parent.top
             font.bold: true
@@ -404,7 +378,6 @@ Rectangle
         {
             id: txtVersion
             color: "#ffffff"
-            text: "(1.0.0)"
             anchors.leftMargin: 8
             anchors.top: parent.top
             anchors.left: txtName.right
@@ -414,7 +387,6 @@ Rectangle
         {
             id: txtSummary
             color: "#ffffff"
-            text: "Plugin Summary kjhghjvghvghcgf ghvgcv yg  ff gtgftyfycv ygv"
             anchors.topMargin: 16
             anchors.top: txtName.bottom
             anchors.right: parent.right
@@ -436,7 +408,6 @@ Rectangle
             id: txtCategory
             y: 71
             color: "#ffffff"
-            text: "Category"
             anchors.left: imgCategory.right
             anchors.leftMargin: 8
             anchors.verticalCenter: imgCategory.verticalCenter
@@ -457,7 +428,6 @@ Rectangle
             id: txtLicense
             y: 98
             color: "#ffffff"
-            text: "GPLv3"
             anchors.left: imgLicense.right
             anchors.leftMargin: 8
             anchors.verticalCenter: imgLicense.verticalCenter
@@ -478,7 +448,6 @@ Rectangle
             id: txtAuthor
             y: 129
             color: "#ffffff"
-            text: "autor"
             anchors.left: imgAuthor.right
             anchors.leftMargin: 8
             anchors.verticalCenter: imgAuthor.verticalCenter

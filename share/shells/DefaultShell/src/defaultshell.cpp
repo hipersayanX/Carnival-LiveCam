@@ -93,9 +93,9 @@ void DefaultShell::begin()
     connect(this->gui, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
     connect(this->gui, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
     connect(this->gui, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
-    connect(this->gui, SIGNAL(pluginActivated(QString)), this, SLOT(onPluginActivated(QString)));
-    connect(this->gui, SIGNAL(pluginDeactivated(QString)), this, SLOT(onPluginDeactivated(QString)));
-    connect(this->gui, SIGNAL(pluginMoved(qint32, qint32)), this, SLOT(onPluginMoved(qint32, qint32)));
+    connect(this->gui, SIGNAL(setEffect(QString, QString)), this, SLOT(onSetEffect(QString, QString)));
+    connect(this->gui, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
+    connect(this->gui, SIGNAL(pluginMoved(QString, qint32, qint32)), this, SLOT(onPluginMoved(QString, qint32, qint32)));
     connect(this->gui, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
     connect(this->gui, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
     connect(this->gui, SIGNAL(closed()), this, SLOT(onClosed()));
@@ -103,6 +103,24 @@ void DefaultShell::begin()
 
 void DefaultShell::end()
 {
+    disconnect(this->gui, SIGNAL(viewPortSizeChanged(QSize)), this, SLOT(onViewPortSizeChanged(QSize)));
+    disconnect(this->gui, SIGNAL(sMouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
+    disconnect(this->gui, SIGNAL(sMousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
+    disconnect(this->gui, SIGNAL(sMousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
+    disconnect(this->gui, SIGNAL(sMouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
+    disconnect(this->gui, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
+    disconnect(this->gui, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
+    disconnect(this->gui, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
+    disconnect(this->gui, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
+    disconnect(this->gui, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
+    disconnect(this->gui, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
+    disconnect(this->gui, SIGNAL(setEffect(QString, QString)), this, SLOT(onSetEffect(QString, QString)));
+    disconnect(this->gui, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
+    disconnect(this->gui, SIGNAL(pluginMoved(QString, qint32, qint32)), this, SLOT(onPluginMoved(QString, qint32, qint32)));
+    disconnect(this->gui, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
+    disconnect(this->gui, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
+    disconnect(this->gui, SIGNAL(closed()), this, SLOT(onClosed()));
+
     delete this->gui;
     this->gui = NULL;
 }
@@ -131,9 +149,19 @@ QSize DefaultShell::viewPortSize()
     return this->gui->size();
 }
 
+QString DefaultShell::showPreview()
+{
+    return this->gui->showPreview();
+}
+
 void DefaultShell::setFrame(const QImage &frame)
 {
     this->gui->setFrame(frame);
+}
+
+void DefaultShell::setPreview(const QImage &frame)
+{
+    this->gui->setPreview(frame);
 }
 
 void DefaultShell::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
@@ -241,19 +269,19 @@ void DefaultShell::onDeviceDisable(QString deviceId)
     emit deviceDisable(deviceId);
 }
 
-void DefaultShell::onPluginActivated(QString pluginId)
+void DefaultShell::onSetEffect(QString pluginId, QString spaceId)
 {
-    emit pluginActivated(pluginId);
+    emit setEffect(pluginId, spaceId);
 }
 
-void DefaultShell::onPluginDeactivated(QString pluginId)
+void DefaultShell::onUnsetEffect(QString pluginId, QString spaceId)
 {
-    emit pluginDeactivated(pluginId);
+    emit unsetEffect(pluginId, spaceId);
 }
 
-void DefaultShell::onPluginMoved(qint32 from, qint32 to)
+void DefaultShell::onPluginMoved(QString spaceId, qint32 from, qint32 to)
 {
-    emit pluginMoved(from, to);
+    emit pluginMoved(spaceId, from, to);
 }
 
 void DefaultShell::onPluginConfigureClicked(QString pluginId)

@@ -36,14 +36,14 @@ class Gui: public QDeclarativeView
 
     public:
         explicit Gui(QWidget *parent=0);
+        QString showPreview();
 
     private:
         WebcamImageProvider *webcamImageProvider;
         QObject *root;
-        QDeclarativeItem *bbxWebcams;
+        QDeclarativeItem *devices;
         QDeclarativeItem *iconBar;
-        QDeclarativeItem *effectBar;
-        QDeclarativeItem *effectView;
+        QDeclarativeItem *effects;
         QDeclarativeItem *windowControls;
         QDeclarativeItem *windowBackground;
         QPoint windowPos0;
@@ -63,15 +63,16 @@ class Gui: public QDeclarativeView
         void enabledDeviceMoved(qint32 from, qint32 to);
         void deviceEnable(QString deviceId);
         void deviceDisable(QString deviceId);
-        void pluginActivated(QString pluginId);
-        void pluginDeactivated(QString pluginId);
-        void pluginMoved(qint32 from, qint32 to);
+        void setEffect(QString pluginId, QString spaceId);
+        void unsetEffect(QString pluginId, QString spaceId);
+        void pluginMoved(QString spaceId, qint32 from, qint32 to);
         void pluginConfigureClicked(QString pluginId);
         void deviceConfigureClicked(QString deviceId);
         void closed();
 
     public slots:
         void setFrame(const QImage &frame);
+        void setPreview(const QImage &frame);
         void moveDevice(qint32 from, qint32 to);
         void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
@@ -82,9 +83,9 @@ class Gui: public QDeclarativeView
         void onEnabledDeviceMoved(int from, int to);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);
-        void onPluginActivated(QString pluginId);
-        void onPluginDeactivated(QString pluginId);
-        void onPluginMoved(int from, int to);
+        void onSetEffect(QString pluginId, QString spaceId);
+        void onUnsetEffect(QString pluginId, QString spaceId);
+        void onPluginMoved(QString spaceId, int from, int to);
         void onPluginConfigureClicked(QString pluginId);
         void onDeviceConfigureClicked(QString deviceId);
         void onMouseDoubleClicked(qreal mouseX, qreal mouseY, QVariant pressedButtons);

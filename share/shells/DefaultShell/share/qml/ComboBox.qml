@@ -43,7 +43,7 @@ Button
 
     function updateOptions(options)
     {
-        txtOption.text = options[recComboBox.currentOption]
+        txtOption.text = (options.length < 1)? "": options[recComboBox.currentOption]
         lswOptions.updateOptions(options)
     }
 
