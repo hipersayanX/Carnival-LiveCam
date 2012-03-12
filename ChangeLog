@@ -1,3 +1,321 @@
+2012-03-10  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* include/plugin/pluginmanager.h, include/shell/shell.h,
+	include/shell/shellmanager.h,
+	share/plugins/DefaultPlugin/include/plugin.h,
+	share/plugins/SnowFall/include/plugin.h,
+	share/plugins/TheMask/include/plugin.h,
+	share/shells/DefaultShell/DefaultShell.pro,
+	share/shells/DefaultShell/include/defaultshell.h,
+	share/shells/DefaultShell/include/gui.h,
+	share/shells/DefaultShell/include/shell.h,
+	share/shells/DefaultShell/share/qml/ComboBox.qml,
+	share/shells/DefaultShell/share/qml/Effects.qml,
+	share/shells/DefaultShell/share/qml/main.qml,
+	share/shells/DefaultShell/src/defaultshell.cpp,
+	share/shells/DefaultShell/src/gui.cpp, src/core/core.cpp,
+	src/plugin/pluginmanager.cpp, src/shell/shellmanager.cpp: Working on
+	Effects GUI.
+
+2012-03-07  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* AUTHORS, Doxyfile, Doxyfile.cfg, build_all.sh,
+	include/core/core.h, include/plugin/plugin.h,
+	include/plugin/pluginmanager.h, include/shell/shell.h,
+	include/shell/shellmanager.h, packagemap.xml,
+	share/plugins/DefaultPlugin/include/plugin.h,
+	share/plugins/SnowFall/include/plugin.h,
+	share/plugins/TheMask/include/plugin.h,
+	share/shells/DefaultShell/share/images/icons/arrow-left.svg,
+	share/shells/DefaultShell/share/images/icons/arrow-right.svg,
+	share/shells/DefaultShell/share/qml/Devices.qml,
+	share/shells/DefaultShell/share/qml/Effects.qml,
+	share/shells/DefaultShell/share/qml/ListWidget.qml,
+	share/shells/DefaultShell/share/qml/Window.qml,
+	share/shells/DefaultShell/share/qml/main.qml, src/core/core.cpp,
+	src/plugin/pluginmanager.cpp, src/shell/shellmanager.cpp: Working on
+	Effects integration.
+
+2012-02-15  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* include/driver/drivermanager.h, include/plugin/plugin.h,
+	include/plugin/pluginmanager.h, include/shell/shell.h,
+	include/shell/shellmanager.h, include/space/space.h,
+	include/space/spacemanager.h, include/space/spacemodel.h,
+	include/streaming/mediastreaming.h,
+	include/streaming/outputformat.h,
+	share/drivers/ImageDriver/src/config.cpp,
+	share/drivers/VideoDriver/src/config.cpp,
+	share/plugins/DefaultPlugin/include/defaultplugin.h,
+	share/plugins/DefaultPlugin/include/plugin.h,
+	share/plugins/DefaultPlugin/include/qosgwidget.h,
+	share/plugins/DefaultPlugin/src/defaultplugin.cpp,
+	share/plugins/DefaultPlugin/src/qosgwidget.cpp,
+	share/plugins/SnowFall/include/plugin.h,
+	share/plugins/SnowFall/include/snow.h,
+	share/plugins/SnowFall/include/snowfall.h,
+	share/plugins/SnowFall/include/snowflake.h,
+	share/plugins/SnowFall/src/snow.cpp,
+	share/plugins/SnowFall/src/snowfall.cpp,
+	share/plugins/SnowFall/src/snowflake.cpp,
+	share/plugins/TheMask/include/plugin.h,
+	share/plugins/TheMask/include/themask.h,
+	share/plugins/TheMask/src/mask.cpp,
+	share/plugins/TheMask/src/themask.cpp,
+	share/shells/DefaultShell/DefaultShell.pro,
+	share/shells/DefaultShell/include/defaultshell.h,
+	share/shells/DefaultShell/include/gui.h,
+	share/shells/DefaultShell/include/shell.h,
+	share/shells/DefaultShell/share/qml/Devices.qml,
+	share/shells/DefaultShell/share/qml/EffectView.qml,
+	share/shells/DefaultShell/src/defaultshell.cpp,
+	share/shells/DefaultShell/src/gui.cpp, src/core/core.cpp,
+	src/driver/devicemanager.cpp, src/driver/drivermanager.cpp,
+	src/plugin/pluginmanager.cpp, src/shell/shellmanager.cpp,
+	src/space/space.cpp, src/space/spacemanager.cpp,
+	src/space/spacemodel.cpp, src/streaming/mediastreaming.cpp,
+	src/streaming/outputformat.cpp: Spaces finished, Working on Effects
+	integration with the new Spaces concept.
+
+2012-02-09  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* README.markdown: Updated README file.
+
+2012-02-09  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* README.markdown, include/space/spacemanager.h,
+	include/space/spacemodel.h, include/space/spacewidget.h,
+	share/shells/DefaultShell/DefaultShell.pro,
+	share/shells/DefaultShell/include/gui.h,
+	share/shells/DefaultShell/share/qml/About.qml,
+	share/shells/DefaultShell/share/qml/Button.qml,
+	share/shells/DefaultShell/share/qml/ButtonBox.qml,
+	share/shells/DefaultShell/share/qml/Candy.qml,
+	share/shells/DefaultShell/share/qml/CandyBar.qml,
+	share/shells/DefaultShell/share/qml/CandyView.qml,
+	share/shells/DefaultShell/share/qml/ComboBox.qml,
+	share/shells/DefaultShell/share/qml/Device.qml,
+	share/shells/DefaultShell/share/qml/Devices.qml,
+	share/shells/DefaultShell/share/qml/DialogBox.qml,
+	share/shells/DefaultShell/share/qml/Effect.qml,
+	share/shells/DefaultShell/share/qml/EffectBar.qml,
+	share/shells/DefaultShell/share/qml/EffectView.qml,
+	share/shells/DefaultShell/share/qml/IconBar.qml,
+	share/shells/DefaultShell/share/qml/ListWidget.qml,
+	share/shells/DefaultShell/share/qml/Slider.qml,
+	share/shells/DefaultShell/share/qml/SoundSlider.qml,
+	share/shells/DefaultShell/share/qml/Spaces.qml,
+	share/shells/DefaultShell/share/qml/Window.qml,
+	share/shells/DefaultShell/share/qml/WindowControls.qml,
+	share/shells/DefaultShell/share/qml/main.qml,
+	share/shells/DefaultShell/src/defaultshell.cpp,
+	share/shells/DefaultShell/src/gui.cpp,
+	share/shells/DefaultShell/src/webcamimageprovider.cpp,
+	src/core/core.cpp, src/space/spacemanager.cpp,
+	src/space/spacemodel.cpp, src/space/spacewidget.cpp: Spaces working
+	pretty well. Fixed webcam delay.
+
+2012-01-30  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* README.markdown, include/core/core.h, include/shell/shell.h,
+	include/shell/shellmanager.h, include/space/spacemanager.h,
+	share/shells/DefaultShell/include/defaultshell.h,
+	share/shells/DefaultShell/include/gui.h,
+	share/shells/DefaultShell/include/shell.h,
+	share/shells/DefaultShell/share/images/icons/maxizespace.svg,
+	share/shells/DefaultShell/share/images/icons/scalerotate.svg,
+	share/shells/DefaultShell/share/qml/Window.qml,
+	share/shells/DefaultShell/src/defaultshell.cpp,
+	share/shells/DefaultShell/src/gui.cpp,
+	share/shells/DefaultShell/src/webcamimageprovider.cpp,
+	src/core/core.cpp, src/plugin/pluginmanager.cpp,
+	src/shell/shellmanager.cpp, src/space/space.cpp,
+	src/space/spacemanager.cpp, src/space/spacemodel.cpp: Spaces mostly
+	finished. Found a frame delay bug.
+
+2012-01-22  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* README.markdown, include/space/space.h,
+	include/space/spacemanager.h, include/space/spacemodel.h,
+	share/drivers/ImageDriver/src/imagedriver.cpp, src/core/core.cpp,
+	src/space/space.cpp, src/space/spacemanager.cpp,
+	src/space/spacemodel.cpp, src/space/spacewidget.cpp: This is the
+	first stage of the Spaces idea. With Bugs, but working.
+
+2012-01-13  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* include/shell/shell.h, include/shell/shellmanager.h,
+	include/space/spacemodel.h,
+	share/drivers/VideoDriver/VideoDriver.pro,
+	share/drivers/WebcamLinux/WebcamLinux.pro,
+	share/plugins/DefaultPlugin/DefaultPlugin.pro,
+	share/plugins/TheMask/TheMask.pro,
+	share/shells/DefaultShell/include/defaultshell.h,
+	share/shells/DefaultShell/include/gui.h,
+	share/shells/DefaultShell/include/shell.h,
+	share/shells/DefaultShell/share/images/icons/spaces.svg,
+	share/shells/DefaultShell/share/qml/Window.qml,
+	share/shells/DefaultShell/src/defaultshell.cpp,
+	share/shells/DefaultShell/src/gui.cpp, src/core/core.cpp,
+	src/driver/devicemanager.cpp, src/shell/shellmanager.cpp,
+	src/space/spacemanager.cpp, src/space/spacemodel.cpp: Disabled
+	Plugins and testing Spaces.
+
+2012-01-12  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* Carnival-LiveCam.pro, include/core/core.h,
+	include/driver/deviceinfo.h, include/driver/devicemanager.h,
+	include/driver/driverinfo.h, include/driver/drivermanager.h,
+	include/plugin/plugininfo.h, include/plugin/pluginmanager.h,
+	include/shell/shell.h, include/shell/shellinfo.h,
+	include/shell/shellmanager.h, include/space/spacemanager.h,
+	include/space/spaceview.h,
+	share/shells/DefaultShell/include/defaultshell.h,
+	share/shells/DefaultShell/include/gui.h,
+	share/shells/DefaultShell/include/shell.h,
+	share/shells/DefaultShell/share/qml/About.qml,
+	share/shells/DefaultShell/share/qml/ButtonBox.qml,
+	share/shells/DefaultShell/share/qml/Device.qml,
+	share/shells/DefaultShell/share/qml/Window.qml,
+	share/shells/DefaultShell/share/qml/main.qml,
+	share/shells/DefaultShell/src/defaultshell.cpp,
+	share/shells/DefaultShell/src/gui.cpp, src/core/core.cpp,
+	src/driver/deviceinfo.cpp, src/driver/devicemanager.cpp,
+	src/driver/driverinfo.cpp, src/driver/drivermanager.cpp,
+	src/plugin/plugininfo.cpp, src/plugin/pluginmanager.cpp,
+	src/shell/shellinfo.cpp, src/shell/shellmanager.cpp,
+	src/space/spacemanager.cpp, src/space/spaceview.cpp: Testing Spaces.
+
+2012-01-07  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* include/space/space.h, include/space/spacecontrols.h,
+	include/space/spacemodel.h, include/space/spaceview.h,
+	include/space/spacewidget.h,
+	share/drivers/VideoDriver/VideoDriver.pro,
+	share/drivers/WebcamLinux/WebcamLinux.pro,
+	share/drivers/WebcamLinux/src/webcamlinux.cpp,
+	share/plugins/DefaultPlugin/DefaultPlugin.pro,
+	share/plugins/TheMask/TheMask.pro, src/core/core.cpp,
+	src/driver/devicemanager.cpp, src/space/space.cpp,
+	src/space/spacecontrols.cpp, src/space/spacemodel.cpp,
+	src/space/spaceview.cpp, src/space/spacewidget.cpp: Working on
+	SpacesView
+
+2012-01-06  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* include/space/spaceview.h, include/space/spacewidget.h,
+	src/space/spaceview.cpp, src/space/spacewidget.cpp: Working on
+	Spaces view 2
+
+2012-01-06  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* Carnival-LiveCam.pro, include/space/spacecontrols.h,
+	include/space/spacemodel.h, include/space/spaceview.h,
+	include/space/spacewidget.h, share/ui/spacecontrols.ui,
+	src/space/spacecontrols.cpp, src/space/spacemodel.cpp,
+	src/space/spaceview.cpp, src/space/spacewidget.cpp: Working on
+	Spaces view
+
+2011-12-30  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* Carnival-LiveCam.pro, README.markdown, build_all.sh,
+	include/space/space.h, include/space/spacemodel.h,
+	include/space/spaceview.h, src/space/space.cpp,
+	src/space/spacemodel.cpp, src/space/spaceview.cpp,
+	src/streaming/mediastreaming.cpp: Working on the first
+	implementation of the spaces
+
+2011-12-15  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* README.markdown: Updated README file one more time :P.
+
+2011-12-15  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* README.markdown: Updated README file again and again :P.
+
+2011-12-15  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* README.markdown: Updated README file again.
+
+2011-12-15  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* INSTALL, README, README.markdown, src/main.cpp: Updated README
+	file.
+
+2011-12-08  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* Carnival-LiveCam.pro, carnival.pro: Changed project name
+
+2011-12-08  Gonzalo Exequiel Pedone <hipersayan.x@gmail.com>
+
+	* AUTHORS, BUGS, COPYING, ChangeLog, Doxyfile, FAQ, INSTALL, NEWS,
+	README, THANKS, TODO, build_all.sh, carnival.pro, docs/COPYING,
+	docs/README, include/driver/deviceinfo.h,
+	include/driver/devicemanager.h, include/driver/driver.h,
+	include/driver/driverfactory.h, include/driver/driverinfo.h,
+	include/driver/drivermanager.h, include/plugin/plugin.h,
+	include/plugin/plugininfo.h, include/plugin/pluginmanager.h,
+	include/shell/shell.h, include/shell/shellfactory.h,
+	include/shell/shellinfo.h, include/shell/shellmanager.h,
+	include/streaming/mediastreaming.h,
+	include/streaming/outputformat.h,
+	share/drivers/ImageDriver/ImageDriver.pro,
+	share/drivers/ImageDriver/include/config.h,
+	share/drivers/ImageDriver/include/driver.h,
+	share/drivers/ImageDriver/include/driverfactory.h,
+	share/drivers/ImageDriver/src/config.cpp,
+	share/drivers/ImageDriver/src/imagedriver.cpp,
+	share/drivers/ImageDriver/src/imagedriverfactory.cpp,
+	share/drivers/VideoDriver/VideoDriver.pro,
+	share/drivers/VideoDriver/include/config.h,
+	share/drivers/VideoDriver/include/driver.h,
+	share/drivers/VideoDriver/include/driverfactory.h,
+	share/drivers/VideoDriver/include/videodriver.h,
+	share/drivers/VideoDriver/include/videodriverfactory.h,
+	share/drivers/VideoDriver/share/icons.qrc,
+	share/drivers/VideoDriver/share/ui/config.ui,
+	share/drivers/VideoDriver/src/config.cpp,
+	share/drivers/VideoDriver/src/videodriver.cpp,
+	share/drivers/VideoDriver/src/videodriverfactory.cpp,
+	share/drivers/WebcamLinux/WebcamLinux.pro,
+	share/drivers/WebcamLinux/include/driver.h,
+	share/drivers/WebcamLinux/include/driverfactory.h,
+	share/drivers/WebcamLinux/include/sleep.h,
+	share/drivers/WebcamLinux/include/webcamlinux.h,
+	share/drivers/WebcamLinux/src/sleep.cpp,
+	share/drivers/WebcamLinux/src/webcamlinux.cpp,
+	share/drivers/WebcamLinux/src/webcamlinuxfactory.cpp,
+	share/plugins/DefaultPlugin/DefaultPlugin.pro,
+	share/plugins/DefaultPlugin/include/defaultplugin.h,
+	share/plugins/DefaultPlugin/include/plugin.h,
+	share/plugins/DefaultPlugin/src/defaultplugin.cpp,
+	share/plugins/SnowFall/SnowFall.pro,
+	share/plugins/SnowFall/include/config.h,
+	share/plugins/SnowFall/include/plugin.h,
+	share/plugins/SnowFall/include/snowfall.h,
+	share/plugins/SnowFall/include/snowflake.h,
+	share/plugins/SnowFall/share/ui/config.ui,
+	share/plugins/SnowFall/src/config.cpp,
+	share/plugins/SnowFall/src/snowfall.cpp,
+	share/plugins/SnowFall/src/snowflake.cpp,
+	share/plugins/TheMask/TheMask.pro,
+	share/plugins/TheMask/include/mask.h,
+	share/plugins/TheMask/include/plugin.h,
+	share/plugins/TheMask/include/themask.h,
+	share/plugins/TheMask/share/haars/haars.txt,
+	share/plugins/TheMask/src/mask.cpp,
+	share/plugins/TheMask/src/themask.cpp,
+	share/shells/DefaultShell/DefaultShell.pro,
+	share/shells/DefaultShell/include/defaultshell.h,
+	share/shells/DefaultShell/include/shell.h,
+	share/shells/DefaultShell/src/defaultshell.cpp, src/core/core.cpp,
+	src/driver/deviceinfo.cpp, src/driver/devicemanager.cpp,
+	src/driver/driverinfo.cpp, src/driver/drivermanager.cpp,
+	src/main.cpp, src/plugin/plugininfo.cpp,
+	src/plugin/pluginmanager.cpp, src/shell/shellinfo.cpp,
+	src/shell/shellmanager.cpp, src/streaming/mediastreaming.cpp,
+	src/streaming/outputformat.cpp: Added Doxygen
+
 2011-11-12  hipersayan_x <hipersayan.x@gmail.com>
 
 	* My first working commit

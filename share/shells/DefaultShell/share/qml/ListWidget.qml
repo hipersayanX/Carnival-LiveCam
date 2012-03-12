@@ -207,7 +207,9 @@ Rectangle
                     index = lsvOptions.count - 1
 
                 lsvOptions.currentIndex = index
-                recListWidget.itemSelected(index, lsvOptions.currentItem.children[0].children[0].text)
+
+                if (lsvOptions.currentItem)
+                    recListWidget.itemSelected(index, lsvOptions.currentItem.children[0].children[0].text)
             }
         }
     }

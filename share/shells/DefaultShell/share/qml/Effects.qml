@@ -34,11 +34,12 @@ Rectangle
     border.color: "#7f7f7f"
 
     property variant devices: []
+    property variant activeDevices: []
     property variant effects: []
-    property variant effectsStack: []
     property variant selected: []
     property real borderSize: 8
     property string currentDeviceId: ""
+    property string preview: ""
 
     signal setEffect(string pluginId, string spaceId)
     signal unsetEffect(string pluginId, string spaceId)
@@ -73,9 +74,13 @@ Rectangle
     {
         var devices = []
 
-        for (var device in recEffects.devices)
-            if (recEffects.devices[device].isEnabled)
-                devices.push(recEffects.devices[device].summary)
+        if (recEffects.activeDevices && recEffects.activeDevices.length > 0)
+            recEffects.currentDeviceId = recEffects.activeDevices[0]
+
+        for (var activeDevice in recEffects.activeDevices)
+            for (var device in recEffects.devices)
+                if (recEffects.activeDevices[activeDevice] == recEffects.devices[device].deviceId)
+                    devices.push(recEffects.devices[device].summary)
 
         devices.sort(recEffects.sortAlphaNoCase)
         cbxDevice.updateOptions(devices)
@@ -85,18 +90,27 @@ Rectangle
     {
         cbxEffectsCategory.updateOptions(recEffects.listCategories())
         lsmEffects.clear()
+        lsmStack.clear()
 
-        for (var effect in effects)
+        for (var effect in recEffects.effects)
         {
             var newEffect = {}
 
-            for (var prop in effects[effect])
-                newEffect["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = effects[effect][prop]
+            for (var prop in recEffects.effects[effect])
+                newEffect["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = recEffects.effects[effect][prop]
 
-            lsmEffects.append(newEffect)
+            if (effects[effect].isActivated)
+                lsmStack.append(newEffect)
+            else
+                lsmEffects.append(newEffect)
         }
 
         grvEffects.currentIndex = 0
+        lsvStack.currentIndex = 0
+
+        // contentHeight !!!
+        sldEffects.updateValue()
+        sldStack.updateValue()
     }
 
     Component
@@ -105,6 +119,9 @@ Rectangle
 
         Item
         {
+            width: 136
+            height: 104
+
             Rectangle
             {
                 x: 10
@@ -117,6 +134,7 @@ Rectangle
 
                 Image
                 {
+                    id: imgStaticPreview
                     anchors.fill: parent
                     source: propThumbnail
                     opacity: 0.75
@@ -141,30 +159,50 @@ Rectangle
                             font.bold: true
                         }
                     }
-                }
 
-                MouseArea
-                {
-                    anchors.fill: parent
-
-                    onClicked:
+                    MouseArea
                     {
-                    }
+                        anchors.fill: parent
+                        hoverEnabled: true
 
-                    onEntered:
-                    {
-                    }
+                        onClicked:
+                        {
+                            var selected = recEffects.selected.slice()
 
-                    onExited:
-                    {
-                    }
+                            if (selected.indexOf(propPluginId) == -1)
+                                selected.push(propPluginId)
+                            else
+                                selected.splice(selected.indexOf(propPluginId), 1)
 
-                    onPressed:
-                    {
-                    }
+                            recEffects.selected = selected
+                        }
 
-                    onReleased:
-                    {
+                        onEntered:
+                        {
+                            imgStaticPreview.opacity = 1
+                        }
+
+                        onExited:
+                        {
+                            imgStaticPreview.opacity = 0.75
+                        }
+
+                        onPressed:
+                        {
+                            txtName.text = propName
+                            txtVersion.text = "(" + propVersion + ")"
+                            txtSummary.text = propSummary
+                            txtCategory.text = propCategory
+                            txtLicense.text = propLicense
+                            txtAuthor.text = propAuthor
+                            btnConfigure.pluginId = propPluginId
+                            btnWeb.url = propWebsite
+                            btnMail.mail = propMail
+                        }
+
+                        onReleased:
+                        {
+                        }
                     }
                 }
             }
@@ -184,16 +222,29 @@ Rectangle
         anchors.left: parent.left
         anchors.leftMargin: 16
 
+        Text
+        {
+            id: txtEffects
+            x: 0
+            y: -56
+            color: "#ffffff"
+            text: qsTr("Effects")
+            anchors.horizontalCenter: recEffectsGrid.horizontalCenter
+            anchors.top: parent.top
+            font.bold: true
+        }
+
         Rectangle
         {
             id: recEffectsGrid
             radius: 4
+            anchors.topMargin: 8
             border.color: "#3f3f3f"
-            anchors.right: recEffectsControls.left
-            anchors.rightMargin: 8
+            anchors.right: recStack.left
+            anchors.rightMargin: 48
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.top: parent.top
+            anchors.top: txtEffects.bottom
 
             gradient: Gradient
             {
@@ -213,6 +264,7 @@ Rectangle
             GridView
             {
                 id: grvEffects
+                interactive: false
                 clip: true
                 anchors.right: sldEffects.left
                 anchors.bottom: parent.bottom
@@ -235,6 +287,41 @@ Rectangle
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.top: parent.top
+                showUpDown: true
+
+                function updateValue()
+                {
+                    var tmpNewMaxValue = Math.ceil(grvEffects.contentHeight / grvEffects.height - 1)
+
+                    if (tmpNewMaxValue < sldEffects.minValue)
+                        sldEffects.maxValue = sldEffects.minValue
+                    else
+                        sldEffects.maxValue = tmpNewMaxValue
+
+                    var newValue = sldEffects.minValue
+
+                    if (sldEffects.maxValue != sldEffects.minValue)
+                    {
+                        var k = (tmpNewMaxValue - sldEffects.minValue) / (sldEffects.maxValue - sldEffects.minValue)
+                        newValue = Math.ceil(k * (sldEffects.value - sldEffects.minValue) + sldEffects.minValue)
+                    }
+
+                    sldEffects.setValue(newValue)
+                    sldEffects.visible = sldEffects.maxValue > sldEffects.minValue? true: false
+                    sldEffects.width = sldEffects.visible? 16: 0
+                }
+
+                onHeightChanged: sldEffects.updateValue()
+
+                Component.onCompleted: sldEffects.updateValue()
+
+                onValueChanged:
+                {
+                    var index = Math.ceil((value - sldEffects.minValue) * (grvEffects.count - 1) /
+                                          (sldEffects.maxValue - sldEffects.minValue))
+
+                    grvEffects.positionViewAtIndex(index, ListView.Beginning)
+                }
             }
         }
 
@@ -248,13 +335,31 @@ Rectangle
             color: "#00000000"
             anchors.right: recStack.left
             anchors.rightMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: recEffectsGrid.verticalCenter
 
             Button
             {
                 id: btnAddEffect
                 icon: "../images/icons/arrow-right.svg"
                 anchors.top: parent.top
+
+                onClicked:
+                {
+                    var effects = recEffects.effects.slice()
+                    var selected = recEffects.selected.slice()
+
+                    for (var plugin in recEffects.selected)
+                        for (var effect in recEffects.effects)
+                            if (recEffects.selected[plugin] == recEffects.effects[effect].pluginId &&
+                                !recEffects.effects[effect].isActivated)
+                            {
+                                effects[effect].isActivated = true
+                                selected.splice(selected.indexOf(recEffects.selected[plugin]), 1)
+                            }
+
+                    recEffects.effects = effects
+                    recEffects.selected = selected
+                }
             }
 
             Button
@@ -262,17 +367,49 @@ Rectangle
                 id: btnRemoveEffect
                 icon: "../images/icons/arrow-left.svg"
                 anchors.bottom: parent.bottom
+
+                onClicked:
+                {
+                    var effects = recEffects.effects.slice()
+                    var selected = recEffects.selected.slice()
+
+                    for (var plugin in recEffects.selected)
+                        for (var effect in recEffects.effects)
+                            if (recEffects.selected[plugin] == recEffects.effects[effect].pluginId &&
+                                recEffects.effects[effect].isActivated)
+                            {
+                                effects[effect].isActivated = false
+                                selected.splice(selected.indexOf(recEffects.selected[plugin]), 1)
+                            }
+
+                    recEffects.effects = effects
+                    recEffects.selected = selected
+                }
             }
+        }
+
+        Text
+        {
+            id: txtStack
+            color: "#ffffff"
+            text: qsTr("Stack")
+            anchors.horizontalCenter: recStack.horizontalCenter
+            anchors.top: parent.top
+            font.bold: true
         }
 
         Rectangle
         {
             id: recStack
-            width: 144
+            x: 360
+            y: 22
+            width: 158
+            height: 386
             radius: 4
+            anchors.topMargin: 8
             border.color: "#3f3f3f"
             anchors.bottom: parent.bottom
-            anchors.top: parent.top
+            anchors.top: txtStack.bottom
             anchors.right: parent.right
 
             gradient: Gradient
@@ -293,6 +430,7 @@ Rectangle
             ListView
             {
                 id: lsvStack
+                interactive: false
                 clip: true
                 anchors.right: sldStack.left
                 anchors.bottom: parent.bottom
@@ -313,6 +451,41 @@ Rectangle
                 anchors.bottom: parent.bottom
                 anchors.top: parent.top
                 anchors.right: parent.right
+                showUpDown: true
+
+                function updateValue()
+                {
+                    var tmpNewMaxValue = Math.ceil(lsvStack.contentHeight / sldStack.height - 1)
+
+                    if (tmpNewMaxValue < sldStack.minValue)
+                        sldStack.maxValue = sldStack.minValue
+                    else
+                        sldStack.maxValue = tmpNewMaxValue
+
+                    var newValue = sldStack.minValue
+
+                    if (sldStack.maxValue != sldStack.minValue)
+                    {
+                        var k = (tmpNewMaxValue - sldStack.minValue) / (sldStack.maxValue - sldStack.minValue)
+                        newValue = Math.ceil(k * (sldStack.value - sldStack.minValue) + sldStack.minValue)
+                    }
+
+                    sldStack.setValue(newValue)
+                    sldStack.visible = sldStack.maxValue > sldStack.minValue? true: false
+                    sldStack.width = sldStack.visible? 16: 0
+                }
+
+                onHeightChanged: sldStack.updateValue()
+
+                Component.onCompleted: sldStack.updateValue()
+
+                onValueChanged:
+                {
+                    var index = Math.ceil((value - sldStack.minValue) * (lsvStack.count - 1) /
+                                          (sldStack.maxValue - sldStack.minValue))
+
+                    lsvStack.positionViewAtIndex(index, ListView.Beginning)
+                }
             }
         }
     }
@@ -339,18 +512,36 @@ Rectangle
         anchors.topMargin: 16
         anchors.right: parent.right
         anchors.rightMargin: 16
+
+        onItemSelected:
+        {
+            recEffects.currentDeviceId = recEffects.activeDevices[index]
+        }
+    }
+
+    Text
+    {
+        id: txtPreview
+        color: "#ffffff"
+        text: qsTr("Preview")
+        anchors.top: cbxDevice.bottom
+        anchors.topMargin: 8
+        anchors.horizontalCenter: cbxDevice.horizontalCenter
+        font.bold: true
     }
 
     Image
     {
         id: imgLivePreview
+        x: 528
+        y: 82
         width: 256
         height: 175
         fillMode: Image.PreserveAspectFit
-        anchors.top: cbxDevice.bottom
+        anchors.top: txtPreview.bottom
         anchors.topMargin: 8
-        anchors.horizontalCenter: cbxDevice.horizontalCenter
-        source: ""
+        anchors.horizontalCenter: txtPreview.horizontalCenter
+        source: recEffects.preview
     }
 
     Rectangle
@@ -468,6 +659,10 @@ Rectangle
                 id: btnConfigure
                 anchors.left: parent.left
                 icon: "../images/icons/configure.svg"
+
+                property string pluginId: ""
+
+                onClicked: recEffects.pluginConfigureClicked(btnConfigure.pluginId)
             }
 
             Button
@@ -475,6 +670,10 @@ Rectangle
                 id: btnWeb
                 anchors.horizontalCenter: parent.horizontalCenter
                 icon: "../images/icons/web.svg"
+
+                property string url: ""
+
+                onClicked: Qt.openUrlExternally(btnWeb.url)
             }
 
             Button
@@ -482,6 +681,10 @@ Rectangle
                 id: btnMail
                 anchors.right: parent.right
                 icon: "../images/icons/mail.svg"
+
+                property string mail: ""
+
+                onClicked: Qt.openUrlExternally(btnMail.mail)
             }
         }
     }

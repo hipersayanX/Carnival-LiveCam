@@ -144,6 +144,7 @@ Window
         visible: false
         anchors.bottom: iconbar.top
         onEscapePressed: visible = false
+        onActiveDevicesChanged: cdbEffects.activeDevices = webcams.activeDevices
         onDevicesChanged: cdbEffects.devices = webcams.devices
     }
 
