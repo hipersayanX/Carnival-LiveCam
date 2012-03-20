@@ -28,10 +28,11 @@ Rectangle
     id: recWindowControls
     width: 120
     height: 16
-    color: "#00000000"
+    color: Qt.rgba(0, 0, 0, 0)
+
     property int iconSize: 16
-    property color highlightUp: "#007fff"
-    property color highlightDown: "#000000"
+    property color highlightUp: Qt.rgba(0, 0.5, 1, 1)
+    property color highlightDown: Qt.rgba(0, 0, 0, 1)
     property bool moving: false
 
     signal entered

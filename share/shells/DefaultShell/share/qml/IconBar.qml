@@ -31,10 +31,10 @@ Rectangle
     radius: 16
 
     property int iconSize: 32
-    property color highlightUp: "#007fff"
-    property color highlightDown: "#000000"
-    property color backgroundUp: "#3f3f3f"
-    property color backgroundDown: "#000000"
+    property color highlightUp: Qt.rgba(0, 0.5, 1, 1)
+    property color highlightDown: Qt.rgba(0, 0, 0, 1)
+    property color backgroundUp: Qt.rgba(0.25, 0.25, 0.25, 1)
+    property color backgroundDown: Qt.rgba(0, 0, 0, 1)
 
     signal clicked(int index)
     signal entered
@@ -67,13 +67,13 @@ Rectangle
         GradientStop
         {
             position: 0
-            color: "#3f3f3f"
+            color: Qt.rgba(0.25, 0.25, 0.25, 1)
         }
 
         GradientStop
         {
             position: 1
-            color: "#000000"
+            color: Qt.rgba(0, 0, 0, 1)
         }
     }
 

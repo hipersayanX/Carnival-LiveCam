@@ -28,9 +28,12 @@ Rectangle
     id: recDialogBox
     width: 128
     height: 56
-    color: "#00000000"
-    property color backgroundUp: "#3f3f3f"
-    property color backgroundDown: "#000000"
+    color: Qt.rgba(0, 0, 0, 0)
+
+    property color backgroundUp: Qt.rgba(0.25, 0.25, 0.25, 1)
+    property color backgroundDown: Qt.rgba(0, 0, 0, 1)
+    property color dialogBorder: Qt.rgba(0.12, 0.12, 0.12, 1)
+    property color textColor: Qt.rgba(1, 1, 1, 1)
     property real markSize: 8
     property string text: ""
 
@@ -45,7 +48,7 @@ Rectangle
         id: recMark
         width: recDialogBox.markSize * Math.SQRT2
         height: recDialogBox.markSize * Math.SQRT2
-        color: "#1f1f1f"
+        color: recDialogBox.dialogBorder
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         rotation: 45
@@ -61,7 +64,7 @@ Rectangle
         anchors.right: parent.right
         anchors.left: parent.left
         border.width: 4
-        border.color: "#1f1f1f"
+        border.color: recDialogBox.dialogBorder
 
         gradient: Gradient
         {
@@ -82,7 +85,7 @@ Rectangle
         {
             id: txtTitle
             text: recDialogBox.text
-            color: "#ffffff"
+            color: recDialogBox.textColor
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
         }

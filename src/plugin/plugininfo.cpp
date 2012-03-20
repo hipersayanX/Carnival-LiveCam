@@ -38,7 +38,6 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
 {
     this->m_fileName = "";
     this->m_pluginId = "";
-    this->m_isEnabled = false;
     this->m_name = "";
     this->m_version = "";
     this->m_summary = "";
@@ -62,7 +61,6 @@ PluginInfo::PluginInfo(const PluginInfo &object):
     QObject(object.parent()),
     m_fileName(object.m_fileName),
     m_pluginId(object.m_pluginId),
-    m_isEnabled(object.m_isEnabled),
     m_name(object.m_name),
     m_version(object.m_version),
     m_summary(object.m_summary),
@@ -81,7 +79,6 @@ PluginInfo::PluginInfo(const PluginInfo &object):
 /*!
   \fn PluginInfo::PluginInfo(QString fileName,
                              QString id,
-                             bool isEnabled,
                              QString name,
                              QString version,
                              QString summary,
@@ -96,7 +93,6 @@ PluginInfo::PluginInfo(const PluginInfo &object):
 
   \param fileName The path from were the plugin is loaded.
   \param id Unique plugin identifier.
-  \param isEnabled \b true if the plugin is loaded, else \b false.
   \param name Human readable plugin name.
   \param version Version of the plugin.
   \param summary Brief human readable description of the plugin.
@@ -111,7 +107,6 @@ PluginInfo::PluginInfo(const PluginInfo &object):
  */
 PluginInfo::PluginInfo(QString fileName,
                        QString id,
-                       bool isEnabled,
                        QString name,
                        QString version,
                        QString summary,
@@ -126,7 +121,6 @@ PluginInfo::PluginInfo(QString fileName,
                        QStringList applyTo):
     m_fileName(fileName),
     m_pluginId(id),
-    m_isEnabled(isEnabled),
     m_name(name),
     m_version(version),
     m_summary(summary),
@@ -153,7 +147,6 @@ PluginInfo& PluginInfo::operator =(const PluginInfo &other)
     {
         this->m_fileName = other.m_fileName;
         this->m_pluginId = other.m_pluginId;
-        this->m_isEnabled = other.m_isEnabled;
         this->m_name = other.m_name;
         this->m_version = other.m_version;
         this->m_summary = other.m_summary;
@@ -189,16 +182,6 @@ QString PluginInfo::fileName()
 QString PluginInfo::pluginId()
 {
     return this->m_pluginId;
-}
-
-/*!
-  \property PluginInfo::isEnabled
-
-  \brief \b true if the plugin is loaded, else \b false.
- */
-bool PluginInfo::isEnabled()
-{
-    return this->m_isEnabled;
 }
 
 /*!
@@ -338,18 +321,6 @@ void PluginInfo::setFileName(QString value)
 void PluginInfo::setPluginId(QString value)
 {
     this->m_pluginId = value;
-}
-
-/*!
-  \fn void PluginInfo::setIsEnabled(bool value)
-
-  \param value \b true if the plugin is activated, else \b false.
-
-  \brief Set if the plugin is activated.
- */
-void PluginInfo::setIsEnabled(bool value)
-{
-    this->m_isEnabled = value;
 }
 
 /*!
@@ -507,16 +478,6 @@ void PluginInfo::resetFileName()
 void PluginInfo::resetPluginId()
 {
     this->m_pluginId = "";
-}
-
-/*!
-  \fn void PluginInfo::resetIsEnabled()
-
-  \brief Reset PluginInfo::isEnabled to \b false.
- */
-void PluginInfo::resetIsEnabled()
-{
-    this->m_isEnabled = false;
 }
 
 /*!

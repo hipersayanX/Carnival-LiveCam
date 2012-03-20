@@ -85,24 +85,32 @@ bool TheMask::isConfigurable()
 
 void TheMask::begin()
 {
-    this->mask = new Mask("share/plugins/TheMask/share/masks/cow.png");
-//    this->mask = new Mask("share/plugins/TheMask/share/masks/guyfawkes.png");
 }
 
-void TheMask::resize(qint32 width, qint32 height)
+void TheMask::addSpace(QString spaceId, QSize frameSize)
 {
-    Q_UNUSED(width)
-    Q_UNUSED(height)
+    this->spaces[spaceId] = Space(QImage("share/plugins/TheMask/share/masks/cow.png"), frameSize);
 }
 
-QImage TheMask::render(const QImage &image)
+void TheMask::removeSpace(QString spaceId)
 {
-    return this->mask->render(image);
+    this->spaces.remove(spaceId);
+}
+
+QImage TheMask::render(QString spaceId, const QImage &image)
+{
+    if (this->spaces.contains(spaceId))
+    {
+        this->mask.setMaskImage(this->spaces[spaceId].maskImage());
+
+        return this->mask.render(image);
+    }
+    else
+        return image;
 }
 
 void TheMask::end()
 {
-    delete this->mask;
 }
 
 void TheMask::configure()

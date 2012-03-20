@@ -31,22 +31,28 @@ Rectangle
     radius: 8
     smooth: true
     border.width: 1
-    border.color: "#7f7f7f"
+    border.color: Qt.rgba(0.5, 0.5, 0.5, 1)
+
     property real minHeight: 24
     property real maxHeight: 32768
+
+    signal itemSelected(int index, string text, string value)
+    signal escapePressed
+
+    Component.onCompleted: recListWidget.updateHeight()
 
     gradient: Gradient
     {
         GradientStop
         {
             position: 0
-            color: "#3f3f3f"
+            color: Qt.rgba(0.25, 0.25, 0.25, 1)
         }
 
         GradientStop
         {
             position: 1
-            color: "#000000"
+            color: Qt.rgba(0, 0, 0, 1)
         }
     }
 
@@ -60,7 +66,7 @@ Rectangle
         lsmOptions.clear()
 
         for(var option in newOptions)
-            lsmOptions.append({"option": newOptions[option]})
+            lsmOptions.append({"propText": newOptions[option][0], "propValue": newOptions[option][1]})
 
         lsvOptions.currentIndex = 0
         recListWidget.updateHeight()
@@ -85,11 +91,6 @@ Rectangle
 
         recListWidget.height *= 1.1
     }
-
-    signal itemSelected(int index, string value)
-    signal escapePressed
-
-    Component.onCompleted: recListWidget.updateHeight()
 
     ListView
     {
@@ -126,13 +127,13 @@ Rectangle
                 GradientStop
                 {
                     position: 0
-                    color: "#007fff"
+                    color: Qt.rgba(0, 0.5, 1, 1)
                 }
 
                 GradientStop
                 {
                     position: 1
-                    color: "#000000"
+                    color: Qt.rgba(0, 0, 0, 1)
                 }
             }
         }
@@ -144,8 +145,8 @@ Rectangle
                 Text
                 {
                     width: lsvOptions.width
-                    text: option
-                    color: "#ffffff"
+                    text: propText
+                    color: Qt.rgba(1, 1, 1, 1)
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -181,8 +182,22 @@ Rectangle
             sldScroll.setValue(tmpValue)
         }
 
-        Keys.onEnterPressed: if (lsvOptions.currentItem) recListWidget.itemSelected(currentIndex, lsvOptions.currentItem.children[0].children[0].text)
-        Keys.onReturnPressed: if (lsvOptions.currentItem) recListWidget.itemSelected(currentIndex, lsvOptions.currentItem.children[0].children[0].text)
+        Keys.onEnterPressed:
+        {
+            if (lsvOptions.currentItem)
+                recListWidget.itemSelected(lsvOptions.currentIndex,
+                                           lsmOptions.get(currentIndex).propText,
+                                           lsmOptions.get(currentIndex).propValue)
+        }
+
+        Keys.onReturnPressed:
+        {
+            if (lsvOptions.currentItem)
+                recListWidget.itemSelected(lsvOptions.currentIndex,
+                                           lsmOptions.get(currentIndex).propText,
+                                           lsmOptions.get(currentIndex).propValue)
+        }
+
         Keys.onEscapePressed: recListWidget.escapePressed()
 
         onMovementEnded:
@@ -209,7 +224,9 @@ Rectangle
                 lsvOptions.currentIndex = index
 
                 if (lsvOptions.currentItem)
-                    recListWidget.itemSelected(index, lsvOptions.currentItem.children[0].children[0].text)
+                    recListWidget.itemSelected(lsvOptions.currentIndex,
+                                               lsmOptions.get(index).propText,
+                                               lsmOptions.get(index).propValue)
             }
         }
     }

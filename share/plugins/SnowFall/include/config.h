@@ -10,23 +10,25 @@ class Config: public QDialog, public Ui::Config
 {
     Q_OBJECT
 
-    Q_PROPERTY(Snow *snow READ snow WRITE setSnow RESET resetSnow)
-
     public:
         explicit Config(QWidget *parent = 0);
-        Snow *snow();
+        Q_INVOKABLE QHash<QString, Snow> *snow();
 
     private:
-        Snow *m_snow;
+        QHash<QString, Snow> *m_snow;
+
+        void updateControls();
 
     public slots:
-        void setSnow(Snow *snow);
+        void setSnow(QHash<QString, Snow> *snow);
         void resetSnow();
 
     protected:
         void changeEvent(QEvent *e);
+        void showEvent(QShowEvent *e);
 
     private slots:
+        void on_cbxSpaceId_currentIndexChanged(int index);
         void on_sldNFlakes_sliderMoved(int value);
         void on_sldAcceleration_sliderMoved(int value);
         void on_sldDirection_sliderMoved(int value);

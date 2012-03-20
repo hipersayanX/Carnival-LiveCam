@@ -25,9 +25,11 @@
 #define DEFAULTPLUGIN_H
 
 #include <QVariant>
+#include <QHash>
 
 #include "plugin.h"
 #include "mask.h"
+#include "space.h"
 
 class TheMask: public QObject, public Plugin
 {
@@ -49,8 +51,9 @@ class TheMask: public QObject, public Plugin
         bool isConfigurable();
 
         void begin();
-        void resize(qint32 width, qint32 height);
-        QImage render(const QImage &image);
+        void addSpace(QString spaceId, QSize frameSize);
+        void removeSpace(QString spaceId);
+        QImage render(QString spaceId, const QImage &image);
         void end();
 
         void configure();
@@ -58,7 +61,8 @@ class TheMask: public QObject, public Plugin
         void setConfigs(QVariant configs);
 
     private:
-        Mask *mask;
+        Mask mask;
+        QHash<QString, Space> spaces;
 };
 
 #endif // DEFAULTPLUGIN_H

@@ -87,38 +87,45 @@ bool SnowFall::isConfigurable()
 
 void SnowFall::begin()
 {
-    this->snow = new Snow(640, // width
-                          480, // height
-                          this->config.spbNFlakes->value(),
-                          this->config.spbAcceleration->value(),
-                          this->config.spbDirection->value(),
-                          this->config.spbRandFactor->value(),
-                          this->config.spbBorder->value(),
-                          this->config.spbMinZ->value(),
-                          this->config.spbMaxZ->value(),
-                          this->config.spbMinScale->value(),
-                          this->config.spbMaxScale->value());
-
-    this->config.setSnow(this->snow);
+    this->config.setSnow(&this->snow);
 }
 
-void SnowFall::resize(qint32 width, qint32 height)
+void SnowFall::addSpace(QString spaceId, QSize frameSize)
 {
-    this->snow->resize(width, height);
+    this->snow[spaceId] = Snow(frameSize.width(),
+                               frameSize.height(),
+                               75,   // Number of Flakes
+                               0.12, // Acceleration
+                               10,   // Direction
+                               0.1,  // Rand Factor
+                               100,  // Border
+                               0.2,  // Min Z
+                               1,    // Max Z
+                               0.1,  // Min Scale
+                               0.2); // MaxScale
 }
 
-QImage SnowFall::render(const QImage &image)
+void SnowFall::removeSpace(QString spaceId)
 {
-    QImage frame = this->snow->render(image);
+    this->snow.remove(spaceId);
+}
 
-    this->snow->next();
+QImage SnowFall::render(QString spaceId, const QImage &image)
+{
+    if (this->snow.contains(spaceId))
+    {
+        QImage frame = this->snow[spaceId].render(image);
 
-    return frame;
+        this->snow[spaceId].next();
+
+        return frame;
+    }
+
+    return image;
 }
 
 void SnowFall::end()
 {
-    delete this->snow;
 }
 
 void SnowFall::configure()
@@ -128,34 +135,52 @@ void SnowFall::configure()
 
 QVariant SnowFall::configs()
 {
-    QList<QVariant> snowConfigs;
+    QHash<QString, QVariant> snowConfigs;
 
-    snowConfigs << QVariant(this->snow->nFlakes())
-                << QVariant(this->snow->acceleration())
-                << QVariant(this->snow->direction())
-                << QVariant(this->snow->randFactor())
-                << QVariant(this->snow->border())
-                << QVariant(this->snow->minZ())
-                << QVariant(this->snow->maxZ())
-                << QVariant(this->snow->minScale())
-                << QVariant(this->snow->maxScale());
+    foreach (QString spaceId, this->snow.keys())
+    {
+        QList<QVariant> snowConfig;
+
+        snowConfig << QVariant(this->snow[spaceId].width())
+                   << QVariant(this->snow[spaceId].height())
+                   << QVariant(this->snow[spaceId].nFlakes())
+                   << QVariant(this->snow[spaceId].acceleration())
+                   << QVariant(this->snow[spaceId].direction())
+                   << QVariant(this->snow[spaceId].randFactor())
+                   << QVariant(this->snow[spaceId].border())
+                   << QVariant(this->snow[spaceId].minZ())
+                   << QVariant(this->snow[spaceId].maxZ())
+                   << QVariant(this->snow[spaceId].minScale())
+                   << QVariant(this->snow[spaceId].maxScale());
+
+        snowConfigs[spaceId] = QVariant(snowConfig);
+    }
 
     return QVariant(snowConfigs);
 }
 
 void SnowFall::setConfigs(QVariant configs)
 {
-    QList<QVariant> snowConfigs = configs.toList();
+    QHash<QString, QVariant> snowConfigs = configs.toHash();
 
-    this->config.spbNFlakes->setValue(snowConfigs[0].toInt());
-    this->config.spbAcceleration->setValue(snowConfigs[1].toFloat());
-    this->config.spbDirection->setValue(snowConfigs[2].toInt());
-    this->config.spbRandFactor->setValue(snowConfigs[3].toFloat());
-    this->config.spbBorder->setValue(snowConfigs[4].toInt());
-    this->config.spbMinZ->setValue(snowConfigs[5].toFloat());
-    this->config.spbMaxZ->setValue(snowConfigs[6].toFloat());
-    this->config.spbMinScale->setValue(snowConfigs[7].toFloat());
-    this->config.spbMaxScale->setValue(snowConfigs[8].toFloat());
+    this->snow.clear();
+
+    foreach (QString spaceId, snowConfigs.keys())
+    {
+        QList<QVariant> config = snowConfigs[spaceId].toList();
+
+        this->snow[spaceId] = Snow(config[0].toInt(),     // Width
+                                   config[1].toInt(),     // Height
+                                   config[2].toInt(),     // Number of Flakes
+                                   config[3].toFloat(),   // Acceleration
+                                   config[4].toInt(),     // Direction
+                                   config[5].toFloat(),   // Rand Factor
+                                   config[6].toInt(),     // Border
+                                   config[7].toFloat(),   // Min Z
+                                   config[8].toFloat(),   // Max Z
+                                   config[9].toFloat(),   // Min Scale
+                                   config[10].toFloat()); // MaxScale
+    }
 }
 
 Q_EXPORT_PLUGIN2(SnowFall, SnowFall)

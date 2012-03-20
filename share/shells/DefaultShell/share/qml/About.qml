@@ -6,15 +6,15 @@ Rectangle
     radius: 10
     opacity: 0.75
     border.width: 1
-    border.color: "#7f7f7f"
+    border.color: Qt.rgba(0.5, 0.5, 0.5, 1)
     width: 445
     height: 300
-    color: "#000000"
+    color: Qt.rgba(0, 0, 0, 1)
 
     Rectangle
     {
         id: recLicense
-        color: "#00000000"
+        color: Qt.rgba(0, 0, 0, 0)
         anchors.rightMargin: 10
         anchors.leftMargin: 10
         anchors.bottomMargin: 10
@@ -24,7 +24,7 @@ Rectangle
         Text
         {
             id: txtDescription
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             font.bold: true
             text: "Carnival LiveCam, Augmented reality made easy."
         }
@@ -32,7 +32,7 @@ Rectangle
         Text
         {
             id: txtCopyleft
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             font.italic: true
             anchors.top: txtDescription.bottom
             text: "Copyright (C) 2011  Gonzalo Exequiel Pedone"
@@ -43,7 +43,7 @@ Rectangle
             id: txtLicense
             anchors.topMargin: 14
             anchors.top: txtCopyleft.bottom
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             text: "This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or

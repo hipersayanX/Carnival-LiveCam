@@ -33,14 +33,16 @@ Mask::Mask(QObject *parent): QObject(parent)
     this->cascadeClassifier.load("share/plugins/TheMask/share/haars/haarcascade_frontalface_alt.xml");
 }
 
-Mask::Mask(QString fileName)
+void Mask::setMaskImage(QImage image)
 {
-    this->cascadeClassifier.load("share/plugins/TheMask/share/haars/haarcascade_frontalface_alt.xml");
-    this->mask = QImage(fileName);
+    this->m_maskImage = image;
 }
 
 QImage Mask::render(const QImage &frame)
 {
+    if (this->m_maskImage.isNull())
+        return frame;
+
     qreal scale = 4;
     QImage smallFrame(frame.scaled(frame.width() / scale, frame.height() / scale));
     cv::Mat matFrame = cv::Mat(smallFrame.height(), smallFrame.width(), CV_8UC3, (uchar *) smallFrame.bits(), smallFrame.bytesPerLine());
@@ -63,7 +65,7 @@ QImage Mask::render(const QImage &frame)
                                 face->y * scale,
                                 face->width * scale,
                                 face->height * scale),
-                                this->mask);
+                                this->m_maskImage);
 
     painter.end();
 

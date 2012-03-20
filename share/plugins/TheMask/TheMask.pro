@@ -26,7 +26,8 @@ DESTDIR += $$PWD
 HEADERS += \
     include/plugin.h \
     include/themask.h \
-    include/mask.h
+    include/mask.h \
+    include/space.h
 
 unix {
     CONFIG += link_pkgconfig
@@ -46,7 +47,8 @@ RCC_DIR += $$PWD/build
 
 SOURCES += \
     src/themask.cpp \
-    src/mask.cpp
+    src/mask.cpp \
+    src/space.cpp
 
 TEMPLATE = lib
 

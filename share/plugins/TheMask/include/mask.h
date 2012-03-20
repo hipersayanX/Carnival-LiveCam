@@ -32,11 +32,11 @@ class Mask: public QObject
     Q_OBJECT
     public:
         explicit Mask(QObject *parent = 0);
-        Mask(QString fileName);
-        QImage render(const QImage &frame);
+        Q_INVOKABLE void setMaskImage(QImage image);
+        Q_INVOKABLE QImage render(const QImage &frame);
 
     private:
-        QImage mask;
+        QImage m_maskImage;
         cv::CascadeClassifier cascadeClassifier;
 };
 

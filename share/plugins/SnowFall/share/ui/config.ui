@@ -7,14 +7,57 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>309</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="1" column="1">
+    <widget class="QSlider" name="sldNFlakes">
+     <property name="maximum">
+      <number>4096</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QSlider" name="sldDirection">
+     <property name="minimum">
+      <number>-90</number>
+     </property>
+     <property name="maximum">
+      <number>90</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="lblBorder">
+     <property name="text">
+      <string>Border</string>
+     </property>
+     <property name="buddy">
+      <cstring>spbBorder</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="QDoubleSpinBox" name="spbMinZ">
+     <property name="maximum">
+      <double>16.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
     <widget class="QLabel" name="lblNFlakes">
      <property name="text">
       <string>Number of Flakes</string>
@@ -24,41 +67,58 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QSlider" name="sldNFlakes">
+   <item row="8" column="2">
+    <widget class="QDoubleSpinBox" name="spbMinScale">
      <property name="maximum">
-      <number>4096</number>
+      <double>16.000000000000000</double>
      </property>
-     <property name="value">
-      <number>75</number>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
      </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <widget class="QDoubleSpinBox" name="spbMaxZ">
+     <property name="maximum">
+      <double>16.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0" colspan="3">
+    <widget class="QDialogButtonBox" name="bbxOkCancel">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QSpinBox" name="spbNFlakes">
-     <property name="maximum">
-      <number>4096</number>
-     </property>
-     <property name="value">
-      <number>75</number>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="lblAcceleration">
+   <item row="9" column="0">
+    <widget class="QLabel" name="lblMaxZ_2">
      <property name="text">
-      <string>Acceleration</string>
+      <string>Max Scale</string>
      </property>
      <property name="buddy">
-      <cstring>spbAcceleration</cstring>
+      <cstring>spbMaxScale</cstring>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QSlider" name="sldAcceleration">
+   <item row="8" column="0">
+    <widget class="QLabel" name="lblMinScale">
+     <property name="text">
+      <string>Min Scale</string>
+     </property>
+     <property name="buddy">
+      <cstring>spbMinScale</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QSlider" name="sldMinZ">
      <property name="maximum">
       <number>160</number>
      </property>
@@ -68,19 +128,50 @@
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QDoubleSpinBox" name="spbAcceleration">
+    <widget class="QSpinBox" name="spbNFlakes">
      <property name="maximum">
-      <double>16.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-     <property name="value">
-      <double>0.120000000000000</double>
+      <number>4096</number>
      </property>
     </widget>
    </item>
    <item row="2" column="0">
+    <widget class="QLabel" name="lblAcceleration">
+     <property name="text">
+      <string>Acceleration</string>
+     </property>
+     <property name="buddy">
+      <cstring>spbAcceleration</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="lblRandFactor">
+     <property name="text">
+      <string>Rand Factor</string>
+     </property>
+     <property name="buddy">
+      <cstring>spbRandFactor</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QSpinBox" name="spbDirection">
+     <property name="minimum">
+      <number>-90</number>
+     </property>
+     <property name="maximum">
+      <number>90</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QSpinBox" name="spbBorder">
+     <property name="maximum">
+      <number>2048</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
     <widget class="QLabel" name="lblDirection">
      <property name="text">
       <string>Direction</string>
@@ -91,104 +182,16 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QSlider" name="sldDirection">
-     <property name="minimum">
-      <number>-90</number>
-     </property>
-     <property name="maximum">
-      <number>90</number>
-     </property>
-     <property name="value">
-      <number>10</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QSpinBox" name="spbDirection">
-     <property name="minimum">
-      <number>-90</number>
-     </property>
-     <property name="maximum">
-      <number>90</number>
-     </property>
-     <property name="value">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="lblRandFactor">
-     <property name="text">
-      <string>Rand Factor</string>
-     </property>
-     <property name="buddy">
-      <cstring>spbRandFactor</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QSlider" name="sldRandFactor">
+    <widget class="QSlider" name="sldAcceleration">
      <property name="maximum">
       <number>160</number>
      </property>
-     <property name="value">
-      <number>1</number>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QDoubleSpinBox" name="spbRandFactor">
-     <property name="maximum">
-      <double>16.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-     <property name="value">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="lblBorder">
-     <property name="text">
-      <string>Border</string>
-     </property>
-     <property name="buddy">
-      <cstring>spbBorder</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QSlider" name="sldBorder">
-     <property name="maximum">
-      <number>2048</number>
-     </property>
-     <property name="value">
-      <number>100</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QSpinBox" name="spbBorder">
-     <property name="maximum">
-      <number>2048</number>
-     </property>
-     <property name="value">
-      <number>100</number>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="lblMinZ">
      <property name="text">
       <string>Min Z</string>
@@ -198,128 +201,17 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QSlider" name="sldMinZ">
-     <property name="maximum">
-      <number>160</number>
-     </property>
-     <property name="value">
-      <number>2</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QDoubleSpinBox" name="spbMinZ">
-     <property name="maximum">
-      <double>16.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-     <property name="value">
-      <double>0.200000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="lblMaxZ">
-     <property name="text">
-      <string>Max Z</string>
-     </property>
-     <property name="buddy">
-      <cstring>spbMaxZ</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QSlider" name="sldMaxZ">
-     <property name="maximum">
-      <number>160</number>
-     </property>
-     <property name="value">
-      <number>10</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="2">
-    <widget class="QDoubleSpinBox" name="spbMaxZ">
-     <property name="maximum">
-      <double>16.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-     <property name="value">
-      <double>1.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="lblMinScale">
-     <property name="text">
-      <string>Min Scale</string>
-     </property>
-     <property name="buddy">
-      <cstring>spbMinScale</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="QSlider" name="sldMinScale">
      <property name="maximum">
       <number>160</number>
      </property>
-     <property name="value">
-      <number>1</number>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="7" column="2">
-    <widget class="QDoubleSpinBox" name="spbMinScale">
-     <property name="maximum">
-      <double>16.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-     <property name="value">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="lblMaxZ_2">
-     <property name="text">
-      <string>Max Scale</string>
-     </property>
-     <property name="buddy">
-      <cstring>spbMaxScale</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QSlider" name="sldMaxScale">
-     <property name="maximum">
-      <number>160</number>
-     </property>
-     <property name="value">
-      <number>2</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2">
+   <item row="9" column="2">
     <widget class="QDoubleSpinBox" name="spbMaxScale">
      <property name="maximum">
       <double>16.000000000000000</double>
@@ -327,12 +219,69 @@
      <property name="singleStep">
       <double>0.100000000000000</double>
      </property>
-     <property name="value">
-      <double>0.200000000000000</double>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QDoubleSpinBox" name="spbAcceleration">
+     <property name="maximum">
+      <double>16.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QDoubleSpinBox" name="spbRandFactor">
+     <property name="maximum">
+      <double>16.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QSlider" name="sldBorder">
+     <property name="maximum">
+      <number>2048</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QSlider" name="sldRandFactor">
+     <property name="maximum">
+      <number>160</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item row="9" column="1">
+    <widget class="QSlider" name="sldMaxScale">
+     <property name="maximum">
+      <number>160</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QSlider" name="sldMaxZ">
+     <property name="maximum">
+      <number>160</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
     <spacer name="vspSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -345,15 +294,42 @@
      </property>
     </spacer>
    </item>
-   <item row="10" column="0" colspan="3">
-    <widget class="QDialogButtonBox" name="bbxOkCancel">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="7" column="0">
+    <widget class="QLabel" name="lblMaxZ">
+     <property name="text">
+      <string>Max Z</string>
      </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     <property name="buddy">
+      <cstring>spbMaxZ</cstring>
      </property>
     </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="lblSpaceId">
+     <property name="text">
+      <string>Space</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="2">
+    <layout class="QHBoxLayout" name="hlySpaceId">
+     <item>
+      <widget class="QComboBox" name="cbxSpaceId"/>
+     </item>
+     <item>
+      <spacer name="hspSpaceId">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

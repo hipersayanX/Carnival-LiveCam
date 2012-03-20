@@ -70,8 +70,6 @@ OTHER_FILES += \
     share/qml/IconBar.qml \
     share/qml/ListWidget.qml \
     share/qml/Slider.qml \
-    share/qml/SoundSlider.qml \
-    share/qml/Spaces.qml \
     share/qml/Window.qml \
     share/qml/WindowControls.qml \
     share/qml/main.qml \

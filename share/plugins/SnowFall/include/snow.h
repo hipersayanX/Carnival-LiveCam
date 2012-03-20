@@ -46,6 +46,7 @@ class Snow: public QObject
 
     public:
         explicit Snow(QObject *parent = 0);
+        Snow(const Snow &object);
 
         Snow(qint32 width,
              qint32 height,
@@ -58,6 +59,8 @@ class Snow: public QObject
              qreal maxZ,
              qreal minScale,
              qreal maxScale);
+
+        Snow& operator =(const Snow &other);
 
         qint32 width();
         qint32 height();
@@ -90,7 +93,6 @@ class Snow: public QObject
 
     public slots:
         void updateFlakes();
-        void resize(qint32 width, qint32 height);
         void reset();
         void next();
         void setWidth(qint32 value);

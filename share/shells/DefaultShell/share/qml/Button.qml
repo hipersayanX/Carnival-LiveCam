@@ -30,18 +30,19 @@ Rectangle
     height: 32
     radius: Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / (5 * Math.SQRT2)
     smooth: true
+    border.color: borderColorNormal
 
     property url icon: ""
-    property color borderColorNormal: "#00000000"
-    property color borderColorHover: "#7f7fff"
-    property color borderColorPressed: "#ffffff"
-    property color backFirstColor: "#3f3f3f"
-    property color backSecondColor: "#000000"
+    property real disabledFactor: 2
+    property color borderColorNormal: Qt.darker(Qt.rgba(0, 0, 0, 0), (recButton.enabled)? 0: recButton.disabledFactor)
+    property color borderColorHover: Qt.darker(Qt.rgba(0.5, 0.5, 1, 1), (recButton.enabled)? 0: recButton.disabledFactor)
+    property color borderColorPressed: Qt.darker(Qt.rgba(1, 1, 1, 1), (recButton.enabled)? 0: recButton.disabledFactor)
+    property color backFirstColor: Qt.darker(Qt.rgba(0.25, 0.25, 0.25, 1), (recButton.enabled)? 0: recButton.disabledFactor)
+    property color backSecondColor: Qt.darker(Qt.rgba(0, 0, 0, 1), (recButton.enabled)? 0: recButton.disabledFactor)
     property real mouseX: 0
     property real mouseY: 0
     property bool isPressed: false
-
-    border.color: borderColorNormal
+    property bool enabled: true
 
     gradient: Gradient
     {
@@ -80,69 +81,95 @@ Rectangle
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.canceled()
+
+            if (recButton.enabled)
+                recButton.canceled()
         }
 
         onClicked:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.clicked()
+
+            if (recButton.enabled)
+                recButton.clicked()
         }
 
         onDoubleClicked:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.doubleClicked()
+
+            if (recButton.enabled)
+                recButton.doubleClicked()
         }
 
         onEntered:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.border.color = recButton.borderColorHover
-            recButton.entered()
+
+            if (recButton.enabled)
+            {
+                recButton.border.color = recButton.borderColorHover
+                recButton.entered()
+            }
         }
 
         onExited:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.border.color = recButton.borderColorNormal
-            recButton.exited()
+
+            if (recButton.enabled)
+            {
+                recButton.border.color = recButton.borderColorNormal
+                recButton.exited()
+            }
         }
 
         onPositionChanged:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.positionChanged(mouse)
+
+            if (recButton.enabled)
+                recButton.positionChanged(mouse)
         }
 
         onPressAndHold:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.pressAndHold(mouse)
+
+            if (recButton.enabled)
+                recButton.pressAndHold(mouse)
         }
 
         onPressed:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.isPressed = true
-            recButton.border.color = recButton.borderColorPressed
-            recButton.pressed()
+
+            if (recButton.enabled)
+            {
+                recButton.isPressed = true
+                recButton.border.color = recButton.borderColorPressed
+                recButton.pressed()
+            }
         }
 
         onReleased:
         {
             recButton.mouseX = mouseX
             recButton.mouseY = mouseY
-            recButton.isPressed = false
-            recButton.border.color = recButton.borderColorHover
-            recButton.released()
+
+            if (recButton.enabled)
+            {
+                recButton.isPressed = false
+                recButton.border.color = recButton.borderColorHover
+                recButton.released()
+            }
         }
     }
 
@@ -155,6 +182,7 @@ Rectangle
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         source: recButton.icon
+        opacity: (recButton.enabled)? 1: 0.5
     }
 
     states:
@@ -162,7 +190,7 @@ Rectangle
         State
         {
             name: "Pressed"
-            when: msaIcon.pressed == true
+            when: msaIcon.pressed && recButton.enabled
 
             PropertyChanges
             {

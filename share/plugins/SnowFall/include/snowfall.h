@@ -50,8 +50,9 @@ class SnowFall: public QObject, public Plugin
         bool isConfigurable();
 
         void begin();
-        void resize(qint32 width, qint32 height);
-        QImage render(const QImage &image);
+        void addSpace(QString spaceId, QSize frameSize);
+        void removeSpace(QString spaceId);
+        QImage render(QString spaceId, const QImage &image);
         void end();
 
         void configure();
@@ -59,7 +60,7 @@ class SnowFall: public QObject, public Plugin
         void setConfigs(QVariant configs);
 
     private:
-        Snow *snow;
+        QHash<QString, Snow> snow;
         Config config;
 };
 

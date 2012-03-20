@@ -29,7 +29,8 @@ Window
     radius: 15
     width: 800
     height: 480
-    color: "#e6000000"
+    color: Qt.rgba(0, 0, 0, 0.9)
+
     property bool showEffectBar: false
 
     onMousePressed:

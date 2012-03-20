@@ -28,10 +28,10 @@ Rectangle
     id: recEffects
     width: 800
     height: 480
-    color: "#000000"
+    color: Qt.rgba(0, 0, 0, 1)
     radius: 2 * recEffects.borderSize
     border.width: 1
-    border.color: "#7f7f7f"
+    border.color: Qt.rgba(0.5, 0.5, 0.5, 1)
 
     property variant devices: []
     property variant activeDevices: []
@@ -48,10 +48,10 @@ Rectangle
 
     function sortAlphaNoCase(a, b)
     {
-        if (a.toLowerCase() < b.toLowerCase())
+        if (a[0].toLowerCase() < b[0].toLowerCase())
             return -1
 
-        if (a.toLowerCase() > b.toLowerCase())
+        if (a[0].toLowerCase() > b[0].toLowerCase())
             return 1
 
         return 0;
@@ -63,11 +63,11 @@ Rectangle
 
         for (var effect in recEffects.effects)
             if (categories.indexOf(recEffects.effects[effect].category) < 0)
-                categories.push(recEffects.effects[effect].category)
+                categories.push([recEffects.effects[effect].category, recEffects.effects[effect].category])
 
         categories.sort(recEffects.sortAlphaNoCase)
 
-        return ["All"].concat(categories)
+        return [["All", "All"]].concat(categories)
     }
 
     onDevicesChanged:
@@ -80,7 +80,7 @@ Rectangle
         for (var activeDevice in recEffects.activeDevices)
             for (var device in recEffects.devices)
                 if (recEffects.activeDevices[activeDevice] == recEffects.devices[device].deviceId)
-                    devices.push(recEffects.devices[device].summary)
+                    devices.push([recEffects.devices[device].summary, recEffects.devices[device].deviceId])
 
         devices.sort(recEffects.sortAlphaNoCase)
         cbxDevice.updateOptions(devices)
@@ -91,6 +91,8 @@ Rectangle
         cbxEffectsCategory.updateOptions(recEffects.listCategories())
         lsmEffects.clear()
         lsmStack.clear()
+        grvEffects.contentHeight = 0
+        lsvStack.contentHeight = 0
 
         for (var effect in recEffects.effects)
         {
@@ -99,16 +101,20 @@ Rectangle
             for (var prop in recEffects.effects[effect])
                 newEffect["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = recEffects.effects[effect][prop]
 
-            if (effects[effect].isActivated)
-                lsmStack.append(newEffect)
-            else
-                lsmEffects.append(newEffect)
+            if (cbxEffectsCategory.currentValue == "" ||
+                 cbxEffectsCategory.currentValue == "All" ||
+                 cbxEffectsCategory.currentValue == recEffects.effects[effect].category)
+            {
+                if (recEffects.effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
+                    lsmStack.append(newEffect)
+                else
+                    lsmEffects.append(newEffect)
+            }
         }
 
         grvEffects.currentIndex = 0
         lsvStack.currentIndex = 0
 
-        // contentHeight !!!
         sldEffects.updateValue()
         sldStack.updateValue()
     }
@@ -128,8 +134,8 @@ Rectangle
                 y: 10
                 width: 128
                 height: 96
-                color: "#000000"
-                border.color: (recEffects.selected.indexOf(propPluginId) != -1)? "#7f7fff": "#00000000"
+                color: Qt.rgba(0, 0, 0, 1)
+                border.color: (recEffects.selected.indexOf(propPluginId) != -1)? Qt.rgba(0.5, 0.5, 1, 1): Qt.rgba(0, 0, 0, 0)
                 border.width: 8
 
                 Image
@@ -144,14 +150,14 @@ Rectangle
                         id: recIs3D
                         width: 20
                         height: 20
-                        color: "#000000"
+                        color: Qt.rgba(0, 0, 0, 1)
                         anchors.right: parent.right
                         anchors.top: parent.top
 
                         Text
                         {
                             id: txtIs3D
-                            color: "#ffffff"
+                            color: Qt.rgba(1, 1, 1, 1)
                             text: propIs3D? "3D": "2D"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
@@ -195,13 +201,23 @@ Rectangle
                             txtCategory.text = propCategory
                             txtLicense.text = propLicense
                             txtAuthor.text = propAuthor
+
+                            var showContact = false
+
+                            for (var effect in recEffects.effects)
+                                if (recEffects.effects[effect].pluginId == propPluginId &&
+                                    recEffects.effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
+                                {
+                                    showContact = true
+
+                                    break
+                                }
+
+                            recContact.visible = showContact
+                            btnConfigure.enabled = propIsConfigurable
                             btnConfigure.pluginId = propPluginId
                             btnWeb.url = propWebsite
                             btnMail.mail = propMail
-                        }
-
-                        onReleased:
-                        {
                         }
                     }
                 }
@@ -212,7 +228,7 @@ Rectangle
     Rectangle
     {
         id: recEffectsContainer
-        color: "#00000000"
+        color: Qt.rgba(0, 0, 0, 0)
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 16
         anchors.right: cbxDevice.left
@@ -227,7 +243,7 @@ Rectangle
             id: txtEffects
             x: 0
             y: -56
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             text: qsTr("Effects")
             anchors.horizontalCenter: recEffectsGrid.horizontalCenter
             anchors.top: parent.top
@@ -239,7 +255,7 @@ Rectangle
             id: recEffectsGrid
             radius: 4
             anchors.topMargin: 8
-            border.color: "#3f3f3f"
+            border.color: Qt.rgba(0.25, 0.25, 0.25, 1)
             anchors.right: recStack.left
             anchors.rightMargin: 48
             anchors.bottom: parent.bottom
@@ -251,13 +267,13 @@ Rectangle
                 GradientStop
                 {
                     position: 0
-                    color: "#1f1f1f"
+                    color: Qt.rgba(0.12, 0.12, 0.12, 1)
                 }
 
                 GradientStop
                 {
                     position: 1
-                    color: "#000000"
+                    color: Qt.rgba(0, 0, 0, 1)
                 }
             }
 
@@ -332,7 +348,7 @@ Rectangle
             y: 43
             width: 32
             height: 80
-            color: "#00000000"
+            color: Qt.rgba(0, 0, 0, 0)
             anchors.right: recStack.left
             anchors.rightMargin: 8
             anchors.verticalCenter: recEffectsGrid.verticalCenter
@@ -351,14 +367,29 @@ Rectangle
                     for (var plugin in recEffects.selected)
                         for (var effect in recEffects.effects)
                             if (recEffects.selected[plugin] == recEffects.effects[effect].pluginId &&
-                                !recEffects.effects[effect].isActivated)
+                                recEffects.effects[effect].applyTo.indexOf(cbxDevice.currentValue) < 0)
                             {
-                                effects[effect].isActivated = true
+                                recEffects.setEffect(recEffects.selected[plugin], recEffects.currentDeviceId)
+                                var applyTo = effects[effect].applyTo
+                                applyTo.push(recEffects.currentDeviceId)
+                                effects[effect].applyTo = applyTo
                                 selected.splice(selected.indexOf(recEffects.selected[plugin]), 1)
                             }
 
                     recEffects.effects = effects
                     recEffects.selected = selected
+
+                    txtName.text = ""
+                    txtVersion.text = ""
+                    txtSummary.text = ""
+                    txtCategory.text = ""
+                    txtLicense.text = ""
+                    txtAuthor.text = ""
+                    recContact.visible = ""
+                    btnConfigure.enabled = false
+                    btnConfigure.pluginId = ""
+                    btnWeb.url = ""
+                    btnMail.mail = ""
                 }
             }
 
@@ -376,14 +407,29 @@ Rectangle
                     for (var plugin in recEffects.selected)
                         for (var effect in recEffects.effects)
                             if (recEffects.selected[plugin] == recEffects.effects[effect].pluginId &&
-                                recEffects.effects[effect].isActivated)
-                            {
-                                effects[effect].isActivated = false
+                                recEffects.effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
+                           {
+                                recEffects.unsetEffect(recEffects.selected[plugin], recEffects.currentDeviceId)
+                                var applyTo = effects[effect].applyTo
+                                applyTo.splice(applyTo.indexOf(recEffects.currentDeviceId), 1)
+                                effects[effect].applyTo = applyTo
                                 selected.splice(selected.indexOf(recEffects.selected[plugin]), 1)
                             }
 
                     recEffects.effects = effects
                     recEffects.selected = selected
+
+                    txtName.text = ""
+                    txtVersion.text = ""
+                    txtSummary.text = ""
+                    txtCategory.text = ""
+                    txtLicense.text = ""
+                    txtAuthor.text = ""
+                    recContact.visible = ""
+                    btnConfigure.enabled = false
+                    btnConfigure.pluginId = ""
+                    btnWeb.url = ""
+                    btnMail.mail = ""
                 }
             }
         }
@@ -391,7 +437,7 @@ Rectangle
         Text
         {
             id: txtStack
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             text: qsTr("Stack")
             anchors.horizontalCenter: recStack.horizontalCenter
             anchors.top: parent.top
@@ -407,7 +453,7 @@ Rectangle
             height: 386
             radius: 4
             anchors.topMargin: 8
-            border.color: "#3f3f3f"
+            border.color: Qt.rgba(0.25, 0.25, 0.25, 1)
             anchors.bottom: parent.bottom
             anchors.top: txtStack.bottom
             anchors.right: parent.right
@@ -417,13 +463,13 @@ Rectangle
                 GradientStop
                 {
                     position: 0
-                    color: "#1f1f1f"
+                    color: Qt.rgba(0.12, 0.12, 0.12, 1)
                 }
 
                 GradientStop
                 {
                     position: 1
-                    color: "#000000"
+                    color: Qt.rgba(0, 0, 0, 1)
                 }
             }
 
@@ -500,6 +546,13 @@ Rectangle
         anchors.rightMargin: 8
         anchors.left: parent.left
         anchors.leftMargin: 16
+
+        onItemSelected:
+        {
+            var effects = recEffects.effects.slice()
+            recEffects.effects = []
+            recEffects.effects = effects
+        }
     }
 
     ComboBox
@@ -515,14 +568,18 @@ Rectangle
 
         onItemSelected:
         {
-            recEffects.currentDeviceId = recEffects.activeDevices[index]
+            recEffects.currentDeviceId = value
+
+            var effects = recEffects.effects.slice()
+            recEffects.effects = []
+            recEffects.effects = effects
         }
     }
 
     Text
     {
         id: txtPreview
-        color: "#ffffff"
+        color: Qt.rgba(1, 1, 1, 1)
         text: qsTr("Preview")
         anchors.top: cbxDevice.bottom
         anchors.topMargin: 8
@@ -547,9 +604,10 @@ Rectangle
     Rectangle
     {
         id: recEffectInfo
+        visible: (txtName.text == "")? false: true
         x: 556
         width: 256
-        color: "#00000000"
+        color: Qt.rgba(0, 0, 0, 0)
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 16
         anchors.top: imgLivePreview.bottom
@@ -559,7 +617,7 @@ Rectangle
         Text
         {
             id: txtName
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             anchors.left: parent.left
             anchors.top: parent.top
             font.bold: true
@@ -568,7 +626,7 @@ Rectangle
         Text
         {
             id: txtVersion
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             anchors.leftMargin: 8
             anchors.top: parent.top
             anchors.left: txtName.right
@@ -577,7 +635,7 @@ Rectangle
         Text
         {
             id: txtSummary
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             anchors.topMargin: 16
             anchors.top: txtName.bottom
             anchors.right: parent.right
@@ -598,7 +656,7 @@ Rectangle
         {
             id: txtCategory
             y: 71
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             anchors.left: imgCategory.right
             anchors.leftMargin: 8
             anchors.verticalCenter: imgCategory.verticalCenter
@@ -618,7 +676,7 @@ Rectangle
         {
             id: txtLicense
             y: 98
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             anchors.left: imgLicense.right
             anchors.leftMargin: 8
             anchors.verticalCenter: imgLicense.verticalCenter
@@ -638,7 +696,7 @@ Rectangle
         {
             id: txtAuthor
             y: 129
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             anchors.left: imgAuthor.right
             anchors.leftMargin: 8
             anchors.verticalCenter: imgAuthor.verticalCenter
@@ -650,7 +708,7 @@ Rectangle
             id: recContact
             width: 128
             height: 32
-            color: "#00000000"
+            color: Qt.rgba(0, 0, 0, 0)
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
 

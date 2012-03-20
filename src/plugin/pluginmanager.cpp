@@ -78,7 +78,6 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
 
             this->pluginsInfo[plugin->id()] = PluginInfo(fileName,
                                                    plugin->id(),
-                                                   false,
                                                    plugin->name(),
                                                    plugin->version(),
                                                    plugin->summary(),
@@ -125,7 +124,6 @@ QList<QVariant> PluginManager::pluginsInfoList()
         pluginInfoMap["author"] = QVariant(plugin.author());
         pluginInfoMap["website"] = QVariant(plugin.website());
         pluginInfoMap["mail"] = QVariant(plugin.mail());
-        pluginInfoMap["isActivated"] = QVariant(false);
         pluginInfoMap["isConfigurable"] = QVariant(plugin.isConfigurable());
         pluginInfoMap["applyTo"] = QVariant(plugin.applyTo());
 
@@ -148,7 +146,7 @@ bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize
 {
     Plugin *plugin;
 
-    if (this->pluginsInfo[pluginId].isEnabled())
+    if (!this->pluginsInfo[pluginId].applyTo().isEmpty())
         plugin = this->plugin(pluginId);
     else
     {
@@ -164,7 +162,6 @@ bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize
         if (!plugin)
             return false;
 
-        this->pluginsInfo[pluginId].setIsEnabled(true);
         this->activePlugins << plugin;
 
         if (this->pluginConfigs.contains(pluginId))
@@ -198,7 +195,7 @@ bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize
 
 bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
 {
-    if (!this->pluginsInfo[pluginId].isEnabled())
+    if (this->pluginsInfo[pluginId].applyTo().isEmpty())
         return false;
 
     Plugin *plugin = this->plugin(pluginId);
@@ -230,7 +227,6 @@ bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
         plugin->end();
         this->activePlugins.removeOne(plugin);
         this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
-        this->pluginsInfo[pluginId].setIsEnabled(false);
         this->pluginLoader.unload();
     }
 

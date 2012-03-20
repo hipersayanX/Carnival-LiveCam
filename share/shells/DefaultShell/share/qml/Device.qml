@@ -28,7 +28,7 @@ Rectangle
     id: recDevice
     width: 256
     height: 32
-    color: "#00000000"
+    color: Qt.rgba(0, 0, 0, 0)
     radius: 10
     clip: true
 
@@ -38,9 +38,9 @@ Rectangle
     property string summary: ""
     property string icon: ""
     property bool isConfigurable: false
-    property color borderColorNormal: "#00000000"
-    property color borderColorHover: "#7f7fff"
-    property color borderColorPressed: "#ffffff"
+    property color borderColorNormal: Qt.rgba(0, 0, 0, 0)
+    property color borderColorHover: Qt.rgba(0.5, 0.5, 1, 1)
+    property color borderColorPressed: Qt.rgba(1, 1, 1, 1)
     property bool moving: false
 
     signal clicked
@@ -63,13 +63,13 @@ Rectangle
             GradientStop
             {
                 position: 0
-                color: "#007fff"
+                color: Qt.rgba(0, 0.5, 1, 1)
             }
 
             GradientStop
             {
                 position: 1
-                color: "#000000"
+                color: Qt.rgba(0, 0, 0, 1)
             }
         }
     }
@@ -87,7 +87,7 @@ Rectangle
     Text
     {
         id: txtSummary
-        color: "#ffffff"
+        color: Qt.rgba(1, 1, 1, 1)
         text: recDevice.summary
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
@@ -96,7 +96,7 @@ Rectangle
     Rectangle
     {
         id: recHoverHighlight
-        color: "#00000000"
+        color: Qt.rgba(0, 0, 0, 0)
         radius: 10
         anchors.fill: parent
         border.width: 2

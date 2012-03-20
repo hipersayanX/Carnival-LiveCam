@@ -26,7 +26,7 @@ import QtQuick 1.1
 Rectangle
 {
     id: recDevices
-    color: "#00000000"
+    color: Qt.rgba(0, 0, 0, 0)
     width: 256
     height: 128
 
@@ -102,7 +102,7 @@ Rectangle
         id: recMark
         width: recDevices.markSize * Math.SQRT2
         height: recDevices.markSize * Math.SQRT2
-        color: "#1f1f1f"
+        color: Qt.rgba(0.12, 0.12, 0.12, 1)
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         rotation: 45
@@ -118,20 +118,20 @@ Rectangle
         anchors.bottomMargin: recDevices.markSize * Math.SQRT1_2
         anchors.top: parent.top
         border.width: 4
-        border.color: "#1f1f1f"
+        border.color: Qt.rgba(0.12, 0.12, 0.12, 1)
 
         gradient: Gradient
         {
             GradientStop
             {
                 position: 0
-                color: "#3f3f3f"
+                color: Qt.rgba(0.25, 0.25, 0.25, 1)
             }
 
             GradientStop
             {
                 position: 1
-                color: "#000000"
+                color: Qt.rgba(0, 0, 0, 1)
             }
         }
 
@@ -139,7 +139,7 @@ Rectangle
         {
             id: txtEnabled
             height: 20
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             text: qsTr("Enabled")
             anchors.right: parent.right
             anchors.top: parent.top
@@ -262,7 +262,7 @@ Rectangle
         {
             id: txtDisabled
             height: 20
-            color: "#ffffff"
+            color: Qt.rgba(1, 1, 1, 1)
             text: qsTr("Disabled")
             anchors.top: lsvEnabledDevices.bottom
             anchors.right: parent.right

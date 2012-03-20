@@ -29,11 +29,14 @@ Button
     width: 100
     height: 24
     radius: 8
-    borderColorNormal: "#7f7f7f"
-    property bool isExpanded: false
-    property real currentOption: 0
+    borderColorNormal: Qt.rgba(0.5, 0.5, 0.5, 1)
 
-    signal itemSelected(int index, string value)
+    property bool isExpanded: false
+    property real currentIndex: 0
+    property string currentText: ""
+    property string currentValue: ""
+
+    signal itemSelected(int index, string text, string value)
 
     onEntered: recExpand.border.color = recComboBox.borderColorHover
     onExited: recExpand.border.color = recComboBox.borderColorNormal
@@ -43,7 +46,8 @@ Button
 
     function updateOptions(options)
     {
-        txtOption.text = (options.length < 1)? "": options[recComboBox.currentOption]
+        recComboBox.currentText = (options[recComboBox.currentIndex])? options[recComboBox.currentIndex][0]: ""
+        recComboBox.currentValue = (options[recComboBox.currentIndex])? options[recComboBox.currentIndex][1]: ""
         lswOptions.updateOptions(options)
     }
 
@@ -51,7 +55,8 @@ Button
     {
         id: txtOption
         y: 24
-        color: "#ffffff"
+        text: recComboBox.currentText
+        color: Qt.rgba(1, 1, 1, 1)
         anchors.right: recExpand.left
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
@@ -64,12 +69,12 @@ Button
         id: recExpand
         width: 8
         height: 8
-        color: "#00000000"
+        color: Qt.rgba(0, 0, 0, 0)
         radius: 3
         smooth: true
         anchors.rightMargin: 4
         border.width: 1
-        border.color: "#7f7f7f"
+        border.color: Qt.rgba(0.5, 0.5, 0.5, 1)
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
     }
@@ -85,10 +90,11 @@ Button
 
         onItemSelected:
         {
-            recComboBox.currentOption = index
-            txtOption.text = value
+            recComboBox.currentIndex = index
+            recComboBox.currentText = text
+            recComboBox.currentValue = value
             recComboBox.isExpanded = false
-            recComboBox.itemSelected(index, value)
+            recComboBox.itemSelected(index, text, value)
         }
 
         onEscapePressed:
@@ -96,7 +102,7 @@ Button
             if (recComboBox.isExpanded)
                 recComboBox.isExpanded = false
 
-            setIndex(recComboBox.currentOption)
+            setIndex(recComboBox.currentIndex)
         }
     }
 

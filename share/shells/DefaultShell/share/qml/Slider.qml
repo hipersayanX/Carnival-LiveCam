@@ -29,6 +29,7 @@ Rectangle
     width: 16
     height: 256
     radius: width / 2
+
     property real minValue: 0
     property real maxValue: 99
     property real value: 0
@@ -41,13 +42,13 @@ Rectangle
         GradientStop
         {
             position: 0
-            color: "#1f1f1f"
+            color: Qt.rgba(0.12, 0.12, 0.12, 1)
         }
 
         GradientStop
         {
             position: 1
-            color: "#000000"
+            color: Qt.rgba(0, 0, 0, 1)
         }
     }
 
@@ -163,7 +164,7 @@ Rectangle
     Rectangle
     {
         id: recSliderArea
-        color: "#00000000"
+        color: Qt.rgba(0, 0, 0, 0)
         anchors.bottom: btnDown.top
         anchors.top: btnUp.bottom
         anchors.right: parent.right
@@ -198,8 +199,9 @@ Rectangle
             anchors.right: parent.right
             anchors.left: parent.left
             radius: width / 2
-            property color backFirstColor: "#bfbfbf"
-            property color backSecondColor: "#7f7f7f"
+
+            property color backFirstColor: Qt.rgba(0.75, 0.75, 0.75, 1)
+            property color backSecondColor: Qt.rgba(0.5, 0.5, 0.5, 1)
             property real oldMouseY: 0
 
             function getHeight()

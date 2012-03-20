@@ -28,10 +28,10 @@ Rectangle
     id: recWindow
     radius: 2 * recWindow.borderSize
     border.width: 1
-    border.color: "#7f7f7f"
+    border.color: Qt.rgba(0.5, 0.5, 0.5, 1)
     width: 640
     height: 480
-    color: "#000000"
+    color: Qt.rgba(0, 0, 0, 1)
 
     property bool resizing: false
     property real borderSize: 8

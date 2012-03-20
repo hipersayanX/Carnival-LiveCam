@@ -31,7 +31,6 @@ class PluginInfo: public QObject
 
     Q_PROPERTY(QString fileName READ fileName WRITE setFileName RESET resetFileName)
     Q_PROPERTY(QString pluginId READ pluginId WRITE setPluginId RESET resetPluginId)
-    Q_PROPERTY(bool isEnabled READ isEnabled WRITE setIsEnabled RESET resetIsEnabled)
     Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
     Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
     Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
@@ -51,7 +50,6 @@ class PluginInfo: public QObject
 
         PluginInfo(QString fileName,
                    QString pluginId,
-                   bool isEnabled,
                    QString name,
                    QString version,
                    QString summary,
@@ -69,7 +67,6 @@ class PluginInfo: public QObject
 
         QString fileName();
         QString pluginId();
-        bool isEnabled();
         QString name();
         QString version();
         QString summary();
@@ -86,7 +83,6 @@ class PluginInfo: public QObject
     private:
         QString m_fileName;
         QString m_pluginId;
-        bool m_isEnabled;
         QString m_name;
         QString m_version;
         QString m_summary;
@@ -103,7 +99,6 @@ class PluginInfo: public QObject
     public slots:
         void setFileName(QString value);
         void setPluginId(QString value);
-        void setIsEnabled(bool value);
         void setName(QString value);
         void setVersion(QString value);
         void setSummary(QString value);
@@ -118,7 +113,6 @@ class PluginInfo: public QObject
         void setApplyTo(QStringList value);
         void resetFileName();
         void resetPluginId();
-        void resetIsEnabled();
         void resetName();
         void resetVersion();
         void resetSummary();
