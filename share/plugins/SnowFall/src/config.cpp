@@ -37,6 +37,9 @@ void Config::updateControls()
 {
     QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+    if (spaceId == "")
+        return;
+
     this->sldNFlakes->setValue((*this->m_snow)[spaceId].nFlakes());
     this->sldAcceleration->setValue((*this->m_snow)[spaceId].acceleration());
     this->sldDirection->setValue((*this->m_snow)[spaceId].direction());
@@ -46,6 +49,16 @@ void Config::updateControls()
     this->sldMaxZ->setValue((*this->m_snow)[spaceId].maxZ());
     this->sldMinScale->setValue((*this->m_snow)[spaceId].minScale());
     this->sldMaxScale->setValue((*this->m_snow)[spaceId].maxScale());
+
+    this->spbNFlakes->setValue((*this->m_snow)[spaceId].nFlakes());
+    this->spbAcceleration->setValue((*this->m_snow)[spaceId].acceleration());
+    this->spbDirection->setValue((*this->m_snow)[spaceId].direction());
+    this->spbRandFactor->setValue((*this->m_snow)[spaceId].randFactor());
+    this->spbBorder->setValue((*this->m_snow)[spaceId].border());
+    this->spbMinZ->setValue((*this->m_snow)[spaceId].minZ());
+    this->spbMaxZ->setValue((*this->m_snow)[spaceId].maxZ());
+    this->spbMinScale->setValue((*this->m_snow)[spaceId].minScale());
+    this->spbMaxScale->setValue((*this->m_snow)[spaceId].maxScale());
 }
 
 QHash<QString, Snow> *Config::snow()
@@ -76,6 +89,9 @@ void Config::on_sldNFlakes_sliderMoved(int value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setNFlakes(value);
         (*this->m_snow)[spaceId].reset();
     }
@@ -89,6 +105,9 @@ void Config::on_sldAcceleration_sliderMoved(int value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setAcceleration(value / 10.0);
         (*this->m_snow)[spaceId].reset();
     }
@@ -99,6 +118,9 @@ void Config::on_sldDirection_sliderMoved(int value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setDirection(value);
         (*this->m_snow)[spaceId].reset();
@@ -113,6 +135,9 @@ void Config::on_sldRandFactor_sliderMoved(int value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setRandFactor(value / 10.0);
         (*this->m_snow)[spaceId].reset();
     }
@@ -123,6 +148,9 @@ void Config::on_sldBorder_sliderMoved(int value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setBorder(value);
         (*this->m_snow)[spaceId].reset();
@@ -137,6 +165,9 @@ void Config::on_sldMinZ_sliderMoved(int value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setMinZ(value / 10.0);
         (*this->m_snow)[spaceId].reset();
     }
@@ -149,6 +180,9 @@ void Config::on_sldMaxZ_sliderMoved(int value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setMaxZ(value / 10.0);
         (*this->m_snow)[spaceId].reset();
@@ -163,6 +197,9 @@ void Config::on_sldMinScale_sliderMoved(int value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setMinScale(value / 10.0);
         (*this->m_snow)[spaceId].reset();
     }
@@ -176,6 +213,9 @@ void Config::on_sldMaxScale_sliderMoved(int value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setMaxScale(value / 10.0);
         (*this->m_snow)[spaceId].reset();
     }
@@ -186,6 +226,9 @@ void Config::on_spbNFlakes_valueChanged(int value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setNFlakes(value);
         (*this->m_snow)[spaceId].reset();
@@ -200,6 +243,9 @@ void Config::on_spbAcceleration_valueChanged(double value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setAcceleration(value);
         (*this->m_snow)[spaceId].reset();
     }
@@ -210,6 +256,9 @@ void Config::on_spbDirection_valueChanged(int value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setDirection(value);
         (*this->m_snow)[spaceId].reset();
@@ -224,6 +273,9 @@ void Config::on_spbRandFactor_valueChanged(double value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setRandFactor(value);
         (*this->m_snow)[spaceId].reset();
     }
@@ -234,6 +286,9 @@ void Config::on_spbBorder_valueChanged(int value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setBorder(value);
         (*this->m_snow)[spaceId].reset();
@@ -248,6 +303,9 @@ void Config::on_spbMinZ_valueChanged(double value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setMinZ(value);
         (*this->m_snow)[spaceId].reset();
     }
@@ -260,6 +318,9 @@ void Config::on_spbMaxZ_valueChanged(double value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setMaxZ(value);
         (*this->m_snow)[spaceId].reset();
@@ -274,6 +335,9 @@ void Config::on_spbMinScale_valueChanged(double value)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
 
+        if (spaceId == "")
+            return;
+
         (*this->m_snow)[spaceId].setMinScale(value);
         (*this->m_snow)[spaceId].reset();
     }
@@ -286,6 +350,9 @@ void Config::on_spbMaxScale_valueChanged(double value)
     if (this->m_snow)
     {
         QString spaceId = this->cbxSpaceId->itemData(this->cbxSpaceId->currentIndex()).toString();
+
+        if (spaceId == "")
+            return;
 
         (*this->m_snow)[spaceId].setMaxScale(value);
         (*this->m_snow)[spaceId].reset();

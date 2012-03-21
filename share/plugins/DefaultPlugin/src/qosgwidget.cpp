@@ -25,53 +25,68 @@
 
 QOSGWidget::QOSGWidget(QWidget *parent): QGLWidget(parent)
 {
-    viewer = new osgViewer::Viewer;
+    this->viewer = new osgViewer::Viewer;
 
-    loadedModel = osgDB::readNodeFile("share/plugins/DefaultPlugin/share/data/cow.osg");
+    this->loadedModel = osgDB::readNodeFile("share/plugins/DefaultPlugin/share/data/cow.osg");
 
-    viewer->getCamera()->setClearMask(GL_DEPTH_BUFFER_BIT);
-    viewer->setCameraManipulator(new osgGA::TrackballManipulator);
+    this->viewer->getCamera()->setClearMask(GL_DEPTH_BUFFER_BIT);
+    this->viewer->setCameraManipulator(new osgGA::TrackballManipulator);
 
-    cow_rot = 0;
+    this->cow_rot = 0;
+}
+
+QImage QOSGWidget::webcamImage()
+{
+    return this->m_webcamImage;
+}
+
+void QOSGWidget::setWebcamImage(const QImage &image)
+{
+    this->m_webcamImage = image;
+}
+
+void QOSGWidget::resetWebcamImage()
+{
+    this->m_webcamImage = QImage();
 }
 
 void QOSGWidget::initializeGL()
 {
-    if (window.valid())
-        window->releaseContext();
+    if (this->window.valid())
+        this->window->releaseContext();
 
-    window = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width(), height());
+    this->window = this->viewer->setUpViewerAsEmbeddedInWindow(0, 0, width(), height());
 }
 
 void QOSGWidget::resizeGL(qint32 width, qint32 height)
 {
-    if (window.valid())
+    if (this->window.valid())
     {
-        window->resized(window->getTraits()->x, window->getTraits()->y, width, height);
-        window->getEventQueue()->windowResize(window->getTraits()->x, window->getTraits()->y, width, height);
+        this->window->resized(this->window->getTraits()->x, this->window->getTraits()->y, width, height);
+        this->window->getEventQueue()->windowResize(this->window->getTraits()->x, this->window->getTraits()->y, width, height);
     }
 }
 
 void QOSGWidget::paintGL()
 {
-    group  = new osg::Group;
+    this->group  = new osg::Group;
 
-    transformation = new osg::MatrixTransform;
-    transformation->setMatrix(osg::Matrix::rotate(cow_rot, 0, 0, 1));
-    transformation->addChild(loadedModel.get());
-    group->addChild(transformation.get());
+    this->transformation = new osg::MatrixTransform;
+    this->transformation->setMatrix(osg::Matrix::rotate(this->cow_rot, 0, 0, 1));
+    this->transformation->addChild(this->loadedModel.get());
+    this->group->addChild(this->transformation.get());
 
-    osg::ref_ptr<osg::Geode> webcam_geode = createWebcamFrameGeode(webcam_image);
+    osg::ref_ptr<osg::Geode> webcam_geode = createWebcamFrameGeode(this->m_webcamImage);
     osg::ref_ptr<osg::Camera> ortho_camera = createOrthoCamera();
     ortho_camera->addChild(webcam_geode.get());
-    group->addChild(ortho_camera.get());
+    this->group->addChild(ortho_camera.get());
 
-    viewer->setSceneData(group.get());
+    this->viewer->setSceneData(this->group.get());
 
-    cow_rot += 0.1;
+    this->cow_rot += 0.1;
 
-    if (viewer.valid())
-        viewer->frame();
+    if (this->viewer.valid())
+        this->viewer->frame();
 }
 
 osg::ref_ptr<osg::TextureRectangle> QOSGWidget::convertQImageToOsgTexture(const QImage &qimage)
@@ -121,4 +136,3 @@ osg::ref_ptr<osg::Camera> QOSGWidget::createOrthoCamera()
 
     return ortho_camera;
 }
-

@@ -92,6 +92,9 @@ void SnowFall::begin()
 
 void SnowFall::addSpace(QString spaceId, QSize frameSize)
 {
+    if (this->snow.contains(spaceId))
+        return;
+
     this->snow[spaceId] = Snow(frameSize.width(),
                                frameSize.height(),
                                75,   // Number of Flakes

@@ -35,12 +35,19 @@ class QOSGWidget: public QGLWidget
 {
     Q_OBJECT
 
+    Q_PROPERTY(QImage webcamImage READ webcamImage WRITE setWebcamImage RESET resetWebcamImage)
+
     public:
         explicit QOSGWidget(QWidget *parent = 0);
-        QImage webcam_image;
+        QImage webcamImage();
+
+    public slots:
+        void setWebcamImage(const QImage &image);
+        void resetWebcamImage();
 
     private:
         qreal cow_rot;
+        QImage m_webcamImage;
 
         osg::ref_ptr<osgViewer::Viewer> viewer;
         osg::observer_ptr<osgViewer::GraphicsWindowEmbedded> window;

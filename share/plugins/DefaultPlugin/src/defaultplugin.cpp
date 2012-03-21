@@ -85,24 +85,40 @@ bool DefaultPlugin::isConfigurable()
 
 void DefaultPlugin::begin()
 {
-    glWidget = new QOSGWidget();
 }
 
-void DefaultPlugin::resize(qint32 width, qint32 height)
+void DefaultPlugin::addSpace(QString spaceId, QSize frameSize)
 {
-    glWidget->resize(width, height);
+    this->glWidget[spaceId] = new QOSGWidget();
+    this->glWidget[spaceId]->resize(frameSize);
 }
 
-QImage DefaultPlugin::render(const QImage &image)
+void DefaultPlugin::removeSpace(QString spaceId)
 {
-    glWidget->webcam_image = image;
+    delete this->glWidget[spaceId];
+    this->glWidget.remove(spaceId);
+}
 
-    return glWidget->renderPixmap(glWidget->width(), glWidget->height(), true).toImage();
+QImage DefaultPlugin::render(QString spaceId, const QImage &image)
+{
+    if (this->glWidget.contains(spaceId))
+    {
+        this->glWidget[spaceId]->setWebcamImage(image);
+
+        return this->glWidget[spaceId]->renderPixmap(this->glWidget[spaceId]->width(),
+                                                     this->glWidget[spaceId]->height(),
+                                                     true).toImage();
+    }
+
+    return image;
 }
 
 void DefaultPlugin::end()
 {
-    delete glWidget;
+    QStringList spaces = this->glWidget.keys();
+
+    foreach (QString spaceId, spaces)
+        this->removeSpace(spaceId);
 }
 
 void DefaultPlugin::configure()
