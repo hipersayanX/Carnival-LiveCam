@@ -27,9 +27,9 @@
 #include <QVariant>
 
 #include "plugin.h"
-#include "qosgwidget.h"
+#include "ogl.h"
 
-class DefaultPlugin: public QObject, public Plugin
+class Cube: public QObject, public Plugin
 {
     Q_OBJECT
     Q_INTERFACES(Plugin)
@@ -64,7 +64,7 @@ class DefaultPlugin: public QObject, public Plugin
         void mouseReleaseEvent(QMouseEvent *event);
 
     private:
-        QHash<QString, QOSGWidget *> glWidget;
+        QHash<QString, OGL *> glWidget;
 };
 
 #endif // DEFAULTPLUGIN_H

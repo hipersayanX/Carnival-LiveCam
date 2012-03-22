@@ -186,4 +186,24 @@ void SnowFall::setConfigs(QVariant configs)
     }
 }
 
+void SnowFall::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void SnowFall::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void SnowFall::mousePressEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void SnowFall::mouseReleaseEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
 Q_EXPORT_PLUGIN2(SnowFall, SnowFall)

@@ -24,6 +24,7 @@
 
 #include <QImage>
 #include <QtPlugin>
+#include <QMouseEvent>
 
 /*!
   \class Plugin
@@ -203,6 +204,11 @@ class Plugin
           Set all configurations presaved with Plugin::configs().
          */
         virtual void setConfigs(QVariant configs) = 0;
+
+        virtual void mouseDoubleClickEvent(QMouseEvent *event) = 0;
+        virtual void mouseMoveEvent(QMouseEvent *event) = 0;
+        virtual void mousePressEvent(QMouseEvent *event) = 0;
+        virtual void mouseReleaseEvent(QMouseEvent *event) = 0;
 };
 
 Q_DECLARE_INTERFACE(Plugin, "plugins.PluginInterface")

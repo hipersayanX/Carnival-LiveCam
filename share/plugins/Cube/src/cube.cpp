@@ -21,99 +21,98 @@
  * OpenSceneGraph test plugin
  */
 
-#include "../include/defaultplugin.h"
+#include "../include/cube.h"
 
-QString DefaultPlugin::author()
+QString Cube::author()
 {
     return "hipersayan_x";
 }
 
-QString DefaultPlugin::mail()
+QString Cube::mail()
 {
     return "hipersayan.x@gmail.com";
 }
 
-QString DefaultPlugin::website()
+QString Cube::website()
 {
     return "hipersayanx.blogspot.com";
 }
 
-QString DefaultPlugin::category()
+QString Cube::category()
 {
     return "Default";
 }
 
-QString DefaultPlugin::id()
+QString Cube::id()
 {
-    return "videoplugin.DefaultPlugin";
+    return "videoplugin.Cube";
 }
 
-QString DefaultPlugin::license()
+QString Cube::license()
 {
     return "GPLv3";
 }
 
-QString DefaultPlugin::name()
+QString Cube::name()
 {
-    return "DefaultPlugin";
+    return "Cube";
 }
 
-QString DefaultPlugin::summary()
+QString Cube::summary()
 {
-    return "Default video plugin";
+    return "Render the webcam image in a cube.";
 }
 
-QString DefaultPlugin::thumbnail()
+QString Cube::thumbnail()
 {
-    return "../../../../../share/plugins/DefaultPlugin/share/thumbnail-128x96.png";
+    return "../../../../../share/plugins/Cube/share/thumbnail-128x96.png";
 }
 
-bool DefaultPlugin::is3D()
+bool Cube::is3D()
 {
     return true;
 }
 
-QString DefaultPlugin::version()
+QString Cube::version()
 {
     return "1.0.0";
 }
 
-bool DefaultPlugin::isConfigurable()
+bool Cube::isConfigurable()
 {
     return false;
 }
 
-void DefaultPlugin::begin()
+void Cube::begin()
 {
 }
 
-void DefaultPlugin::addSpace(QString spaceId, QSize frameSize)
+void Cube::addSpace(QString spaceId, QSize frameSize)
 {
-    this->glWidget[spaceId] = new QOSGWidget();
+    this->glWidget[spaceId] = new OGL();
     this->glWidget[spaceId]->resize(frameSize);
 }
 
-void DefaultPlugin::removeSpace(QString spaceId)
+void Cube::removeSpace(QString spaceId)
 {
     delete this->glWidget[spaceId];
     this->glWidget.remove(spaceId);
 }
 
-QImage DefaultPlugin::render(QString spaceId, const QImage &image)
+QImage Cube::render(QString spaceId, const QImage &image)
 {
     if (this->glWidget.contains(spaceId))
     {
         this->glWidget[spaceId]->setWebcamImage(image);
 
         return this->glWidget[spaceId]->renderPixmap(this->glWidget[spaceId]->width(),
-                                                     this->glWidget[spaceId]->height(),
-                                                     true).toImage();
+                                                     this->glWidget[spaceId]->height()).toImage();
     }
 
     return image;
 }
 
-void DefaultPlugin::end()
+void Cube::end()
 {
     QStringList spaces = this->glWidget.keys();
 
@@ -121,38 +120,38 @@ void DefaultPlugin::end()
         this->removeSpace(spaceId);
 }
 
-void DefaultPlugin::configure()
+void Cube::configure()
 {
 }
 
-QVariant DefaultPlugin::configs()
+QVariant Cube::configs()
 {
     return QVariant();
 }
 
-void DefaultPlugin::setConfigs(QVariant configs)
+void Cube::setConfigs(QVariant configs)
 {
     Q_UNUSED(configs)
 }
 
-void DefaultPlugin::mouseDoubleClickEvent(QMouseEvent *event)
+void Cube::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mouseMoveEvent(QMouseEvent *event)
+void Cube::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mousePressEvent(QMouseEvent *event)
+void Cube::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mouseReleaseEvent(QMouseEvent *event)
+void Cube::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
 }
 
-Q_EXPORT_PLUGIN2(DefaultPlugin, DefaultPlugin)
+Q_EXPORT_PLUGIN2(Cube, Cube)

@@ -127,4 +127,24 @@ void TheMask::setConfigs(QVariant configs)
     Q_UNUSED(configs)
 }
 
+void TheMask::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void TheMask::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void TheMask::mousePressEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void TheMask::mouseReleaseEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
 Q_EXPORT_PLUGIN2(TheMask, TheMask)

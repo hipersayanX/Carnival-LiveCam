@@ -59,6 +59,11 @@ class SnowFall: public QObject, public Plugin
         QVariant configs();
         void setConfigs(QVariant configs);
 
+        void mouseDoubleClickEvent(QMouseEvent *event);
+        void mouseMoveEvent(QMouseEvent *event);
+        void mousePressEvent(QMouseEvent *event);
+        void mouseReleaseEvent(QMouseEvent *event);
+
     private:
         QHash<QString, Snow> snow;
         Config config;
