@@ -414,9 +414,17 @@ Rectangle
                 anchors.top: parent.top
                 showUpDown: true
 
-                function updateValue()
+                function updVal()
                 {
-                    var tmpNewMaxValue = Math.ceil(grvEffects.contentHeight / grvEffects.height - 1)
+                    var tmpNewMaxValue = 0
+
+                    if (grvEffects.count != 0 && grvEffects.contentHeight == 0)
+                        grvEffects.contentHeight = grvEffects.count * 104
+
+                    if (grvEffects.contentHeight == 0 && grvEffects.height == 0)
+                        tmpNewMaxValue = 0
+                    else
+                        tmpNewMaxValue = Math.ceil(grvEffects.contentHeight / grvEffects.height - 1)
 
                     if (tmpNewMaxValue < sldEffects.minValue)
                         sldEffects.maxValue = sldEffects.minValue
@@ -436,7 +444,7 @@ Rectangle
                     sldEffects.width = sldEffects.visible? 16: 0
                 }
 
-                onHeightChanged: sldEffects.updateValue()
+                onHeightChanged: sldEffects.updVal()
 
                 Component.onCompleted: sldEffects.updateValue()
 
@@ -496,6 +504,9 @@ Rectangle
                     btnConfigure.pluginId = ""
                     btnWeb.url = ""
                     btnMail.mail = ""
+
+                    sldEffects.updVal()
+                    sldStack.updVal()
                 }
             }
 
@@ -515,7 +526,7 @@ Rectangle
                         for (var effect in effects)
                             if (recEffects.selected[plugin] == effects[effect].pluginId &&
                                 effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
-                           {
+                            {
                                 recEffects.unsetEffect(recEffects.selected[plugin], recEffects.currentDeviceId)
                                 selected.splice(selected.indexOf(recEffects.selected[plugin]), 1)
                             }
@@ -533,6 +544,9 @@ Rectangle
                     btnConfigure.pluginId = ""
                     btnWeb.url = ""
                     btnMail.mail = ""
+
+                    sldEffects.updVal()
+                    sldStack.updVal()
                 }
             }
         }
@@ -623,9 +637,17 @@ Rectangle
                 anchors.right: parent.right
                 showUpDown: true
 
-                function updateValue()
+                function updVal()
                 {
-                    var tmpNewMaxValue = Math.ceil(lsvStack.contentHeight / sldStack.height - 1)
+                    var tmpNewMaxValue = 0
+
+                    if (lsvStack.count != 0 && lsvStack.contentHeight == 0)
+                        lsvStack.contentHeight = lsvStack.count * 104
+
+                    if (lsvStack.contentHeight == 0 && lsvStack.height == 0)
+                        tmpNewMaxValue = 0
+                    else
+                        tmpNewMaxValue = Math.ceil(lsvStack.contentHeight / lsvStack.height - 1)
 
                     if (tmpNewMaxValue < sldStack.minValue)
                         sldStack.maxValue = sldStack.minValue
@@ -645,7 +667,7 @@ Rectangle
                     sldStack.width = sldStack.visible? 16: 0
                 }
 
-                onHeightChanged: sldStack.updateValue()
+                onHeightChanged: sldStack.updVal()
 
                 Component.onCompleted: sldStack.updateValue()
 
@@ -679,26 +701,6 @@ Rectangle
         }
     }
 
-    ComboBox
-    {
-        id: cbxDevice
-        x: 556
-        width: 256
-        height: 32
-        anchors.top: parent.top
-        anchors.topMargin: 16
-        anchors.right: parent.right
-        anchors.rightMargin: 16
-
-        onItemSelected:
-        {
-            recEffects.currentDeviceId = value
-
-            var effects = recEffects.effects.slice()
-            recEffects.effects = []
-            recEffects.effects = effects
-        }
-    }
 
     Text
     {
@@ -868,6 +870,27 @@ Rectangle
 
                 onClicked: Qt.openUrlExternally(btnMail.mail)
             }
+        }
+    }
+
+    ComboBox
+    {
+        id: cbxDevice
+        x: 556
+        width: 256
+        height: 32
+        anchors.top: parent.top
+        anchors.topMargin: 16
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+
+        onItemSelected:
+        {
+            recEffects.currentDeviceId = value
+
+            var effects = recEffects.effects.slice()
+            recEffects.effects = []
+            recEffects.effects = effects
         }
     }
 }

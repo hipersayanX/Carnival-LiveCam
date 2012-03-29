@@ -59,10 +59,12 @@ Rectangle
     {
         lsmDisabledDevices.clear()
         lsmEnabledDevices.clear()
+        var activeDevices = (recDevices.activeDevices)? recDevices.activeDevices.slice(): []
+        activeDevices.reverse()
 
-        for (var activeDevice in recDevices.activeDevices)
+        for (var activeDevice in activeDevices)
             for (var aDevice in recDevices.devices)
-                if (recDevices.devices[aDevice].deviceId == recDevices.activeDevices[activeDevice])
+                if (recDevices.devices[aDevice].deviceId == activeDevices[activeDevice])
                 {
                     var newActiveDevice = {}
 
@@ -135,6 +137,64 @@ Rectangle
             }
         }
 
+        Component
+        {
+            id: cmpDevice
+
+            Device
+            {
+                id: dvcDevice
+                width: recButtonBoxContainer.width
+                deviceId: propDeviceId
+                driverId: propDriverId
+                isEnabled: propIsEnabled
+                summary: propSummary
+                icon: propIcon
+                isConfigurable: propIsConfigurable
+
+                property real oldIndex: 0
+                property real newIndex: 0
+                property real oldPositionY: 0
+
+                onConfigure: recDevices.configureDevice(dvcDevice.deviceId)
+
+                onClicked:
+                {
+                    if (dvcDevice.isEnabled)
+                        recDevices.deviceDisable(dvcDevice.deviceId)
+                    else
+                        recDevices.deviceEnable(dvcDevice.deviceId)
+                }
+
+                onBeginMove:
+                {
+                    dvcDevice.oldIndex = lsvEnabledDevices.deviceIndex(dvcDevice.deviceId)
+                    dvcDevice.oldPositionY = mouseY
+                }
+
+                onMove:
+                {
+                    dvcDevice.newIndex = Math.round((mouseY - dvcDevice.oldPositionY) * (lsvEnabledDevices.count / lsvEnabledDevices.contentHeight) + dvcDevice.oldIndex)
+
+                    if (dvcDevice.newIndex < 0)
+                        dvcDevice.newIndex = 0
+
+                    if (dvcDevice.newIndex >= lsvEnabledDevices.count)
+                        dvcDevice.newIndex = lsvEnabledDevices.count - 1
+
+                    if (dvcDevice.newIndex != dvcDevice.oldIndex)
+                    {
+                        lsmEnabledDevices.move(dvcDevice.oldIndex, dvcDevice.newIndex, 1)
+
+                        recDevices.enabledDeviceMoved(lsvEnabledDevices.count - dvcDevice.oldIndex - 1,
+                                                      lsvEnabledDevices.count - dvcDevice.newIndex - 1)
+
+                        dvcDevice.oldIndex = dvcDevice.newIndex
+                    }
+                }
+            }
+        }
+
         Text
         {
             id: txtEnabled
@@ -186,76 +246,7 @@ Rectangle
                 id: lsmEnabledDevices
             }
 
-            delegate: Component
-            {
-                Device
-                {
-                    id: dvcEnabledDevice
-                    width: recButtonBoxContainer.width
-                    deviceId: propDeviceId
-                    driverId: propDriverId
-                    isEnabled: propIsEnabled
-                    summary: propSummary
-                    icon: propIcon
-                    isConfigurable: propIsConfigurable
-                    property real oldIndex: 0
-                    property real newIndex: 0
-                    property real oldPositionY: 0
-
-                    onConfigure: recDevices.configureDevice(dvcEnabledDevice.deviceId)
-
-                    onClicked:
-                    {/*
-                        var devices = []
-
-                        for (var d in recDevices.devices)
-                        {
-                            var device = {}
-
-                            for (var prop in recDevices.devices[d])
-                                device[prop] = (recDevices.devices[d].deviceId == dvcEnabledDevice.deviceId && prop == "isEnabled")? false: recDevices.devices[d][prop]
-
-                            devices.push(device)
-                        }
-*/
-                        recDevices.deviceDisable(dvcEnabledDevice.deviceId)
-/*
-                        var activeDevices = recDevices.activeDevices.slice()
-
-                        activeDevices.splice(activeDevices.indexOf(dvcEnabledDevice.deviceId), 1)
-                        recDevices.activeDevices = activeDevices
-
-                        recDevices.devices = devices*/
-                    }
-
-                    onBeginMove:
-                    {
-                        dvcEnabledDevice.oldIndex = lsvEnabledDevices.deviceIndex(dvcEnabledDevice.deviceId)
-                        dvcEnabledDevice.oldPositionY = mouseY
-                    }
-
-                    onMove:
-                    {
-                        dvcEnabledDevice.newIndex = Math.round((mouseY - dvcEnabledDevice.oldPositionY) * (lsvEnabledDevices.count / lsvEnabledDevices.contentHeight) + dvcEnabledDevice.oldIndex)
-
-                        if (dvcEnabledDevice.newIndex < 0)
-                            dvcEnabledDevice.newIndex = 0
-
-                        if (dvcEnabledDevice.newIndex >= lsvEnabledDevices.count)
-                            dvcEnabledDevice.newIndex = lsvEnabledDevices.count - 1
-
-                        if (dvcEnabledDevice.newIndex != dvcEnabledDevice.oldIndex)
-                        {
-                            lsmEnabledDevices.move(dvcEnabledDevice.oldIndex, dvcEnabledDevice.newIndex, 1)
-
-                            recDevices.enabledDeviceMoved(lsvEnabledDevices.count - dvcEnabledDevice.oldIndex - 1,
-                                                          lsvEnabledDevices.count - dvcEnabledDevice.newIndex - 1)
-
-                            dvcEnabledDevice.oldIndex = dvcEnabledDevice.newIndex
-                        }
-                    }
-                }
-            }
+            delegate: cmpDevice
         }
 
         Text
@@ -287,54 +278,7 @@ Rectangle
                 id: lsmDisabledDevices
             }
 
-            delegate: Component
-            {
-                Device
-                {
-                    id: dvcDisabledDevice
-                    width: recButtonBoxContainer.width
-                    deviceId: propDeviceId
-                    driverId: propDriverId
-                    isEnabled: propIsEnabled
-                    summary: propSummary
-                    icon: propIcon
-                    isConfigurable: propIsConfigurable
-
-                    onConfigure: recDevices.configureDevice(dvcDisabledDevice.deviceId)
-
-                    onClicked:
-                    {/*
-                        var devices = []
-                        var index = -1
-
-                        for (var d in recDevices.devices)
-                        {
-                            var device = {}
-
-                            if (recDevices.devices[d].deviceId == dvcDisabledDevice.deviceId)
-                                index = d
-
-                            for (var prop in recDevices.devices[d])
-                                device[prop] = (recDevices.devices[d].deviceId == dvcDisabledDevice.deviceId &&
-                                                prop == "isEnabled")? true: recDevices.devices[d][prop]
-
-                            devices.push(device)
-                        }
-
-                        if (index >= 0)
-                            devices.unshift(devices.splice(index, 1)[0])
-*/
-                        recDevices.deviceEnable(dvcDisabledDevice.deviceId)
-/*
-                        var activeDevices = recDevices.activeDevices.slice()
-
-                        activeDevices.splice(0, 0, dvcDisabledDevice.deviceId)
-                        recDevices.activeDevices = activeDevices
-
-                        recDevices.devices = devices*/
-                    }
-                }
-            }
+            delegate: cmpDevice
         }
     }
 }

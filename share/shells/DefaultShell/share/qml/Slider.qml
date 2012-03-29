@@ -54,14 +54,13 @@ Rectangle
 
     function updateValue()
     {
-        var k = (recSliderArea.height - btnSlider.height) / (recSlider.maxValue - recSlider.minValue)
-
         if (recSlider.value < recSlider.minValue)
             recSlider.value = recSlider.minValue
 
         if (recSlider.value > recSlider.maxValue)
             recSlider.value = recSlider.maxValue
 
+        var k = (recSliderArea.height - btnSlider.height) / (recSlider.maxValue - recSlider.minValue)
         btnSlider.y = Math.round(k * (recSlider.value - recSlider.minValue))
     }
 
@@ -74,6 +73,13 @@ Rectangle
 
         if (recSlider.value > recSlider.maxValue)
             recSlider.value = recSlider.maxValue
+
+        if (recSlider.maxValue == recSlider.minValue)
+        {
+            btnSlider.y = 0
+
+            return
+        }
 
         var k = (recSliderArea.height - btnSlider.height) / (recSlider.maxValue - recSlider.minValue)
         btnSlider.y = Math.round(k * (recSlider.value - recSlider.minValue))

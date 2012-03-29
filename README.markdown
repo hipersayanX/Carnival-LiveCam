@@ -1,6 +1,6 @@
 # Carnival LiveCam, augmented reality made easy #
 
-![Example of the snow plugin](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/snowexample.png)
+![Example of the snow plugin](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/mainscreen.png)
 
 ## Intro ##
 
