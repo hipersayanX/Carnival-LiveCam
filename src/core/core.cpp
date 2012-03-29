@@ -54,6 +54,11 @@ Core::Core(QObject *parent): QObject(parent)
     connect(&this->spaceManager, SIGNAL(spaceMoved(qint32, qint32)), &this->shellManager, SLOT(moveDevice(qint32, qint32)));
     connect(&this->deviceManager, SIGNAL(devicesModified()), this, SLOT(devicesModified()));
 
+    connect(&this->spaceManager, SIGNAL(mouseDoubleClick(QString, QMouseEvent *)), &this->pluginManager, SLOT(mouseDoubleClickEvent(QString, QMouseEvent *)));
+    connect(&this->spaceManager, SIGNAL(mouseMove(QString, QMouseEvent *)), &this->pluginManager, SLOT(mouseMoveEvent(QString, QMouseEvent *)));
+    connect(&this->spaceManager, SIGNAL(mousePress(QString, QMouseEvent *)), &this->pluginManager, SLOT(mousePressEvent(QString, QMouseEvent *)));
+    connect(&this->spaceManager, SIGNAL(mouseRelease(QString, QMouseEvent *)), &this->pluginManager, SLOT(mouseReleaseEvent(QString, QMouseEvent *)));
+
     this->shellManager.widget()->show();
 
     this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
@@ -113,12 +118,17 @@ void Core::deviceEnable(QString deviceId)
 {
     this->deviceManager.deviceEnable(deviceId);
     this->spaceManager.setSpace(deviceId, QImage());
+    this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
+    this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
 }
 
 void Core::deviceDisable(QString deviceId)
 {
+    this->pluginManager.unsetEffects(deviceId);
     this->deviceManager.deviceDisable(deviceId);
     this->spaceManager.removeSpace(deviceId);
+    this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
+    this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
 }
 
 /*!
@@ -153,10 +163,20 @@ void Core::captureFrame()
 
 void Core::setEffect(QString pluginId, QString spaceId)
 {
-    this->pluginManager.setEffect(pluginId, spaceId, this->deviceManager.frameSize(spaceId));
+    if (this->pluginManager.setEffect(pluginId, spaceId, this->deviceManager.frameSize(spaceId)))
+    {
+        this->deviceManager.setEffect(spaceId, pluginId);
+        this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
+        this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
+    }
 }
 
 void Core::unsetEffect(QString pluginId, QString spaceId)
 {
-    this->pluginManager.unsetEffect(pluginId, spaceId);
+    if (this->pluginManager.unsetEffect(pluginId, spaceId))
+    {
+        this->deviceManager.unsetEffect(spaceId, pluginId);
+        this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
+        this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
+    }
 }

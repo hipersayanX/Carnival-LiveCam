@@ -205,7 +205,7 @@ Rectangle
                     onConfigure: recDevices.configureDevice(dvcEnabledDevice.deviceId)
 
                     onClicked:
-                    {
+                    {/*
                         var devices = []
 
                         for (var d in recDevices.devices)
@@ -217,15 +217,15 @@ Rectangle
 
                             devices.push(device)
                         }
-
+*/
                         recDevices.deviceDisable(dvcEnabledDevice.deviceId)
-
+/*
                         var activeDevices = recDevices.activeDevices.slice()
 
                         activeDevices.splice(activeDevices.indexOf(dvcEnabledDevice.deviceId), 1)
                         recDevices.activeDevices = activeDevices
 
-                        recDevices.devices = devices
+                        recDevices.devices = devices*/
                     }
 
                     onBeginMove:
@@ -303,7 +303,7 @@ Rectangle
                     onConfigure: recDevices.configureDevice(dvcDisabledDevice.deviceId)
 
                     onClicked:
-                    {
+                    {/*
                         var devices = []
                         var index = -1
 
@@ -323,15 +323,15 @@ Rectangle
 
                         if (index >= 0)
                             devices.unshift(devices.splice(index, 1)[0])
-
+*/
                         recDevices.deviceEnable(dvcDisabledDevice.deviceId)
-
+/*
                         var activeDevices = recDevices.activeDevices.slice()
 
                         activeDevices.splice(0, 0, dvcDisabledDevice.deviceId)
                         recDevices.activeDevices = activeDevices
 
-                        recDevices.devices = devices
+                        recDevices.devices = devices*/
                     }
                 }
             }

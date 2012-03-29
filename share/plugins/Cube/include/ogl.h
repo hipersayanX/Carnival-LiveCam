@@ -25,6 +25,7 @@
 #define OGL_H
 
 #include <QtOpenGL>
+#include <QTime>
 
 class OGL: public QGLWidget
 {
@@ -37,14 +38,21 @@ class OGL: public QGLWidget
         QImage webcamImage();
 
     public slots:
+        void mouseDoubleClick(QMouseEvent *event);
+        void mouseMove(QMouseEvent *event);
+        void mousePress(QMouseEvent *event);
+        void mouseRelease(QMouseEvent *event);
+
+    public slots:
         void setWebcamImage(const QImage &image);
         void resetWebcamImage();
 
     private:
         QImage m_webcamImage;
-        GLfloat xrot; /* X Rotation ( NEW ) */
-        GLfloat yrot; /* Y Rotation ( NEW ) */
-        GLfloat zrot; /* Z Rotation ( NEW ) */
+        bool m_mousePressed;
+        QPoint m_mousePos0;
+        GLfloat m_xrot;
+        GLfloat m_yrot;
 
         void initializeGL();
         void resizeGL(qint32 width, qint32 height);

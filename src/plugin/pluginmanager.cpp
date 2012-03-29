@@ -233,6 +233,18 @@ bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
     return true;
 }
 
+void PluginManager::unsetEffects(QString spaceId)
+{
+    QStringList activePlugins;
+
+    foreach (Plugin *plugin, this->activePlugins)
+        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+            activePlugins << plugin->id();
+
+    foreach (QString pluginId, activePlugins)
+        this->unsetEffect(pluginId, spaceId);
+}
+
 /*!
   \fn void PluginManager::configurePlugin(QString id)
 
@@ -262,6 +274,34 @@ void PluginManager::movePlugin(QString spaceId, qint32 from, qint32 to)
 {
     if (this->devices.contains(spaceId))
         this->devices[spaceId].move(from, to);
+}
+
+void PluginManager::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
+{
+    foreach (Plugin *plugin, this->activePlugins)
+        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+            plugin->mouseDoubleClickEvent(spaceId, event);
+}
+
+void PluginManager::mouseMoveEvent(QString spaceId, QMouseEvent *event)
+{
+    foreach (Plugin *plugin, this->activePlugins)
+        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+            plugin->mouseMoveEvent(spaceId, event);
+}
+
+void PluginManager::mousePressEvent(QString spaceId, QMouseEvent *event)
+{
+    foreach (Plugin *plugin, this->activePlugins)
+        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+            plugin->mousePressEvent(spaceId, event);
+}
+
+void PluginManager::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
+{
+    foreach (Plugin *plugin, this->activePlugins)
+        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+            plugin->mouseReleaseEvent(spaceId, event);
 }
 
 /*!

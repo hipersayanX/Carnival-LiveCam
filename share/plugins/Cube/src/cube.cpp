@@ -40,7 +40,7 @@ QString Cube::website()
 
 QString Cube::category()
 {
-    return "Default";
+    return "OpenGL";
 }
 
 QString Cube::id()
@@ -134,24 +134,28 @@ void Cube::setConfigs(QVariant configs)
     Q_UNUSED(configs)
 }
 
-void Cube::mouseDoubleClickEvent(QMouseEvent *event)
+void Cube::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
 {
-    Q_UNUSED(event)
+    if (this->glWidget.contains(spaceId))
+        this->glWidget[spaceId]->mouseDoubleClick(event);
 }
 
-void Cube::mouseMoveEvent(QMouseEvent *event)
+void Cube::mouseMoveEvent(QString spaceId, QMouseEvent *event)
 {
-    Q_UNUSED(event)
+    if (this->glWidget.contains(spaceId))
+        this->glWidget[spaceId]->mouseMove(event);
 }
 
-void Cube::mousePressEvent(QMouseEvent *event)
+void Cube::mousePressEvent(QString spaceId, QMouseEvent *event)
 {
-    Q_UNUSED(event)
+    if (this->glWidget.contains(spaceId))
+        this->glWidget[spaceId]->mousePress(event);
 }
 
-void Cube::mouseReleaseEvent(QMouseEvent *event)
+void Cube::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
 {
-    Q_UNUSED(event)
+    if (this->glWidget.contains(spaceId))
+        this->glWidget[spaceId]->mouseRelease(event);
 }
 
 Q_EXPORT_PLUGIN2(Cube, Cube)

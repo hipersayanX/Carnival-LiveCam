@@ -42,6 +42,7 @@ DeviceInfo::DeviceInfo(QObject *parent): QObject(parent)
     this->m_summary = "";
     this->m_icon = "";
     this->m_isConfigurable = false;
+    this->m_effects = QStringList();
 }
 
 /*!
@@ -56,7 +57,8 @@ DeviceInfo::DeviceInfo(const DeviceInfo &object):
     m_isEnabled(object.m_isEnabled),
     m_summary(object.m_summary),
     m_icon(object.m_icon),
-    m_isConfigurable(object.m_isConfigurable)
+    m_isConfigurable(object.m_isConfigurable),
+    m_effects(object.m_effects)
 {
 }
 
@@ -75,13 +77,15 @@ DeviceInfo::DeviceInfo(QString id,
                        bool isEnabled,
                        QString summary,
                        QString icon,
-                       bool isConfigurable):
+                       bool isConfigurable,
+                       QStringList effects):
     m_deviceId(id),
     m_driverId(driverId),
     m_isEnabled(isEnabled),
     m_summary(summary),
     m_icon(icon),
-    m_isConfigurable(isConfigurable)
+    m_isConfigurable(isConfigurable),
+    m_effects(effects)
 {
 }
 
@@ -100,6 +104,7 @@ DeviceInfo& DeviceInfo::operator =(const DeviceInfo &other)
         this->m_summary = other.m_summary;
         this->m_icon = other.m_icon;
         this->m_isConfigurable = other.m_isConfigurable;
+        this->m_effects = other.m_effects;
     }
 
     return *this;
@@ -166,6 +171,11 @@ QString DeviceInfo::icon()
 bool DeviceInfo::isConfigurable()
 {
     return this->m_isConfigurable;
+}
+
+QStringList DeviceInfo::effects()
+{
+    return this->m_effects;
 }
 
 /*!
@@ -240,6 +250,11 @@ void DeviceInfo::setIsConfigurable(bool value)
     this->m_isConfigurable = value;
 }
 
+void DeviceInfo::setEffects(QStringList value)
+{
+    this->m_effects = value;
+}
+
 /*!
   \fn void DeviceInfo::resetId()
 
@@ -298,4 +313,9 @@ void DeviceInfo::resetIcon()
 void DeviceInfo::resetIsConfigurable()
 {
     this->m_isConfigurable = false;
+}
+
+void DeviceInfo::resetEffects()
+{
+    this->m_effects = QStringList();
 }

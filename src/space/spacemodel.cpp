@@ -192,6 +192,29 @@ bool SpaceModel::isMaximized(QString spaceId)
     return false;
 }
 
+QSizeF SpaceModel::spaceSize(QString spaceId)
+{
+    foreach (Space space, this->m_spaces)
+        if (space.spaceId() == spaceId)
+            return space.size();
+
+    return QSizeF();
+}
+
+QPointF SpaceModel::mapToLocal(QPointF point, QString *spaceId)
+{
+    foreach (Space space, this->reversed(this->m_spaces))
+        if (space.contains(point))
+        {
+            if (spaceId)
+                *spaceId = space.spaceId();
+
+            return space.mapToLocal(point);
+        }
+
+    return QPointF();
+}
+
 qreal SpaceModel::calculateAngle(QPointF point)
 {
     if (point.x() == 0 && point.y() == 0)

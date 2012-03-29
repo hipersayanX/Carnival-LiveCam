@@ -127,23 +127,27 @@ void TheMask::setConfigs(QVariant configs)
     Q_UNUSED(configs)
 }
 
-void TheMask::mouseDoubleClickEvent(QMouseEvent *event)
+void TheMask::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void TheMask::mouseMoveEvent(QMouseEvent *event)
+void TheMask::mouseMoveEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void TheMask::mousePressEvent(QMouseEvent *event)
+void TheMask::mousePressEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void TheMask::mouseReleaseEvent(QMouseEvent *event)
+void TheMask::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 

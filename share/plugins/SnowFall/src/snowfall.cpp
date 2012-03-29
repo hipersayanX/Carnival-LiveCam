@@ -186,23 +186,27 @@ void SnowFall::setConfigs(QVariant configs)
     }
 }
 
-void SnowFall::mouseDoubleClickEvent(QMouseEvent *event)
+void SnowFall::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void SnowFall::mouseMoveEvent(QMouseEvent *event)
+void SnowFall::mouseMoveEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void SnowFall::mousePressEvent(QMouseEvent *event)
+void SnowFall::mousePressEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void SnowFall::mouseReleaseEvent(QMouseEvent *event)
+void SnowFall::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 

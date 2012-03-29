@@ -23,6 +23,7 @@
 #define DEVICEINFO_H
 
 #include <QObject>
+#include <QStringList>
 
 class DeviceInfo: public QObject
 {
@@ -34,6 +35,7 @@ class DeviceInfo: public QObject
     Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
     Q_PROPERTY(QString icon READ icon WRITE setIcon RESET resetIcon)
     Q_PROPERTY(bool isConfigurable READ isConfigurable WRITE setIsConfigurable RESET resetIsConfigurable)
+    Q_PROPERTY(QStringList effects READ effects WRITE setEffects RESET resetEffects)
 
     public:
         explicit DeviceInfo(QObject *parent = 0);
@@ -44,7 +46,8 @@ class DeviceInfo: public QObject
                    bool isEnabled,
                    QString summary,
                    QString icon,
-                   bool isConfigurable);
+                   bool isConfigurable,
+                   QStringList effects);
 
         DeviceInfo& operator =(const DeviceInfo &other);
 
@@ -54,6 +57,7 @@ class DeviceInfo: public QObject
         QString summary();
         QString icon();
         bool isConfigurable();
+        QStringList effects();
 
     private:
         QString m_deviceId;
@@ -62,6 +66,7 @@ class DeviceInfo: public QObject
         QString m_summary;
         QString m_icon;
         bool m_isConfigurable;
+        QStringList m_effects;
 
     public slots:
         void setDeviceId(QString value);
@@ -70,12 +75,14 @@ class DeviceInfo: public QObject
         void setSummary(QString value);
         void setIcon(QString value);
         void setIsConfigurable(bool value);
+        void setEffects(QStringList value);
         void resetDeviceId();
         void resetDriverId();
         void resetIsEnabled();
         void resetSummary();
         void resetIcon();
         void resetIsConfigurable();
+        void resetEffects();
 };
 
 #endif // DEVICEINFO_H

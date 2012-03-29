@@ -77,6 +77,10 @@ class SpaceManager: public QObject
 
     signals:
         void spaceMoved(qint32 from, qint32 to);
+        void mouseDoubleClick(QString spaceId, QMouseEvent *event);
+        void mouseMove(QString spaceId, QMouseEvent *event);
+        void mousePress(QString spaceId, QMouseEvent *event);
+        void mouseRelease(QString spaceId, QMouseEvent *event);
 
     private slots:
         void onSpaceMoved(qint32 from, qint32 to);

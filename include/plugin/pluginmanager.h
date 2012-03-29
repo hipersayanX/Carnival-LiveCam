@@ -43,8 +43,13 @@ class PluginManager: public QObject
     public slots:
         bool setEffect(QString pluginId, QString spaceId, QSize frameSize);
         bool unsetEffect(QString pluginId, QString spaceId);
+        void unsetEffects(QString spaceId);
         void configurePlugin(QString pluginId);
         void movePlugin(QString spaceId, qint32 from, qint32 to);
+        void mouseDoubleClickEvent(QString spaceId, QMouseEvent *event);
+        void mouseMoveEvent(QString spaceId, QMouseEvent *event);
+        void mousePressEvent(QString spaceId, QMouseEvent *event);
+        void mouseReleaseEvent(QString spaceId, QMouseEvent *event);
 
     private:
         QPluginLoader pluginLoader;

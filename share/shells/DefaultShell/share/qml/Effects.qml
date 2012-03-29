@@ -60,10 +60,18 @@ Rectangle
     function listCategories()
     {
         var categories = []
+        var cats = []
 
         for (var effect in recEffects.effects)
-            if (categories.indexOf(recEffects.effects[effect].category) < 0)
-                categories.push([recEffects.effects[effect].category, recEffects.effects[effect].category])
+        {
+            var category = recEffects.effects[effect].category
+
+            if (cats.indexOf(category) < 0)
+            {
+                categories.push([category, category])
+                cats.push(category)
+            }
+        }
 
         categories.sort(recEffects.sortAlphaNoCase)
 
@@ -84,6 +92,9 @@ Rectangle
 
         devices.sort(recEffects.sortAlphaNoCase)
         cbxDevice.updateOptions(devices)
+
+        if (devices.length > 0)
+            recEffects.currentDeviceId = devices[0][1]
     }
 
     onEffectsChanged:
@@ -93,24 +104,51 @@ Rectangle
         lsmStack.clear()
         grvEffects.contentHeight = 0
         lsvStack.contentHeight = 0
+        var stack = []
+        var effects = recEffects.effects.slice()
+        var devices = (recEffects.devices)? recEffects.devices.slice(): []
+        var effect = 0
+        var newEffect = {}
+        var prop = 0
 
-        for (var effect in recEffects.effects)
-        {
-            var newEffect = {}
-
-            for (var prop in recEffects.effects[effect])
-                newEffect["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = recEffects.effects[effect][prop]
-
-            if (cbxEffectsCategory.currentValue == "" ||
-                 cbxEffectsCategory.currentValue == "All" ||
-                 cbxEffectsCategory.currentValue == recEffects.effects[effect].category)
+        for (var device in devices)
+            if (devices[device].deviceId == cbxDevice.currentValue)
             {
-                if (recEffects.effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
-                    lsmStack.append(newEffect)
-                else
-                    lsmEffects.append(newEffect)
+                for (effect in effects)
+                {
+                    if (effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
+                        continue
+
+                    newEffect = {}
+
+                    for (prop in effects[effect])
+                        newEffect["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = effects[effect][prop]
+
+                    if (cbxEffectsCategory.currentValue == "" ||
+                         cbxEffectsCategory.currentValue == "All" ||
+                         cbxEffectsCategory.currentValue == effects[effect].category)
+                        lsmEffects.append(newEffect)
+                }
+
+                for (var devEffect in devices[device].effects)
+                    for (effect in effects)
+                        if (devices[device].effects[devEffect] == effects[effect].pluginId)
+                        {
+                            newEffect = {}
+
+                            for (prop in effects[effect])
+                                newEffect["prop" + prop.charAt(0).toUpperCase() + prop.slice(1)] = effects[effect][prop]
+
+                            if (cbxEffectsCategory.currentValue == "" ||
+                                 cbxEffectsCategory.currentValue == "All" ||
+                                 cbxEffectsCategory.currentValue == effects[effect].category)
+                                lsmStack.append(newEffect)
+
+                            break
+                        }
+
+                break
             }
-        }
 
         grvEffects.currentIndex = 0
         lsvStack.currentIndex = 0
@@ -168,6 +206,7 @@ Rectangle
 
                     MouseArea
                     {
+                        id: msaEffect
                         anchors.fill: parent
                         hoverEnabled: true
 
@@ -219,6 +258,76 @@ Rectangle
                             btnWeb.url = propWebsite
                             btnMail.mail = propMail
                         }
+                    }
+
+                    Button
+                    {
+                        id: btnMove
+                        icon: "../images/icons/move.svg"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        opacity: 0.01
+                        visible: propApplyTo.count > 0
+
+                        property bool moving: false
+                        property real oldIndex: 0
+                        property real oldPositionY: 0
+
+                        onClicked:
+                        {
+                            var selected = recEffects.selected.slice()
+
+                            if (selected.indexOf(propPluginId) == -1)
+                                selected.push(propPluginId)
+                            else
+                                selected.splice(selected.indexOf(propPluginId), 1)
+
+                            recEffects.selected = selected
+                        }
+
+                        onEntered:
+                        {
+                            imgStaticPreview.opacity = 1
+                            btnMove.opacity = 1
+                        }
+
+                        onExited:
+                        {
+                            imgStaticPreview.opacity = 0.75
+                            btnMove.opacity = 0.01
+                        }
+
+                        onPressed:
+                        {
+                            btnMove.oldIndex = lsvStack.pluginIndex(propPluginId)
+                            btnMove.oldPositionY = mouseY
+                            btnMove.moving = true
+                        }
+
+                        onPositionChanged:
+                        {
+                            if (!btnMove.moving)
+                                return
+
+                            var newIndex = Math.round((mouseY - btnMove.oldPositionY) *
+                                                      (lsvStack.count / lsvStack.contentHeight) +
+                                                      btnMove.oldIndex)
+
+                            if (newIndex < 0)
+                                newIndex = 0
+
+                            if (newIndex >= lsvStack.count)
+                                newIndex = lsvStack.count - 1
+
+                            if (newIndex != btnMove.oldIndex)
+                            {
+                                lsmStack.move(btnMove.oldIndex, newIndex, 1)
+                                recEffects.pluginMoved(cbxDevice.currentValue, btnMove.oldIndex, newIndex)
+                                btnMove.oldIndex = newIndex
+                            }
+                        }
+
+                        onReleased: btnMove.moving = false
                     }
                 }
             }
@@ -361,22 +470,19 @@ Rectangle
 
                 onClicked:
                 {
+                    var devices = recEffects.devices.slice()
                     var effects = recEffects.effects.slice()
                     var selected = recEffects.selected.slice()
 
                     for (var plugin in recEffects.selected)
-                        for (var effect in recEffects.effects)
-                            if (recEffects.selected[plugin] == recEffects.effects[effect].pluginId &&
-                                recEffects.effects[effect].applyTo.indexOf(cbxDevice.currentValue) < 0)
+                        for (var effect in effects)
+                            if (recEffects.selected[plugin] == effects[effect].pluginId &&
+                                effects[effect].applyTo.indexOf(cbxDevice.currentValue) < 0)
                             {
                                 recEffects.setEffect(recEffects.selected[plugin], recEffects.currentDeviceId)
-                                var applyTo = effects[effect].applyTo
-                                applyTo.push(recEffects.currentDeviceId)
-                                effects[effect].applyTo = applyTo
                                 selected.splice(selected.indexOf(recEffects.selected[plugin]), 1)
                             }
 
-                    recEffects.effects = effects
                     recEffects.selected = selected
 
                     txtName.text = ""
@@ -401,22 +507,19 @@ Rectangle
 
                 onClicked:
                 {
+                    var devices = recEffects.devices.slice()
                     var effects = recEffects.effects.slice()
                     var selected = recEffects.selected.slice()
 
                     for (var plugin in recEffects.selected)
-                        for (var effect in recEffects.effects)
-                            if (recEffects.selected[plugin] == recEffects.effects[effect].pluginId &&
-                                recEffects.effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
+                        for (var effect in effects)
+                            if (recEffects.selected[plugin] == effects[effect].pluginId &&
+                                effects[effect].applyTo.indexOf(cbxDevice.currentValue) >= 0)
                            {
                                 recEffects.unsetEffect(recEffects.selected[plugin], recEffects.currentDeviceId)
-                                var applyTo = effects[effect].applyTo
-                                applyTo.splice(applyTo.indexOf(recEffects.currentDeviceId), 1)
-                                effects[effect].applyTo = applyTo
                                 selected.splice(selected.indexOf(recEffects.selected[plugin]), 1)
                             }
 
-                    recEffects.effects = effects
                     recEffects.selected = selected
 
                     txtName.text = ""
@@ -482,6 +585,27 @@ Rectangle
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.top: parent.top
+
+                function pluginIndex(pluginId)
+                {
+                    var prevIndex = lsvStack.currentIndex
+
+                    for (var effect = 0; effect < lsvStack.count; effect++)
+                    {
+                        lsvStack.currentIndex = effect
+
+                        if (lsmStack.get(lsvStack.currentIndex).propPluginId == pluginId)
+                        {
+                            lsvStack.currentIndex = prevIndex
+
+                            return effect
+                        }
+                    }
+
+                    lsvStack.currentIndex = prevIndex
+
+                    return -1
+                }
 
                 delegate: cmpEffectDelegate
 

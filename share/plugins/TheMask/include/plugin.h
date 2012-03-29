@@ -205,10 +205,10 @@ class Plugin
          */
         virtual void setConfigs(QVariant configs) = 0;
 
-        virtual void mouseDoubleClickEvent(QMouseEvent *event) = 0;
-        virtual void mouseMoveEvent(QMouseEvent *event) = 0;
-        virtual void mousePressEvent(QMouseEvent *event) = 0;
-        virtual void mouseReleaseEvent(QMouseEvent *event) = 0;
+        virtual void mouseDoubleClickEvent(QString spaceId, QMouseEvent *event) = 0;
+        virtual void mouseMoveEvent(QString spaceId, QMouseEvent *event) = 0;
+        virtual void mousePressEvent(QString spaceId, QMouseEvent *event) = 0;
+        virtual void mouseReleaseEvent(QString spaceId, QMouseEvent *event) = 0;
 };
 
 Q_DECLARE_INTERFACE(Plugin, "plugins.PluginInterface")

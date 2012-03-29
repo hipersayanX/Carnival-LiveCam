@@ -123,6 +123,7 @@ QList<QVariant> DeviceManager::devicesInfoList()
         deviceInfoMap["summary"] = QVariant(device.summary());
         deviceInfoMap["icon"] = QVariant(device.icon());
         deviceInfoMap["isConfigurable"] = QVariant(device.isConfigurable());
+        deviceInfoMap["effects"] = QVariant(device.effects());
 
         deviceList << deviceInfoMap;
     }
@@ -177,7 +178,8 @@ void DeviceManager::updateDevices()
                                                    devicesPreStatus.contains(device)? devicesPreStatus[device]: false,
                                                    driver->deviceSummary(device),
                                                    driver->icon(),
-                                                   driver->isConfigurable());
+                                                   driver->isConfigurable(),
+                                                   QStringList());
 
         this->driverManager.unload(driverId);
     }
@@ -305,4 +307,32 @@ void DeviceManager::setActiveDevices(QStringList value)
 void DeviceManager::resetActiveDevices()
 {
     this->m_activeDevices.clear();
+}
+
+void DeviceManager::setEffect(QString deviceId, QString pluginId)
+{
+    if (!this->devicesInfo.contains(deviceId))
+        return;
+
+    QStringList effects = this->devicesInfo[deviceId].effects();
+
+    if (effects.contains(pluginId))
+        return;
+
+    effects << pluginId;
+    this->devicesInfo[deviceId].setEffects(effects);
+}
+
+void DeviceManager::unsetEffect(QString deviceId, QString pluginId)
+{
+    if (!this->devicesInfo.contains(deviceId))
+        return;
+
+    QStringList effects = this->devicesInfo[deviceId].effects();
+
+    if (!effects.contains(pluginId))
+        return;
+
+    effects.removeOne(pluginId);
+    this->devicesInfo[deviceId].setEffects(effects);
 }

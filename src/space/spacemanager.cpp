@@ -164,10 +164,10 @@ void SpaceManager::sendHoverEvent(QWidget *receiver, const QPoint &position)
 }
 
 QWidget *SpaceManager::sendMouseEvent(QEvent::Type type,
-                                   const QPointF &position,
-                                   Qt::MouseButton button,
-                                   Qt::MouseButtons buttons,
-                                   Qt::KeyboardModifiers modifiers)
+                                      const QPointF &position,
+                                      Qt::MouseButton button,
+                                      Qt::MouseButtons buttons,
+                                      Qt::KeyboardModifiers modifiers)
 {
     QGraphicsProxyWidget *proxyWidget = qgraphicsitem_cast<QGraphicsProxyWidget *>(this->mainSpace.itemAt(position, QTransform()));
 
@@ -194,10 +194,10 @@ QWidget *SpaceManager::sendMouseEvent(QEvent::Type type,
     this->sendHoverEvent(controlWidget, controlWidgetLocalPoint);
 
     QMouseEvent mouseEvent(type,
-                      controlWidgetLocalPoint,
-                      button,
-                      buttons,
-                      modifiers);
+                           controlWidgetLocalPoint,
+                           button,
+                           buttons,
+                           modifiers);
 
     QApplication::sendEvent(controlWidget, &mouseEvent);
 
@@ -285,7 +285,7 @@ void SpaceManager::setSnapping(bool snapping, qint32 nParts, qreal snappingPT, q
 
     this->spaceModel.setSnapping(snapping,
                                  nParts,
-                                 snappingPT * this->spaceModel.rect().width()/ this->m_viewPortSize.width(),
+                                 snappingPT * this->spaceModel.rect().width() / this->m_viewPortSize.width(),
                                  snappingRT);
 }
 
@@ -305,7 +305,7 @@ void SpaceManager::setViewPortSize(QSize size)
 
     this->spaceModel.setSnapping(this->m_snapping,
                                  this->m_nParts,
-                                 this->m_snappingPT * this->spaceModel.rect().width()/ this->m_viewPortSize.width(),
+                                 this->m_snappingPT * this->spaceModel.rect().width() / this->m_viewPortSize.width(),
                                  this->m_snappingRT);
 
     this->updateButtonsSize();
@@ -350,20 +350,33 @@ void SpaceManager::mouseDoubleClickEvent(QMouseEvent *event)
     if (!event)
         return;
 
+    QPointF modelMousePos = this->mapViewPortToModel(event->pos(), this->m_viewPortSize);
+
     if (!this->m_editMode)
     {
-        delete event;
+        QString spaceId;
+        QPointF pos = this->spaceModel.mapToLocal(modelMousePos, &spaceId);
 
-        return;
+        if (spaceId != "")
+        {
+            QSizeF size = this->spaceModel.spaceSize(spaceId);
+            QPointF npos = pos + QPointF(size.width(), size.height()) / 2;
+
+            QMouseEvent mouseEvent(QEvent::MouseButtonDblClick,
+                                   npos.toPoint(),
+                                   event->button(),
+                                   event->buttons(),
+                                   Qt::NoModifier);
+
+            emit mouseDoubleClick(spaceId, &mouseEvent);
+        }
     }
-
-//    this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
-
-    this->sendMouseEvent(QEvent::MouseButtonDblClick,
-                         this->mapViewPortToModel(event->pos(), this->m_viewPortSize),
-                         event->button(),
-                         event->buttons(),
-                         Qt::NoModifier);
+    else
+        this->sendMouseEvent(QEvent::MouseButtonDblClick,
+                             modelMousePos,
+                             event->button(),
+                             event->buttons(),
+                             Qt::NoModifier);
 
     delete event;
 }
@@ -373,29 +386,44 @@ void SpaceManager::mouseMoveEvent(QMouseEvent *event)
     if (!event)
         return;
 
-    if (!this->m_editMode)
-    {
-        delete event;
-
-        return;
-    }
-
     QPointF modelMousePos = this->mapViewPortToModel(event->pos(), this->m_viewPortSize);
 
-    this->sendMouseEvent(QEvent::MouseMove,
-                         modelMousePos,
-                         event->button(),
-                         event->buttons(),
-                         Qt::NoModifier);
-
-    if (this->scaleAndRotate)
+    if (!this->m_editMode)
     {
-        this->spaceModel.scaleAndRotateSpace(modelMousePos);
-        this->updateButtonsSize();
-    }
+        QString spaceId;
+        QPointF pos = this->spaceModel.mapToLocal(modelMousePos, &spaceId);
 
-    if (this->move)
-        this->spaceModel.moveSpace(modelMousePos);
+        if (spaceId != "")
+        {
+            QSizeF size = this->spaceModel.spaceSize(spaceId);
+            QPointF npos = pos + QPointF(size.width(), size.height()) / 2;
+
+            QMouseEvent mouseEvent(QEvent::MouseMove,
+                                   npos.toPoint(),
+                                   event->button(),
+                                   event->buttons(),
+                                   Qt::NoModifier);
+
+            emit mouseMove(spaceId, &mouseEvent);
+        }
+    }
+    else
+    {
+        this->sendMouseEvent(QEvent::MouseMove,
+                             modelMousePos,
+                             event->button(),
+                             event->buttons(),
+                             Qt::NoModifier);
+
+        if (this->scaleAndRotate)
+        {
+            this->spaceModel.scaleAndRotateSpace(modelMousePos);
+            this->updateButtonsSize();
+        }
+
+        if (this->move)
+            this->spaceModel.moveSpace(modelMousePos);
+    }
 
     delete event;
 }
@@ -405,29 +433,44 @@ void SpaceManager::mousePressEvent(QMouseEvent *event)
     if (!event)
         return;
 
-    if (!this->m_editMode)
-    {
-        delete event;
-
-        return;
-    }
-
     QPointF modelMousePos = this->mapViewPortToModel(event->pos(), this->m_viewPortSize);
 
-    this->spaceModel.selectSpace(modelMousePos);
+    if (!this->m_editMode)
+    {
+        QString spaceId;
+        QPointF pos = this->spaceModel.mapToLocal(modelMousePos, &spaceId);
 
-    QWidget *widget = this->sendMouseEvent(QEvent::MouseButtonPress,
-                                           modelMousePos,
-                                           event->button(),
-                                           event->buttons(),
-                                            Qt::NoModifier);
+        if (spaceId != "")
+        {
+            QSizeF size = this->spaceModel.spaceSize(spaceId);
+            QPointF npos = pos + QPointF(size.width(), size.height()) / 2;
 
-    if (widget && widget->objectName() == "btnToggleMaximize")
-        this->spaceModel.toggleMaximizedSpace();
-    else if (widget && widget->objectName() == "btnScaleAndRotate" && event->button() == Qt::LeftButton)
-        this->scaleAndRotate = true;
-    else if (this->spaceModel.currentSelectedSpace() != "")
-        this->move = true;
+            QMouseEvent mouseEvent(QEvent::MouseButtonPress,
+                                   npos.toPoint(),
+                                   event->button(),
+                                   event->buttons(),
+                                   Qt::NoModifier);
+
+            emit mousePress(spaceId, &mouseEvent);
+        }
+    }
+    else
+    {
+        this->spaceModel.selectSpace(modelMousePos);
+
+        QWidget *widget = this->sendMouseEvent(QEvent::MouseButtonPress,
+                                               modelMousePos,
+                                               event->button(),
+                                               event->buttons(),
+                                               Qt::NoModifier);
+
+        if (widget && widget->objectName() == "btnToggleMaximize")
+            this->spaceModel.toggleMaximizedSpace();
+        else if (widget && widget->objectName() == "btnScaleAndRotate" && event->button() == Qt::LeftButton)
+            this->scaleAndRotate = true;
+        else if (this->spaceModel.currentSelectedSpace() != "")
+            this->move = true;
+    }
 
     delete event;
 }
@@ -437,27 +480,40 @@ void SpaceManager::mouseReleaseEvent(QMouseEvent *event)
     if (!event)
         return;
 
-    if (!this->m_editMode)
-    {
-        delete event;
-
-        return;
-    }
-
     QPointF modelMousePos = this->mapViewPortToModel(event->pos(), this->m_viewPortSize);
 
-//    this->spaceModel.selectSpace(this->mapToMainSpace(event->pos(), this->m_viewPortSize));
-
-    this->sendMouseEvent(QEvent::MouseButtonRelease,
-                         modelMousePos,
-                         event->button(),
-                         event->buttons(),
-                         Qt::NoModifier);
-
-    if (event->button() == Qt::LeftButton)
+    if (!this->m_editMode)
     {
-        this->move = false;
-        this->scaleAndRotate = false;
+        QString spaceId;
+        QPointF pos = this->spaceModel.mapToLocal(modelMousePos, &spaceId);
+
+        if (spaceId != "")
+        {
+            QSizeF size = this->spaceModel.spaceSize(spaceId);
+            QPointF npos = pos + QPointF(size.width(), size.height()) / 2;
+
+            QMouseEvent mouseEvent(QEvent::MouseButtonRelease,
+                                     npos.toPoint(),
+                                     event->button(),
+                                     event->buttons(),
+                                     Qt::NoModifier);
+
+            emit mouseRelease(spaceId, &mouseEvent);
+        }
+    }
+    else
+    {
+        this->sendMouseEvent(QEvent::MouseButtonRelease,
+                             modelMousePos,
+                             event->button(),
+                             event->buttons(),
+                             Qt::NoModifier);
+
+        if (event->button() == Qt::LeftButton)
+        {
+            this->move = false;
+            this->scaleAndRotate = false;
+        }
     }
 
     delete event;

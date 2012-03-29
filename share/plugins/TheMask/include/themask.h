@@ -60,10 +60,10 @@ class TheMask: public QObject, public Plugin
         QVariant configs();
         void setConfigs(QVariant configs);
 
-        void mouseDoubleClickEvent(QMouseEvent *event);
-        void mouseMoveEvent(QMouseEvent *event);
-        void mousePressEvent(QMouseEvent *event);
-        void mouseReleaseEvent(QMouseEvent *event);
+        void mouseDoubleClickEvent(QString spaceId, QMouseEvent *event);
+        void mouseMoveEvent(QString spaceId, QMouseEvent *event);
+        void mousePressEvent(QString spaceId, QMouseEvent *event);
+        void mouseReleaseEvent(QString spaceId, QMouseEvent *event);
 
     private:
         Mask mask;

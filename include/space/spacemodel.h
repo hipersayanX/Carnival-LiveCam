@@ -47,6 +47,8 @@ class SpaceModel: public QObject
         Q_INVOKABLE void selectSpace(QPointF point);
         Q_INVOKABLE void toggleMaximizedSpace();
         Q_INVOKABLE bool isMaximized(QString spaceId);
+        Q_INVOKABLE QSizeF spaceSize(QString spaceId);
+        Q_INVOKABLE QPointF mapToLocal(QPointF point, QString *spaceId = NULL);
 
         QString currentSelectedSpace();
         QRectF rect();

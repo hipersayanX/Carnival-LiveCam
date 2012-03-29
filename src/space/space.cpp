@@ -379,17 +379,24 @@ void Space::move(QPointF pos, const QList<qreal> &hLines, const QList<qreal> &vL
     }
 }
 
-bool Space::contains(QPointF point)
+QPointF Space::mapToLocal(QPointF point)
 {
     QPointF p = point - this->m_center;
 
     qreal x = p.x() *  cos(this->m_rotation) + p.y() * sin(this->m_rotation);
     qreal y = p.x() * -sin(this->m_rotation) + p.y() * cos(this->m_rotation);
 
+    return QPointF(x, y);
+}
+
+bool Space::contains(QPointF point)
+{
+    QPointF p = this->mapToLocal(point);
+
     QRectF rect(QPointF(0, 0), this->m_scale * this->m_size);
     rect.moveCenter(QPointF(0, 0));
 
-    return rect.contains(x, y);
+    return rect.contains(p);
 }
 
 QSizeF Space::internalRectSize(QSizeF size)

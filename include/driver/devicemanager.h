@@ -52,6 +52,8 @@ class DeviceManager: public QObject
         void configure(QString deviceId);
         void setActiveDevices(QStringList value);
         void resetActiveDevices();
+        void setEffect(QString deviceId, QString pluginId);
+        void unsetEffect(QString deviceId, QString pluginId);
 
     signals:
         /*!

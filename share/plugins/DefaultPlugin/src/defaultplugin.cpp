@@ -40,7 +40,7 @@ QString DefaultPlugin::website()
 
 QString DefaultPlugin::category()
 {
-    return "Default";
+    return "OpenGL";
 }
 
 QString DefaultPlugin::id()
@@ -135,23 +135,27 @@ void DefaultPlugin::setConfigs(QVariant configs)
     Q_UNUSED(configs)
 }
 
-void DefaultPlugin::mouseDoubleClickEvent(QMouseEvent *event)
+void DefaultPlugin::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mouseMoveEvent(QMouseEvent *event)
+void DefaultPlugin::mouseMoveEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mousePressEvent(QMouseEvent *event)
+void DefaultPlugin::mousePressEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mouseReleaseEvent(QMouseEvent *event)
+void DefaultPlugin::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
 {
+    Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
