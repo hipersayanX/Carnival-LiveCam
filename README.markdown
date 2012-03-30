@@ -6,7 +6,7 @@
 
 After a long time to be developing in the background, finally present my most ambitious project [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam).
 [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can capture images from multiple sources (webcams, video files, image files), and apply various effects such as effects of rain, fire, masks, 3D effects and 2D of all kinds. And also can take pictures and record video.
-[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is still in an early stage of development, but it shows many of the features that are able to offer. Is the ideal time to join the the development.
+[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is still in an early stage of development (Alpha), but it shows many of the features that are able to offer. Is the ideal time to join the the development.
 [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is licensed under GPLv3 and hosted on [github](https://github.com/).
 
 ## Basics ##
@@ -24,25 +24,20 @@ At the bottom center of [Carnival LiveCam](https://github.com/hipersayanX/Carniv
 * Select the capture device.
 * Take a picture.
 * Record video.
-* Open the Effect Bar.
+* Open the Effects configuration dialog.
+* Enable or disable the Spaces edit mode.
 * Set the window to full screen.
 * Information about the program.
 
 ![Controls Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/controlsbar.png)
 
-On the right side of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can see the Effect Bar, here we can turn on the effects we want to apply to the video. The effects are activated or deactivated by simply clicking on the preview, the deactivated effects has a red box around, the activated has a green box. Each effect has 3 controls:
+One of the most important fetures of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is the ability to show many capture devices, modify it's position and apply several effects at same time. Is also possible to interact with some effects using a mouse or any pointer device.
 
-* __Upper right__: This control displays if the effect requires or not 3D acceleration.
-* __Bottom left__: Displays information about the effect.
-* __Bottom right__: You can configure the effect. Only available in some effects.
+![The Effect Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/spacesandplugins.png)
 
-We can also filter by the type of effect using the combobox at the top.
+The another most important fetures is the Effects selection dialog. Here you can select what effects will be applied to each capture device.
 
-![The Effect Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/cadybar.png)
-
-Inside the effect bar we also have the _Effect Stack_, here we can change the order in which each effect is applied.
-
-![The Effect Stack](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/stackbar.png)
+![The Effect Stack](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/effects.png)
 
 Here we see one of the configuration dialogs of a driver in this case the driver of images. With a simple design intended for an _point&click_ experience.
 
@@ -85,9 +80,12 @@ And finally the shell designed in QML.
 From what we have left to do:
 
 * As a high priority is the creation of the webcam drivers for Mac OS X and Windows.
-* Design a mechanism to capture and display from multiple devices simultaneously, for example, that can show 3 webcams at the same time.
 * Ideally, at the time of release the version for end users, [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) must have at least 20 effects that provide different effects that users can apply to their videos.
 It would be ideal to have more shells, such as a web interface, a plasmoid for KDE, etc..
+* Add videoconferences and live streaming capabilities (ie. using XMPP and Jingle), also, will be really nice if web servers or web developers can make use of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) to capture images from client side and processing it on server side (ie. in Apache, Nginx, Cherokee, etc.).
+* Add scripting capabilities, for instance, using Python or Qt Script to write new plugins or drivers.
+* Add configuration schemas. You can select what effects, what devices, and what shell will be loaded at startup or at any time.
+* More tablet approach, easy and intuitive. Less resources and power consumption.
 * So far [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) has no logo or artwork, or a website that identifies it. If you have ideas to share in these areas would be great if you join the development.
 * Any other idea that comes to mind.
 
