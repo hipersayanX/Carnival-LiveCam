@@ -45,9 +45,9 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
     {
         pluginDir.cd(dirext);
 
-        foreach (QString plugin, pluginDir.entryList(QDir::Files, QDir::Name))
+        foreach (QString pluginPath, pluginDir.entryList(QDir::Files, QDir::Name))
         {
-            QString fileName = pluginDir.absoluteFilePath(plugin);
+            QString fileName = pluginDir.absoluteFilePath(pluginPath);
 
             if (!QLibrary::isLibrary(fileName))
                 continue;
