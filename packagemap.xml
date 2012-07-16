@@ -38,7 +38,12 @@
     <file>
         <path>include/plugin/plugin.h</path>
         <type>c++</type>
-        <license>gpl</icense>
+        <license>mit</icense>
+    </file>
+    <file>
+        <path>include/plugin/pluginfactory.h</path>
+        <type>c++</type>
+        <license>mit</icense>
     </file>
     <file>
         <path>include/plugin/plugininfo.h</path>
