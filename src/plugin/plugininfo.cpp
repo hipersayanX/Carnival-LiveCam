@@ -39,14 +39,15 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
     this->m_name = "";
     this->m_version = "";
     this->m_summary = "";
+    this->m_type = Plugin::PluginUnknown;
     this->m_category = "";
     this->m_thumbnail = "";
     this->m_license = "";
     this->m_author = "";
     this->m_website = "";
     this->m_mail = "";
-    this->m_is3D = false;
     this->m_isConfigurable = false;
+    this->m_configs = QVariant();
     this->m_applyTo = QStringList();
 }
 
@@ -62,14 +63,15 @@ PluginInfo::PluginInfo(const PluginInfo &object):
     m_name(object.m_name),
     m_version(object.m_version),
     m_summary(object.m_summary),
+    m_type(object.m_type),
     m_category(object.m_category),
     m_thumbnail(object.m_thumbnail),
     m_license(object.m_license),
     m_author(object.m_author),
     m_website(object.m_website),
     m_mail(object.m_mail),
-    m_is3D(object.m_is3D),
     m_isConfigurable(object.m_isConfigurable),
+    m_configs(object.m_configs),
     m_applyTo(object.m_applyTo)
 {
 }
@@ -86,7 +88,6 @@ PluginInfo::PluginInfo(const PluginInfo &object):
                              QString author,
                              QString website,
                              QString mail,
-                             bool is3D,
                              bool isConfigurable)
 
   \param fileName The path from were the plugin is loaded.
@@ -100,7 +101,6 @@ PluginInfo::PluginInfo(const PluginInfo &object):
   \param author The author of the plugin.
   \param website The website where the plugin is hosted.
   \param mail The mail of the plugin author.
-  \param is3D \b true if the plugin requires 3D accelerated graphics card, \b else false.
   \param isConfigurable \b true if the plugin has a configuration dialog, \b else false.
  */
 PluginInfo::PluginInfo(QString fileName,
@@ -108,28 +108,30 @@ PluginInfo::PluginInfo(QString fileName,
                        QString name,
                        QString version,
                        QString summary,
+                       Plugin::PluginType type,
                        QString category,
                        QString thumbnail,
                        QString license,
                        QString author,
                        QString website,
                        QString mail,
-                       bool is3D,
                        bool isConfigurable,
+                       QVariant configs,
                        QStringList applyTo):
     m_fileName(fileName),
     m_pluginId(id),
     m_name(name),
     m_version(version),
     m_summary(summary),
+    m_type(type),
     m_category(category),
     m_thumbnail(thumbnail),
     m_license(license),
     m_author(author),
     m_website(website),
     m_mail(mail),
-    m_is3D(is3D),
     m_isConfigurable(isConfigurable),
+    m_configs(configs),
     m_applyTo(applyTo)
 {
 }
@@ -148,18 +150,42 @@ PluginInfo& PluginInfo::operator =(const PluginInfo &other)
         this->m_name = other.m_name;
         this->m_version = other.m_version;
         this->m_summary = other.m_summary;
+        this->m_type = other.m_type;
         this->m_category = other.m_category;
         this->m_thumbnail = other.m_thumbnail;
         this->m_license = other.m_license;
         this->m_author = other.m_author;
         this->m_website = other.m_website;
         this->m_mail = other.m_mail;
-        this->m_is3D = other.m_is3D;
         this->m_isConfigurable = other.m_isConfigurable;
+        this->m_configs = other.m_configs;
         this->m_applyTo = other.m_applyTo;
     }
 
     return *this;
+}
+
+QMap<QString, QVariant> PluginInfo::toMap()
+{
+    QMap<QString, QVariant> map;
+
+    map["fileName"] = QVariant(this->m_fileName);
+    map["pluginId"] = QVariant(this->m_pluginId);
+    map["name"] = QVariant(this->m_name);
+    map["version"] = QVariant(this->m_version);
+    map["summary"] = QVariant(this->m_summary);
+    map["type"] = QVariant(this->m_type);
+    map["category"] = QVariant(this->m_category);
+    map["thumbnail"] = QVariant(this->m_thumbnail);
+    map["license"] = QVariant(this->m_license);
+    map["author"] = QVariant(this->m_author);
+    map["website"] = QVariant(this->m_website);
+    map["mail"] = QVariant(this->m_mail);
+    map["isConfigurable"] = QVariant(this->m_isConfigurable);
+    map["configs"] = QVariant(this->m_configs);
+    map["applyTo"] = QVariant(this->m_applyTo);
+
+    return map;
 }
 
 /*!
@@ -210,6 +236,11 @@ QString PluginInfo::version()
 QString PluginInfo::summary()
 {
     return this->m_summary;
+}
+
+Plugin::PluginType PluginInfo::type()
+{
+    return this->m_type;
 }
 
 /*!
@@ -273,16 +304,6 @@ QString PluginInfo::mail()
 }
 
 /*!
-  \property PluginInfo::is3D
-
-  \brief \b true if the plugin requires 3D accelerated graphics card, \b else false.
- */
-bool PluginInfo::is3D()
-{
-    return this->m_is3D;
-}
-
-/*!
   \property PluginInfo::isConfigurable
 
   \brief \b true if the plugin has a configuration dialog, \b else false.
@@ -290,6 +311,11 @@ bool PluginInfo::is3D()
 bool PluginInfo::isConfigurable()
 {
     return this->m_isConfigurable;
+}
+
+QVariant PluginInfo::configs()
+{
+    return this->m_configs;
 }
 
 QStringList PluginInfo::applyTo()
@@ -304,9 +330,9 @@ QStringList PluginInfo::applyTo()
 
   \brief Set the plugin file name.
  */
-void PluginInfo::setFileName(QString value)
+void PluginInfo::setFileName(QString fileName)
 {
-    this->m_fileName = value;
+    this->m_fileName = fileName;
 }
 
 /*!
@@ -316,9 +342,9 @@ void PluginInfo::setFileName(QString value)
 
   \brief Set the unique plugin identifier.
  */
-void PluginInfo::setPluginId(QString value)
+void PluginInfo::setPluginId(QString pluginId)
 {
-    this->m_pluginId = value;
+    this->m_pluginId = pluginId;
 }
 
 /*!
@@ -328,9 +354,9 @@ void PluginInfo::setPluginId(QString value)
 
   \brief Set the human readable plugin name.
  */
-void PluginInfo::setName(QString value)
+void PluginInfo::setName(QString name)
 {
-    this->m_name = value;
+    this->m_name = name;
 }
 
 /*!
@@ -340,9 +366,9 @@ void PluginInfo::setName(QString value)
 
   \brief Set the version of the plugin.
  */
-void PluginInfo::setVersion(QString value)
+void PluginInfo::setVersion(QString version)
 {
-    this->m_version = value;
+    this->m_version = version;
 }
 
 /*!
@@ -352,9 +378,14 @@ void PluginInfo::setVersion(QString value)
 
   \brief Set the description of the plugin.
  */
-void PluginInfo::setSummary(QString value)
+void PluginInfo::setSummary(QString summary)
 {
-    this->m_summary = value;
+    this->m_summary = summary;
+}
+
+void PluginInfo::setType(Plugin::PluginType type)
+{
+    this->m_type = type;
 }
 
 /*!
@@ -364,9 +395,9 @@ void PluginInfo::setSummary(QString value)
 
   \brief The category of the plugin.
  */
-void PluginInfo::setCategory(QString value)
+void PluginInfo::setCategory(QString category)
 {
-    this->m_category = value;
+    this->m_category = category;
 }
 
 /*!
@@ -376,9 +407,9 @@ void PluginInfo::setCategory(QString value)
 
   \brief Set the thumbnail of the plugin.
  */
-void PluginInfo::setThumbnail(QString value)
+void PluginInfo::setThumbnail(QString thumbnail)
 {
-    this->m_thumbnail = value;
+    this->m_thumbnail = thumbnail;
 }
 
 /*!
@@ -388,9 +419,9 @@ void PluginInfo::setThumbnail(QString value)
 
   \brief Set the lisence of the plugin.
  */
-void PluginInfo::setLicense(QString value)
+void PluginInfo::setLicense(QString license)
 {
-    this->m_license = value;
+    this->m_license = license;
 }
 
 /*!
@@ -400,9 +431,9 @@ void PluginInfo::setLicense(QString value)
 
   \brief Set the author of the plugin.
  */
-void PluginInfo::setAuthor(QString value)
+void PluginInfo::setAuthor(QString author)
 {
-    this->m_author = value;
+    this->m_author = author;
 }
 
 /*!
@@ -412,9 +443,9 @@ void PluginInfo::setAuthor(QString value)
 
   \brief Set the website of the plugin.
  */
-void PluginInfo::setWebsite(QString value)
+void PluginInfo::setWebsite(QString website)
 {
-    this->m_website = value;
+    this->m_website = website;
 }
 
 /*!
@@ -424,21 +455,9 @@ void PluginInfo::setWebsite(QString value)
 
   \brief Set the mail of the plugin author.
  */
-void PluginInfo::setMail(QString value)
+void PluginInfo::setMail(QString mail)
 {
-    this->m_mail = value;
-}
-
-/*!
-  \fn void PluginInfo::setIs3D(bool value)
-
-  \param value \b true if requires 3D accelerated graphics card, else \b false.
-
-  \brief Set if the plugin requires 3D accelerated graphics card.
- */
-void PluginInfo::setIs3D(bool value)
-{
-    this->m_is3D = value;
+    this->m_mail = mail;
 }
 
 /*!
@@ -448,14 +467,19 @@ void PluginInfo::setIs3D(bool value)
 
   \brief Set if plugin is configurable.
  */
-void PluginInfo::setIsConfigurable(bool value)
+void PluginInfo::setIsConfigurable(bool isConfigurable)
 {
-    this->m_isConfigurable = value;
+    this->m_isConfigurable = isConfigurable;
 }
 
-void PluginInfo::setApplyTo(QStringList value)
+void PluginInfo::setConfigs(const QVariant &configs)
 {
-    this->m_applyTo = value;
+    this->m_configs = configs;
+}
+
+void PluginInfo::setApplyTo(QStringList applyTo)
+{
+    this->m_applyTo = applyTo;
 }
 
 /*!
@@ -506,6 +530,11 @@ void PluginInfo::resetVersion()
 void PluginInfo::resetSummary()
 {
     this->m_summary = "";
+}
+
+void PluginInfo::resetType()
+{
+    this->m_type = Plugin::PluginUnknown;
 }
 
 /*!
@@ -569,16 +598,6 @@ void PluginInfo::resetMail()
 }
 
 /*!
-  \fn void PluginInfo::resetIs3D()
-
-  \brief Reset PluginInfo::is3D to \b false.
- */
-void PluginInfo::resetIs3D()
-{
-    this->m_is3D = false;
-}
-
-/*!
   \fn void PluginInfo::resetIsConfigurable()
 
   \brief Reset PluginInfo::isConfigurable to \b false.
@@ -586,6 +605,11 @@ void PluginInfo::resetIs3D()
 void PluginInfo::resetIsConfigurable()
 {
     this->m_isConfigurable = false;
+}
+
+void PluginInfo::resetConfigs()
+{
+    this->m_configs = QVariant();
 }
 
 void PluginInfo::resetApplyTo()

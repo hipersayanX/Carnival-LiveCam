@@ -20,8 +20,7 @@
 #ifndef PLUGININFO_H
 #define PLUGININFO_H
 
-#include <QObject>
-#include <QStringList>
+#include "plugin.h"
 
 class PluginInfo: public QObject
 {
@@ -32,14 +31,15 @@ class PluginInfo: public QObject
     Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
     Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
     Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
+    Q_PROPERTY(Plugin::PluginType type READ type WRITE setType RESET resetType)
     Q_PROPERTY(QString category READ category WRITE setCategory RESET resetCategory)
     Q_PROPERTY(QString thumbnail READ thumbnail WRITE setThumbnail RESET resetThumbnail)
     Q_PROPERTY(QString license READ license WRITE setLicense RESET resetLicense)
     Q_PROPERTY(QString author READ author WRITE setAuthor RESET resetAuthor)
     Q_PROPERTY(QString website READ website WRITE setWebsite RESET resetWebsite)
     Q_PROPERTY(QString mail READ mail WRITE setMail RESET resetMail)
-    Q_PROPERTY(bool is3D READ is3D WRITE setIs3D RESET resetIs3D)
     Q_PROPERTY(bool isConfigurable READ isConfigurable WRITE setIsConfigurable RESET resetIsConfigurable)
+    Q_PROPERTY(QVariant configs READ configs WRITE setConfigs RESET resetConfigs)
     Q_PROPERTY(QStringList applyTo READ applyTo WRITE setApplyTo RESET resetApplyTo)
 
     public:
@@ -51,31 +51,35 @@ class PluginInfo: public QObject
                    QString name,
                    QString version,
                    QString summary,
+                   Plugin::PluginType type,
                    QString category,
                    QString thumbnail,
                    QString license,
                    QString author,
                    QString website,
                    QString mail,
-                   bool is3D,
                    bool isConfigurable,
+                   const QVariant &configs,
                    QStringList applyTo);
 
         PluginInfo& operator =(const PluginInfo &other);
+
+        Q_INVOKABLE QMap<QString, QVariant> toMap();
 
         QString fileName();
         QString pluginId();
         QString name();
         QString version();
         QString summary();
+        Plugin::PluginType type();
         QString category();
         QString thumbnail();
         QString license();
         QString author();
         QString website();
         QString mail();
-        bool is3D();
         bool isConfigurable();
+        QVariant configs();
         QStringList applyTo();
 
     private:
@@ -84,44 +88,47 @@ class PluginInfo: public QObject
         QString m_name;
         QString m_version;
         QString m_summary;
+        Plugin::PluginType m_type;
         QString m_category;
         QString m_thumbnail;
         QString m_license;
         QString m_author;
         QString m_website;
         QString m_mail;
-        bool m_is3D;
         bool m_isConfigurable;
+        QVariant m_configs;
         QStringList m_applyTo;
 
     public slots:
-        void setFileName(QString value);
-        void setPluginId(QString value);
-        void setName(QString value);
-        void setVersion(QString value);
-        void setSummary(QString value);
-        void setCategory(QString value);
-        void setThumbnail(QString value);
-        void setLicense(QString value);
-        void setAuthor(QString value);
-        void setWebsite(QString value);
-        void setMail(QString value);
-        void setIs3D(bool value);
-        void setIsConfigurable(bool value);
-        void setApplyTo(QStringList value);
+        void setFileName(QString fileName);
+        void setPluginId(QString pluginId);
+        void setName(QString name);
+        void setVersion(QString version);
+        void setSummary(QString summary);
+        void setType(Plugin::PluginType type);
+        void setCategory(QString category);
+        void setThumbnail(QString thumbnail);
+        void setLicense(QString license);
+        void setAuthor(QString author);
+        void setWebsite(QString website);
+        void setMail(QString mail);
+        void setIsConfigurable(bool isConfigurable);
+        void setConfigs(const QVariant &configs);
+        void setApplyTo(QStringList applyTo);
         void resetFileName();
         void resetPluginId();
         void resetName();
         void resetVersion();
         void resetSummary();
+        void resetType();
         void resetCategory();
         void resetThumbnail();
         void resetLicense();
         void resetAuthor();
         void resetWebsite();
         void resetMail();
-        void resetIs3D();
         void resetIsConfigurable();
+        void resetConfigs();
         void resetApplyTo();
 };
 

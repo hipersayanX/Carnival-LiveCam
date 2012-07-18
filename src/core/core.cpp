@@ -60,7 +60,7 @@ Core::Core(QObject *parent): QObject(parent)
     this->shellManager.widget()->show();
 
     this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
-    this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
+    this->shellManager.updatePlugins(this->pluginManager.toList());
 
     connect(&this->shellManager, SIGNAL(deviceEnable(QString)), this, SLOT(deviceEnable(QString)));
     connect(&this->shellManager, SIGNAL(deviceDisable(QString)), this, SLOT(deviceDisable(QString)));
@@ -117,7 +117,7 @@ void Core::deviceEnable(QString deviceId)
     this->deviceManager.deviceEnable(deviceId);
     this->spaceManager.setSpace(deviceId, QImage());
     this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
-    this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
+    this->shellManager.updatePlugins(this->pluginManager.toList());
 }
 
 void Core::deviceDisable(QString deviceId)
@@ -126,7 +126,7 @@ void Core::deviceDisable(QString deviceId)
     this->deviceManager.deviceDisable(deviceId);
     this->spaceManager.removeSpace(deviceId);
     this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
-    this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
+    this->shellManager.updatePlugins(this->pluginManager.toList());
 }
 
 /*!
@@ -165,7 +165,7 @@ void Core::setEffect(QString pluginId, QString spaceId)
     {
         this->deviceManager.setEffect(spaceId, pluginId);
         this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
-        this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
+        this->shellManager.updatePlugins(this->pluginManager.toList());
     }
 }
 
@@ -175,6 +175,6 @@ void Core::unsetEffect(QString pluginId, QString spaceId)
     {
         this->deviceManager.unsetEffect(spaceId, pluginId);
         this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
-        this->shellManager.updatePlugins(this->pluginManager.pluginsInfoList());
+        this->shellManager.updatePlugins(this->pluginManager.toList());
     }
 }

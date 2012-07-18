@@ -17,11 +17,6 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include <QStringList>
-#include <QLibrary>
-#include <QDir>
-#include <QDebug>
-
 #include "../../include/plugin/pluginmanager.h"
 
 /*!
@@ -50,16 +45,16 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
             if (!QLibrary::isLibrary(fileName))
                 continue;
 
-            this->pluginLoader.setFileName(fileName);
+            this->m_pluginLoader.setFileName(fileName);
 
-            if (!this->pluginLoader.load())
+            if (!this->m_pluginLoader.load())
             {
-                qDebug() << this->pluginLoader.errorString();
+                qDebug() << this->m_pluginLoader.errorString();
 
                 continue;
             }
 
-            QObject *pluginInstance = this->pluginLoader.instance();
+            QObject *pluginInstance = this->m_pluginLoader.instance();
 
             if (!pluginInstance)
                 continue;
@@ -71,10 +66,10 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
 
             qDebug() << "Loading: " << fileName;
 
-            if (this->pluginConfigs.contains(plugin->id()))
-                plugin->setConfigs(this->pluginConfigs[plugin->id()]);
+            if (this->m_pluginConfigs.contains(plugin->id()))
+                plugin->setConfigs(this->m_pluginConfigs[plugin->id()]);
 
-            this->pluginsInfo[plugin->id()] = PluginInfo(fileName,
+            this->m_pluginsInfo[plugin->id()] = PluginInfo(fileName,
                                                    plugin->id(),
                                                    plugin->name(),
                                                    plugin->version(),
@@ -89,7 +84,7 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
                                                    plugin->isConfigurable(),
                                                    QStringList());
 
-            this->pluginLoader.unload();
+            this->m_pluginLoader.unload();
         }
 
         pluginDir.cdUp();
@@ -103,11 +98,11 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
 
   \brief Returns the list of plugins information in standard format.
  */
-QList<QVariant> PluginManager::pluginsInfoList()
+QList<QVariant> PluginManager::toList()
 {
     QList<QVariant> pluginList;
 
-    foreach (PluginInfo plugin, this->pluginsInfo)
+    foreach (PluginInfo plugin, this->m_pluginsInfo)
     {
         QMap<QString, QVariant> pluginInfoMap;
 
@@ -133,7 +128,7 @@ QList<QVariant> PluginManager::pluginsInfoList()
 
 Plugin *PluginManager::plugin(QString pluginId)
 {
-    foreach (Plugin *pluginPtr, this->activePlugins)
+    foreach (Plugin *pluginPtr, this->m_activePlugins)
         if (pluginPtr->id() == pluginId)
             return pluginPtr;
 
@@ -144,13 +139,13 @@ bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize
 {
     Plugin *plugin;
 
-    if (!this->pluginsInfo[pluginId].applyTo().isEmpty())
+    if (!this->m_pluginsInfo[pluginId].applyTo().isEmpty())
         plugin = this->plugin(pluginId);
     else
     {
-        this->pluginLoader.setFileName(pluginsInfo[pluginId].fileName());
+        this->m_pluginLoader.setFileName(m_pluginsInfo[pluginId].fileName());
 
-        QObject *pluginInstance = this->pluginLoader.instance();
+        QObject *pluginInstance = this->m_pluginLoader.instance();
 
         if (!pluginInstance)
             return false;
@@ -160,32 +155,32 @@ bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize
         if (!plugin)
             return false;
 
-        this->activePlugins << plugin;
+        this->m_activePlugins << plugin;
 
-        if (this->pluginConfigs.contains(pluginId))
-            plugin->setConfigs(this->pluginConfigs[pluginId]);
+        if (this->m_pluginConfigs.contains(pluginId))
+            plugin->setConfigs(this->m_pluginConfigs[pluginId]);
 
         plugin->begin();
     }
 
     plugin->addSpace(spaceId, frameSize);
 
-    if (this->devices.contains(spaceId))
-        this->devices[spaceId] << pluginId;
+    if (this->m_plugins.contains(spaceId))
+        this->m_plugins[spaceId] << pluginId;
     else
     {
         QStringList devicesList;
 
         devicesList << pluginId;
-        this->devices[spaceId] = devicesList;
+        this->m_plugins[spaceId] = devicesList;
     }
 
-    QStringList applyToList = this->pluginsInfo[pluginId].applyTo();
+    QStringList applyToList = this->m_pluginsInfo[pluginId].applyTo();
 
     if (!applyToList.contains(spaceId))
     {
         applyToList << spaceId;
-        this->pluginsInfo[pluginId].setApplyTo(applyToList);
+        this->m_pluginsInfo[pluginId].setApplyTo(applyToList);
     }
 
     return true;
@@ -193,7 +188,7 @@ bool PluginManager::setEffect(QString pluginId, QString spaceId, QSize frameSize
 
 bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
 {
-    if (this->pluginsInfo[pluginId].applyTo().isEmpty())
+    if (this->m_pluginsInfo[pluginId].applyTo().isEmpty())
         return false;
 
     Plugin *plugin = this->plugin(pluginId);
@@ -201,31 +196,31 @@ bool PluginManager::unsetEffect(QString pluginId, QString spaceId)
     if (!plugin)
         return false;
 
-    if (this->devices.contains(spaceId))
+    if (this->m_plugins.contains(spaceId))
     {
-        this->devices[spaceId].removeOne(pluginId);
+        this->m_plugins[spaceId].removeOne(pluginId);
 
-        if (this->devices[spaceId].isEmpty())
-            this->devices.remove(spaceId);
+        if (this->m_plugins[spaceId].isEmpty())
+            this->m_plugins.remove(spaceId);
     }
 
     plugin->removeSpace(spaceId);
 
-    QStringList applyToList = this->pluginsInfo[pluginId].applyTo();
+    QStringList applyToList = this->m_pluginsInfo[pluginId].applyTo();
 
     if (applyToList.contains(spaceId))
     {
         applyToList.removeOne(spaceId);
-        this->pluginsInfo[pluginId].setApplyTo(applyToList);
+        this->m_pluginsInfo[pluginId].setApplyTo(applyToList);
     }
 
-    if (this->pluginsInfo[pluginId].applyTo().isEmpty())
+    if (this->m_pluginsInfo[pluginId].applyTo().isEmpty())
     {
-        this->pluginConfigs[pluginId] = plugin->configs();
+        this->m_pluginConfigs[pluginId] = plugin->configs();
         plugin->end();
-        this->activePlugins.removeOne(plugin);
-        this->pluginLoader.setFileName(this->pluginsInfo[pluginId].fileName());
-        this->pluginLoader.unload();
+        this->m_activePlugins.removeOne(plugin);
+        this->m_pluginLoader.setFileName(this->m_pluginsInfo[pluginId].fileName());
+        this->m_pluginLoader.unload();
     }
 
     return true;
@@ -235,8 +230,8 @@ void PluginManager::unsetEffects(QString spaceId)
 {
     QStringList activePlugins;
 
-    foreach (Plugin *plugin, this->activePlugins)
-        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+    foreach (Plugin *plugin, this->m_activePlugins)
+        if (this->m_pluginsInfo[plugin->id()].applyTo().contains(spaceId))
             activePlugins << plugin->id();
 
     foreach (QString pluginId, activePlugins)
@@ -270,35 +265,35 @@ void PluginManager::configurePlugin(QString pluginId)
  */
 void PluginManager::movePlugin(QString spaceId, qint32 from, qint32 to)
 {
-    if (this->devices.contains(spaceId))
-        this->devices[spaceId].move(from, to);
+    if (this->m_plugins.contains(spaceId))
+        this->m_plugins[spaceId].move(from, to);
 }
 
 void PluginManager::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
 {
-    foreach (Plugin *plugin, this->activePlugins)
-        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+    foreach (Plugin *plugin, this->m_activePlugins)
+        if (this->m_pluginsInfo[plugin->id()].applyTo().contains(spaceId))
             plugin->mouseDoubleClickEvent(spaceId, event);
 }
 
 void PluginManager::mouseMoveEvent(QString spaceId, QMouseEvent *event)
 {
-    foreach (Plugin *plugin, this->activePlugins)
-        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+    foreach (Plugin *plugin, this->m_activePlugins)
+        if (this->m_pluginsInfo[plugin->id()].applyTo().contains(spaceId))
             plugin->mouseMoveEvent(spaceId, event);
 }
 
 void PluginManager::mousePressEvent(QString spaceId, QMouseEvent *event)
 {
-    foreach (Plugin *plugin, this->activePlugins)
-        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+    foreach (Plugin *plugin, this->m_activePlugins)
+        if (this->m_pluginsInfo[plugin->id()].applyTo().contains(spaceId))
             plugin->mousePressEvent(spaceId, event);
 }
 
 void PluginManager::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
 {
-    foreach (Plugin *plugin, this->activePlugins)
-        if (this->pluginsInfo[plugin->id()].applyTo().contains(spaceId))
+    foreach (Plugin *plugin, this->m_activePlugins)
+        if (this->m_pluginsInfo[plugin->id()].applyTo().contains(spaceId))
             plugin->mouseReleaseEvent(spaceId, event);
 }
 
@@ -315,10 +310,10 @@ QImage PluginManager::render(QString deviceId, const QImage &image)
 {
     QImage frame = image;
 
-    if (!this->devices.contains(deviceId))
+    if (!this->m_plugins.contains(deviceId))
         return frame;
 
-    foreach (QString pluginId, this->devices[deviceId])
+    foreach (QString pluginId, this->m_plugins[deviceId])
     {
         Plugin *plugin = this->plugin(pluginId);
 

@@ -25,7 +25,7 @@
 #include "plugin.h"
 #include "qosgwidget.h"
 
-class DefaultPlugin: public QObject, public Plugin
+class TheCow: public QObject, public Plugin
 {
     Q_OBJECT
     Q_INTERFACES(Plugin)

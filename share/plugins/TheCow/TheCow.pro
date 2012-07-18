@@ -25,7 +25,7 @@ DESTDIR += $$PWD
 
 HEADERS += \
     include/plugin.h \
-    include/defaultplugin.h \
+    include/thecow.h \
     include/qosgwidget.h
 
 unix {
@@ -42,7 +42,7 @@ QT += core gui opengl
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/defaultplugin.cpp \
+    src/thecow.cpp \
     src/qosgwidget.cpp
 
 TEMPLATE = lib

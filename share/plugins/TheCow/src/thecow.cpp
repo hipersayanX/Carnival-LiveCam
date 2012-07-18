@@ -17,85 +17,85 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/defaultplugin.h"
+#include "../include/thecow.h"
 
-QString DefaultPlugin::author()
+QString TheCow::author()
 {
     return "hipersayan_x";
 }
 
-QString DefaultPlugin::mail()
+QString TheCow::mail()
 {
     return "hipersayan.x@gmail.com";
 }
 
-QString DefaultPlugin::website()
+QString TheCow::website()
 {
     return "hipersayanx.blogspot.com";
 }
 
-QString DefaultPlugin::category()
+QString TheCow::category()
 {
     return "OpenGL";
 }
 
-QString DefaultPlugin::id()
+QString TheCow::id()
 {
-    return "videoplugin.DefaultPlugin";
+    return "videoplugin.TheCow";
 }
 
-QString DefaultPlugin::license()
+QString TheCow::license()
 {
     return "GPLv3";
 }
 
-QString DefaultPlugin::name()
+QString TheCow::name()
 {
-    return "DefaultPlugin";
+    return "The Cow";
 }
 
-QString DefaultPlugin::summary()
+QString TheCow::summary()
 {
-    return "Default video plugin";
+    return "This plugin shows a cow 3D model";
 }
 
-QString DefaultPlugin::thumbnail()
+QString TheCow::thumbnail()
 {
     return "../../../../../share/plugins/DefaultPlugin/share/thumbnail-128x96.png";
 }
 
-bool DefaultPlugin::is3D()
+bool TheCow::is3D()
 {
     return true;
 }
 
-QString DefaultPlugin::version()
+QString TheCow::version()
 {
     return "1.0.0";
 }
 
-bool DefaultPlugin::isConfigurable()
+bool TheCow::isConfigurable()
 {
     return false;
 }
 
-void DefaultPlugin::begin()
+void TheCow::begin()
 {
 }
 
-void DefaultPlugin::addSpace(QString spaceId, QSize frameSize)
+void TheCow::addSpace(QString spaceId, QSize frameSize)
 {
     this->glWidget[spaceId] = new QOSGWidget();
     this->glWidget[spaceId]->resize(frameSize);
 }
 
-void DefaultPlugin::removeSpace(QString spaceId)
+void TheCow::removeSpace(QString spaceId)
 {
     delete this->glWidget[spaceId];
     this->glWidget.remove(spaceId);
 }
 
-QImage DefaultPlugin::render(QString spaceId, const QImage &image)
+QImage TheCow::render(QString spaceId, const QImage &image)
 {
     if (this->glWidget.contains(spaceId))
     {
@@ -109,7 +109,7 @@ QImage DefaultPlugin::render(QString spaceId, const QImage &image)
     return image;
 }
 
-void DefaultPlugin::end()
+void TheCow::end()
 {
     QStringList spaces = this->glWidget.keys();
 
@@ -117,42 +117,42 @@ void DefaultPlugin::end()
         this->removeSpace(spaceId);
 }
 
-void DefaultPlugin::configure()
+void TheCow::configure()
 {
 }
 
-QVariant DefaultPlugin::configs()
+QVariant TheCow::configs()
 {
     return QVariant();
 }
 
-void DefaultPlugin::setConfigs(QVariant configs)
+void TheCow::setConfigs(QVariant configs)
 {
     Q_UNUSED(configs)
 }
 
-void DefaultPlugin::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
+void TheCow::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
 {
     Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mouseMoveEvent(QString spaceId, QMouseEvent *event)
+void TheCow::mouseMoveEvent(QString spaceId, QMouseEvent *event)
 {
     Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mousePressEvent(QString spaceId, QMouseEvent *event)
+void TheCow::mousePressEvent(QString spaceId, QMouseEvent *event)
 {
     Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-void DefaultPlugin::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
+void TheCow::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
 {
     Q_UNUSED(spaceId)
     Q_UNUSED(event)
 }
 
-Q_EXPORT_PLUGIN2(DefaultPlugin, DefaultPlugin)
+Q_EXPORT_PLUGIN2(TheCow, TheCow)
