@@ -31,7 +31,7 @@
 class PluginFactory
 {
     public:
-        virtual Plugin *driver() = 0;
+        virtual Plugin *plugin() = 0;
 };
 
 Q_DECLARE_INTERFACE(PluginFactory, "plugin.PluginFactoryInterface")

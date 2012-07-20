@@ -48,7 +48,6 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
     this->m_mail = "";
     this->m_isConfigurable = false;
     this->m_configs = QVariant();
-    this->m_applyTo = QStringList();
 }
 
 /*!
@@ -71,8 +70,7 @@ PluginInfo::PluginInfo(const PluginInfo &object):
     m_website(object.m_website),
     m_mail(object.m_mail),
     m_isConfigurable(object.m_isConfigurable),
-    m_configs(object.m_configs),
-    m_applyTo(object.m_applyTo)
+    m_configs(object.m_configs)
 {
 }
 
@@ -116,8 +114,7 @@ PluginInfo::PluginInfo(QString fileName,
                        QString website,
                        QString mail,
                        bool isConfigurable,
-                       QVariant configs,
-                       QStringList applyTo):
+                       QVariant configs):
     m_fileName(fileName),
     m_pluginId(id),
     m_name(name),
@@ -131,8 +128,7 @@ PluginInfo::PluginInfo(QString fileName,
     m_website(website),
     m_mail(mail),
     m_isConfigurable(isConfigurable),
-    m_configs(configs),
-    m_applyTo(applyTo)
+    m_configs(configs)
 {
 }
 
@@ -159,7 +155,6 @@ PluginInfo& PluginInfo::operator =(const PluginInfo &other)
         this->m_mail = other.m_mail;
         this->m_isConfigurable = other.m_isConfigurable;
         this->m_configs = other.m_configs;
-        this->m_applyTo = other.m_applyTo;
     }
 
     return *this;
@@ -183,7 +178,6 @@ QMap<QString, QVariant> PluginInfo::toMap()
     map["mail"] = QVariant(this->m_mail);
     map["isConfigurable"] = QVariant(this->m_isConfigurable);
     map["configs"] = QVariant(this->m_configs);
-    map["applyTo"] = QVariant(this->m_applyTo);
 
     return map;
 }
@@ -316,11 +310,6 @@ bool PluginInfo::isConfigurable()
 QVariant PluginInfo::configs()
 {
     return this->m_configs;
-}
-
-QStringList PluginInfo::applyTo()
-{
-    return this->m_applyTo;
 }
 
 /*!
@@ -477,11 +466,6 @@ void PluginInfo::setConfigs(const QVariant &configs)
     this->m_configs = configs;
 }
 
-void PluginInfo::setApplyTo(QStringList applyTo)
-{
-    this->m_applyTo = applyTo;
-}
-
 /*!
   \fn void PluginInfo::resetFileName()
 
@@ -610,9 +594,4 @@ void PluginInfo::resetIsConfigurable()
 void PluginInfo::resetConfigs()
 {
     this->m_configs = QVariant();
-}
-
-void PluginInfo::resetApplyTo()
-{
-    this->m_applyTo = QStringList();
 }

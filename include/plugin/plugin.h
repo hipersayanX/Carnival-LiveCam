@@ -26,6 +26,7 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
+#include <QtGui>
 #include <QtPlugin>
 
 /// Plugin template.
@@ -57,8 +58,6 @@ class Plugin: public QObject
             PluginVideoEffect,
             PluginStream
         } PluginType;
-
-        // Common methods.
 
         /// Returns the unique plugin identifier.
         ///
@@ -127,9 +126,11 @@ class Plugin: public QObject
         /// \return Plugin configurations.
         virtual QVariant configs() = 0;
 
-    public slots:
-        // Common methods.
+    signals:
+        void setPipeline(QString pipeline);
+        void sendFrame(const QImage &frame);
 
+    public slots:
         /// This function is called after Plugin::setConfigs().
         /// This method executes the initialization code for the plugin.
         virtual void begin() = 0;
@@ -149,7 +150,7 @@ class Plugin: public QObject
 
         virtual void resetConfigs() = 0;
 
-        virtual void setPluginManager(QObject *pluginManager);
+        void recvFrame(const QImage &frame);
 };
 
 #endif // PLUGIN_H

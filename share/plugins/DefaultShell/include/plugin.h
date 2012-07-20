@@ -26,6 +26,7 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
+#include <QtGui>
 #include <QtPlugin>
 
 /// Plugin template.

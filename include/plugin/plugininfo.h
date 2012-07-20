@@ -40,7 +40,6 @@ class PluginInfo: public QObject
     Q_PROPERTY(QString mail READ mail WRITE setMail RESET resetMail)
     Q_PROPERTY(bool isConfigurable READ isConfigurable WRITE setIsConfigurable RESET resetIsConfigurable)
     Q_PROPERTY(QVariant configs READ configs WRITE setConfigs RESET resetConfigs)
-    Q_PROPERTY(QStringList applyTo READ applyTo WRITE setApplyTo RESET resetApplyTo)
 
     public:
         explicit PluginInfo(QObject *parent = 0);
@@ -59,8 +58,7 @@ class PluginInfo: public QObject
                    QString website,
                    QString mail,
                    bool isConfigurable,
-                   const QVariant &configs,
-                   QStringList applyTo);
+                   const QVariant &configs);
 
         PluginInfo& operator =(const PluginInfo &other);
 
@@ -80,7 +78,6 @@ class PluginInfo: public QObject
         QString mail();
         bool isConfigurable();
         QVariant configs();
-        QStringList applyTo();
 
     private:
         QString m_fileName;
@@ -97,7 +94,6 @@ class PluginInfo: public QObject
         QString m_mail;
         bool m_isConfigurable;
         QVariant m_configs;
-        QStringList m_applyTo;
 
     public slots:
         void setFileName(QString fileName);
@@ -114,7 +110,6 @@ class PluginInfo: public QObject
         void setMail(QString mail);
         void setIsConfigurable(bool isConfigurable);
         void setConfigs(const QVariant &configs);
-        void setApplyTo(QStringList applyTo);
         void resetFileName();
         void resetPluginId();
         void resetName();
@@ -129,7 +124,6 @@ class PluginInfo: public QObject
         void resetMail();
         void resetIsConfigurable();
         void resetConfigs();
-        void resetApplyTo();
 };
 
 #endif // PLUGININFO_H
