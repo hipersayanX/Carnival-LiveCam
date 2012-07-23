@@ -42,6 +42,11 @@ class PluginManager: public QObject
         bool load(QString pluginId);
         bool unload(QString pluginId);
 
+        void parsePipeline(QString pipeline,
+                           QMap<QString, QVariant> &instances,
+                           QList<QStringList> &connections,
+                           QList<QStringList> &ss);
+
     public slots:
         void setPipeline(QString pipeline);
 };

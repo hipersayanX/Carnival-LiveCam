@@ -92,7 +92,7 @@ class Plugin: public QObject
         /// Returns the thumbnail of the plugin.
         ///
         /// \return thumbnail of the plugin.
-        virtual QImage thumbnail() = 0;
+        virtual QString thumbnail() = 0;
 
         /// Returns the license of the plugin.
         ///

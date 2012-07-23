@@ -102,7 +102,7 @@ PluginInfo::PluginInfo(const PluginInfo &object):
   \param isConfigurable \b true if the plugin has a configuration dialog, \b else false.
  */
 PluginInfo::PluginInfo(QString fileName,
-                       QString id,
+                       QString pluginId,
                        QString name,
                        QString version,
                        QString summary,
@@ -114,9 +114,9 @@ PluginInfo::PluginInfo(QString fileName,
                        QString website,
                        QString mail,
                        bool isConfigurable,
-                       QVariant configs):
+                       const QVariant &configs):
     m_fileName(fileName),
-    m_pluginId(id),
+    m_pluginId(pluginId),
     m_name(name),
     m_version(version),
     m_summary(summary),
