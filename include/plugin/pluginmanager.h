@@ -43,9 +43,17 @@ class PluginManager: public QObject
         bool unload(QString pluginId);
 
         void parsePipeline(QString pipeline,
-                           QMap<QString, QVariant> &instances,
-                           QList<QStringList> &connections,
-                           QList<QStringList> &ss);
+                           QMap<QString, QVariant> *instances = NULL,
+                           QList<QStringList> *connections = NULL,
+                           QList<QStringList> *ss = NULL);
+
+        int indexOfSubSequence(QStringList l, QStringList sub);
+        QList<QStringList> sequences(QList<QStringList> connections);
+        QStringList lcs(QStringList a, QStringList b);
+        void alignSequences(QStringList sequence1,
+                            QStringList sequence2,
+                            QStringList *aSequence1 = NULL,
+                            QStringList *aSequence2 = NULL);
 
     public slots:
         void setPipeline(QString pipeline);

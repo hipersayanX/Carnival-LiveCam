@@ -171,13 +171,18 @@ bool PluginManager::unload(QString pluginId)
 }
 
 void PluginManager::parsePipeline(QString pipeline,
-                                  QMap<QString, QVariant> &instances,
-                                  QList<QStringList> &connections,
-                                  QList<QStringList> &ss)
+                                  QMap<QString, QVariant> *instances,
+                                  QList<QStringList> *connections,
+                                  QList<QStringList> *ss)
 {
-    instances.clear();
-    connections.clear();
-    ss.clear();
+    if (instances)
+        instances->clear();
+
+    if (connections)
+        connections->clear();
+
+    if (ss)
+        ss->clear();
 
     QStringList r = pipeline.split(QRegExp("[0-9a-zA-Z.<>=]+=[\"'][^\r^\n]+[\"']|!{1}|[0-9a-zA-Z.<>=]+"),
                                    QString::SkipEmptyParts);
@@ -232,7 +237,8 @@ void PluginManager::parsePipeline(QString pipeline,
                 slot = s1;
             }
 
-            ss << (QStringList() << sender << signal << receiver << slot);
+            if (ss)
+                *ss << (QStringList() << sender << signal << receiver << slot);
         }
         else if (p.contains(">"))
         {
@@ -262,7 +268,8 @@ void PluginManager::parsePipeline(QString pipeline,
                 slot = s2;
             }
 
-            ss << (QStringList() << sender << signal << receiver << slot);
+            if (ss)
+                *ss << (QStringList() << sender << signal << receiver << slot);
         }
         else
         {
@@ -270,8 +277,8 @@ void PluginManager::parsePipeline(QString pipeline,
             {
                 QList<QVariant> ep = QList<QVariant>() << elementName << properties;
 
-                if (!elementName.endsWith("."))
-                    instances[QString("%1,%2").arg(i).arg(j)] = ep;
+                if (!elementName.endsWith(".") && instances)
+                    (*instances)[QString("%1,%2").arg(i).arg(j)] = ep;
 
                 pipe << ep;
                 i++;
@@ -294,8 +301,8 @@ void PluginManager::parsePipeline(QString pipeline,
             {
                 QList<QVariant> ep = QList<QVariant>() << elementName << properties;
 
-                if (!elementName.endsWith("."))
-                    instances[QString("%1,%2").arg(i).arg(j)] = ep;
+                if (!elementName.endsWith(".") && instances)
+                    (*instances)[QString("%1,%2").arg(i).arg(j)] = ep;
 
                 pipe << ep;
                 i++;
@@ -316,10 +323,10 @@ void PluginManager::parsePipeline(QString pipeline,
 
     foreach (QVariant pipe, pipes)
         foreach (QVariant element, pipe.toList())
-            if (element.toList()[0].toString().endsWith("."))
-                foreach (QString instance, instances.keys())
+            if (element.toList()[0].toString().endsWith(".") && instances)
+                foreach (QString instance, (*instances).keys())
                 {
-                    QMap<QString, QVariant> props = instances[instance].toList()[1].toMap();
+                    QMap<QString, QVariant> props = (*instances)[instance].toList()[1].toMap();
                     QString name = element.toList()[0].toString();
 
                     if (props.contains("objectName") &&
@@ -352,7 +359,8 @@ void PluginManager::parsePipeline(QString pipeline,
                 else
                     nxt = QString("%1,%2").arg(i + 1).arg(j);
 
-                connections << (QStringList() << cur << nxt);
+                if (connections)
+                    *connections << (QStringList() << cur << nxt);
             }
 
             i++;
@@ -361,13 +369,213 @@ void PluginManager::parsePipeline(QString pipeline,
         j++;
     }
 
-    foreach (QStringList s, ss)
-    {
-        if (s[0].endsWith("."))
-            s[0] = references[s[0]];
+    if (ss)
+        foreach (QStringList s, *ss)
+        {
+            if (s[0].endsWith("."))
+                s[0] = references[s[0]];
 
-        if (s[2].endsWith("."))
-            s[2] = references[s[2]];
+            if (s[2].endsWith("."))
+                s[2] = references[s[2]];
+        }
+}
+
+int PluginManager::indexOfSubSequence(QStringList l, QStringList sub)
+{
+    if (sub.length() > l.length())
+        return -1;
+
+    for (int i = 0; i < l.length() - sub.length() + 1; i++)
+    {
+        int j = 0;
+        bool eq = true;
+
+        foreach (QString s, sub)
+        {
+            if (l[i + j] != s)
+            {
+                eq = false;
+
+                break;
+            }
+
+            j++;
+        }
+
+        if (eq)
+            return i;
+    }
+
+    return -1;
+}
+
+QList<QStringList> PluginManager::sequences(QList<QStringList> connections)
+{
+    QList<QStringList> nextConnections;
+
+    while (true)
+    {
+        nextConnections.clear();
+        bool wasChanged = false;
+
+        foreach (QStringList connection, connections)
+        {
+            bool change = false;
+
+            foreach (QStringList nextConnection, connections)
+                if (nextConnection[0] == connection[connection.length() - 1])
+                {
+                    nextConnections.append(connection + nextConnection.mid(1));
+                    wasChanged = true;
+                    change = true;
+                }
+
+            if (!change)
+                nextConnections.append(connection);
+        }
+
+        if (wasChanged)
+            connections = nextConnections;
+        else
+            break;
+    }
+
+    QList<QStringList> sequences;
+
+    foreach (QStringList sequence, nextConnections)
+    {
+        bool repeated = false;
+
+        for (int oldSequence = 0; oldSequence < sequences.length(); oldSequence++)
+        {
+            if (this->indexOfSubSequence(sequences[oldSequence], sequence) >= 0)
+            {
+                repeated = true;
+
+                break;
+            }
+            else if (this->indexOfSubSequence(sequence, sequences[oldSequence]) >= 0)
+            {
+                sequences[oldSequence] = sequence;
+
+                break;
+            }
+        }
+
+        if (!repeated)
+            sequences.append(sequence);
+    }
+
+    return sequences;
+}
+
+QStringList PluginManager::lcs(QStringList a, QStringList b)
+{
+    if (a.isEmpty() || b.isEmpty())
+        return QStringList();
+
+    int l = a.length() + b.length() - 1;
+
+    QStringList fill;
+    int f;
+
+    for (f = 0; f < b.length() - 1; f++)
+        fill << "";
+
+    QStringList sa = a + fill;
+
+    fill.clear();
+
+    for (f = 0; f < a.length() - 1; f++)
+        fill << "";
+
+    QStringList sb = fill + b;
+
+    QStringList longest;
+    QStringList cur;
+
+    for (int k = 0; k < l; k++)
+    {
+        cur.clear();
+
+        for (int c = 0; c < l; c++)
+        {
+            if (sa[c] != "" && sb[c] != "" && sa[c] == sb[c])
+                cur.append(sa[c]);
+            else
+            {
+                if (cur.length() > longest.length())
+                    longest = cur;
+
+                cur.clear();
+            }
+        }
+
+        if (cur.length() > longest.length())
+            longest = cur;
+
+        if (sa[sa.length() - 1] == "")
+        {
+            sa.prepend("");
+            sa.removeLast();
+        }
+        else
+        {
+            sb.removeFirst();
+            sb.append("");
+        }
+    }
+
+    return longest;
+}
+
+void PluginManager::alignSequences(QStringList sequence1,
+                                   QStringList sequence2,
+                                   QStringList *aSequence1,
+                                   QStringList *aSequence2)
+{
+    QStringList cs = this->lcs(sequence1, sequence2);
+
+    if (cs.isEmpty())
+    {
+        QStringList fill;
+        int f;
+
+        for (f = 0; f < sequence2.length(); f++)
+            fill << "";
+
+        if (aSequence1)
+            *aSequence1 = sequence1 + fill;
+
+        fill.clear();
+
+        for (f = 0; f < sequence1.length(); f++)
+            fill << "";
+
+        if (aSequence2)
+            *aSequence2 = fill + sequence2;
+    }
+    else
+    {
+        QStringList left1 = sequence1.mid(0, this->indexOfSubSequence(sequence1, cs));
+        QStringList left2 = sequence2.mid(0, this->indexOfSubSequence(sequence2, cs));
+
+        QStringList right1 = sequence1.mid(this->indexOfSubSequence(sequence1, cs) + cs.length());
+        QStringList right2 = sequence2.mid(this->indexOfSubSequence(sequence2, cs) + cs.length());
+
+        QStringList als1;
+        QStringList als2;
+        QStringList ars1;
+        QStringList ars2;
+
+        this->alignSequences(left1, left2, &als1, &als2);
+        this->alignSequences(right1, right2, &ars1, &ars2);
+
+        if (aSequence1)
+            *aSequence1 = als1 + cs + ars1;
+
+        if (aSequence2)
+            *aSequence2 = als2 + cs + ars2;
     }
 }
 
