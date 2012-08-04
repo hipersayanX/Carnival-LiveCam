@@ -48,12 +48,22 @@ class PluginManager: public QObject
                            QList<QStringList> *ss = NULL);
 
         int indexOfSubSequence(QStringList l, QStringList sub);
-        QList<QStringList> sequences(QList<QStringList> connections);
+        QList<QStringList> sequences(QMap<QString, QVariant> instances, QList<QStringList> connections);
         QStringList lcs(QStringList a, QStringList b);
+
         void alignSequences(QStringList sequence1,
                             QStringList sequence2,
                             QStringList *aSequence1 = NULL,
                             QStringList *aSequence2 = NULL);
+
+        QStringList unalignSequence(QStringList sequence);
+        int sequenceCount(QList<QStringList> sequences, QStringList sequence);
+        int alignScore(QStringList aSequence1, QStringList aSequence2);
+
+        void msa(QList<QStringList> sequences1,
+                 QList<QStringList> sequences2,
+                 QList<QStringList> *sSequences1 = NULL,
+                 QList<QStringList> *sSequences2 = NULL);
 
     public slots:
         void setPipeline(QString pipeline);

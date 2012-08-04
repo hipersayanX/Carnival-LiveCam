@@ -409,7 +409,7 @@ int PluginManager::indexOfSubSequence(QStringList l, QStringList sub)
     return -1;
 }
 
-QList<QStringList> PluginManager::sequences(QList<QStringList> connections)
+QList<QStringList> PluginManager::sequences(QMap<QString, QVariant> instances, QList<QStringList> connections)
 {
     QList<QStringList> nextConnections;
 
@@ -464,6 +464,22 @@ QList<QStringList> PluginManager::sequences(QList<QStringList> connections)
 
         if (!repeated)
             sequences.append(sequence);
+    }
+
+    foreach (QString instance, instances.keys())
+    {
+        bool has = false;
+
+        foreach (QStringList sequence, sequences)
+            if (sequence.contains(instance))
+            {
+                has = true;
+
+                break;
+            }
+
+        if (!has)
+            sequences << (QStringList() << instance);
     }
 
     return sequences;
@@ -536,6 +552,12 @@ void PluginManager::alignSequences(QStringList sequence1,
 {
     QStringList cs = this->lcs(sequence1, sequence2);
 
+    if (aSequence1)
+        aSequence1->clear();
+
+    if (aSequence2)
+        aSequence2->clear();
+
     if (cs.isEmpty())
     {
         QStringList fill;
@@ -576,6 +598,170 @@ void PluginManager::alignSequences(QStringList sequence1,
 
         if (aSequence2)
             *aSequence2 = als2 + cs + ars2;
+    }
+}
+
+QStringList PluginManager::unalignSequence(QStringList sequence)
+{
+    QStringList uaSequence;
+
+    foreach (QString element, sequence)
+        if (element != "")
+            uaSequence << element;
+
+    return uaSequence;
+}
+
+int PluginManager::sequenceCount(QList<QStringList> sequences, QStringList sequence)
+{
+    int count = 0;
+
+    foreach (QStringList s, sequences)
+        if (this->unalignSequence(s) == this->unalignSequence(sequence))
+            count++;
+
+    return count;
+}
+
+int PluginManager::alignScore(QStringList aSequence1, QStringList aSequence2)
+{
+    score = 0;
+
+    for (int i = 0; i < aSequence1.length(); i++)
+        if (aSequence1[i] == aSequence2[i])
+            // match
+            score++;
+        else
+            // gap
+            score--;
+
+    return score;
+}
+
+void PluginManager::msa(QList<QStringList> sequences1,
+                        QList<QStringList> sequences2,
+                        QList<QStringList> *sSequences1,
+                        QList<QStringList> *sSequences2)
+{
+    QList<int> scores;
+
+    foreach (QStringList sequence2, sequences2)
+        foreach (QStringList sequence1, sequences1)
+        {
+            QStringList aSequence1;
+            QStringList aSequence2;
+
+            this->alignSequences(sequence1, sequence2, &aSequence1, &aSequence2);
+            int score = this->alignScore(aSequence1, aSequence2);
+
+            if (scores.isEmpty())
+            {
+                if (sSequences1)
+                    (*sSequences1) << aSequence1;
+
+                if (sSequences2)
+                    (*sSequences2) << aSequence2;
+
+                scores << score;
+            }
+            else
+            {
+                int imin = 0;
+                int imax = len(scores) - 1;
+                int imid = (imax + imin) >> 1;
+
+                while (true)
+                {
+                    if (score == scores[imid])
+                    {
+                        if (sSequences1)
+                            sSequences1->insert(imid + 1, aSequence1);
+
+                        if (sSequences2)
+                            sSequences2->insert(imid + 1, aSequence2);
+
+                        scores->insert(imid + 1, score);
+
+                        break;
+                    }
+                    else if (score < scores[imid])
+                        imax = imid;
+                    else if (score > scores[imid])
+                        imin = imid;
+
+                    imid = (imax + imin) >> 1;
+
+                    if (imid == imin || imid == imax)
+                    {
+                        if (score < scores[imin])
+                        {
+                            if (sSequences1)
+                                sSequences1->insert(imin, aSequence1);
+
+                            if (sSequences2)
+                                sSequences2->insert(imin, aSequence2);
+
+                            scores->insert(imin, score);
+                        }
+                        else if (score > scores[imax])
+                        {
+                            if (sSequences1)
+                                sSequences1->insert(imax + 1, aSequence1);
+
+                            if (sSequences2)
+                                sSequences2->insert(imax + 1, aSequence2);
+
+                            scores->insert(imax + 1, score);
+                        }
+                        else
+                        {
+                            if (sSequences1)
+                                sSequences1->insert(imin + 1, aSequence1);
+
+                            if (sSequences2)
+                                sSequences2->insert(imin + 1, aSequence2);
+
+                            scores->insert(imin + 1, score);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+    if (!sSequences1 || !sSequences2)
+        return;
+
+    for (int i = 0; i < scores.length(); i++)
+    {
+        int count1 = this->sequenceCount(*sSequences1, (*sSequences1)[i]);
+        int count2 = this->sequenceCount(*sSequences2, (*sSequences2)[i]);
+
+        if (count1 > 1 && count2 > 1)
+        {
+            sSequences1->removeAt(i);
+            sSequences2->removeAt(i);
+            scores->removeAt(i);
+
+            i--;
+        }
+        else if (count1 > 1 && count2 < 2)
+        {
+            (*sSequences2)[i] = this->unalignSequence((*sSequences2)[i]);
+            (*sSequences1)[i].clear();
+
+            for (int j = 0; j < (*sSequences2)[i].length(); j++)
+                (*sSequences1)[i] << "";
+        }
+        else if (count1 < 2 && count2 > 1)
+        {
+            (*sSequences1)[i] = this->unalignSequence((*sSequences1)[i]);
+            (*sSequences2)[i].clear();
+
+            for (int j = 0; j < (*sSequences1)[i].length(); j++)
+                (*sSequences2)[i] << "";
+        }
     }
 }
 
