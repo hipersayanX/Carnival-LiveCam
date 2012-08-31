@@ -63,12 +63,12 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
             if (!pluginInstance)
                 continue;
 
-            PluginFactory *pluginFactory = qobject_cast<PluginFactory *>(pluginInstance);
+            Plugin *pluginFactory = qobject_cast<Plugin *>(pluginInstance);
 
             if (!pluginFactory)
                 continue;
 
-            Plugin *plugin = pluginFactory->plugin();
+            PluginInstance *plugin = pluginFactory->newInstance();
 
             if (!plugin)
                 continue;
@@ -102,7 +102,7 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
 
   \brief Returns the list of plugins information in standard format.
  */
-QList<QVariant> PluginManager::toList()
+QList<QVariant> PluginManager::pluginList()
 {
     QList<QVariant> list;
 
@@ -112,7 +112,7 @@ QList<QVariant> PluginManager::toList()
     return list;
 }
 
-Plugin *PluginManager::plugin(QString pluginId)
+PluginInstance *PluginManager::plugin(QString pluginId)
 {
     return this->isLoaded(pluginId)? this->m_plugins[pluginId]: NULL;
 }
@@ -137,12 +137,12 @@ bool PluginManager::load(QString pluginId)
     if (!pluginInstance)
         return false;
 
-    PluginFactory *pluginFactory = qobject_cast<PluginFactory *>(pluginInstance);
+    Plugin *pluginFactory = qobject_cast<Plugin *>(pluginInstance);
 
     if (!pluginFactory)
         return false;
 
-    Plugin *plugin = pluginFactory->plugin();
+    PluginInstance *plugin = pluginFactory->newInstance();
 
     if (!plugin)
         return false;

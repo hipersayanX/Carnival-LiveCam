@@ -26,28 +26,12 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include <QtGui>
 #include <QtPlugin>
 
-/// Plugin template.
-class Plugin: public QObject
+#include "plugininstance.h"
+
+class Plugin
 {
-    Q_OBJECT
-
-    Q_PROPERTY(QString pluginId READ pluginId)
-    Q_PROPERTY(QString name READ name)
-    Q_PROPERTY(QString version READ version)
-    Q_PROPERTY(QString summary READ summary)
-    Q_PROPERTY(PluginType type READ type)
-    Q_PROPERTY(QString category READ category)
-    Q_PROPERTY(QString thumbnail READ thumbnail)
-    Q_PROPERTY(QString license READ license)
-    Q_PROPERTY(QString author READ author)
-    Q_PROPERTY(QString website READ website)
-    Q_PROPERTY(QString mail READ mail)
-    Q_PROPERTY(bool isConfigurable READ isConfigurable)
-    Q_PROPERTY(QVariant configs READ configs WRITE setConfigs RESET resetConfigs)
-
     public:
         typedef enum _PluginType
         {
@@ -92,7 +76,7 @@ class Plugin: public QObject
         /// Returns the thumbnail of the plugin.
         ///
         /// \return thumbnail of the plugin.
-        virtual QString thumbnail() = 0;
+        virtual QImage thumbnail() = 0;
 
         /// Returns the license of the plugin.
         ///
@@ -120,37 +104,9 @@ class Plugin: public QObject
         /// \retval false if has not a configuration.
         virtual bool isConfigurable() = 0;
 
-        /// This method is called before Plugin::end().
-        /// Must return all significant data that the plugin wants to reload again.
-        ///
-        /// \return Plugin configurations.
-        virtual QVariant configs() = 0;
-
-    signals:
-        void setPipeline(QString pipeline);
-        void sendFrame(const QImage &frame);
-
-    public slots:
-        /// This function is called after Plugin::setConfigs().
-        /// This method executes the initialization code for the plugin.
-        virtual void begin() = 0;
-
-        /// This function is called after Plugin::configs(), and before unload the plugin.
-        /// This method executes the finalization code for the plugin.
-        virtual void end() = 0;
-
-        /// Calls the configuration dialog of the plugin.
-        virtual void configure() = 0;
-
-        /// This method is called before Plugin::begin().
-        /// Set all configurations presaved with Plugin::configs().
-        ///
-        /// \param configs Plugin configurations.
-        virtual void setConfigs(const QVariant &configs) = 0;
-
-        virtual void resetConfigs() = 0;
-
-        void recvFrame(const QImage &frame);
+        virtual PluginInstance *newInstance() = 0;
 };
+
+Q_DECLARE_INTERFACE(Plugin, "CarnivalLiveCam.Plugin")
 
 #endif // PLUGIN_H

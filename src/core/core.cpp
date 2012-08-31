@@ -23,22 +23,20 @@
 
 #include "../../include/core/core.h"
 
-/*!
-  \class Core
+/// \class Core
+///
+/// \brief Main core class.
+///
+/// This class manages and initialice the DeviceManager, ShellManager,
+/// PluginManager and MediaStreaming modules.
 
-  \brief Main core class.
-
-  This class manages and initialice the DeviceManager, ShellManager,
-  PluginManager and MediaStreaming modules.
-*/
-
-/*!
-  \fn Core::Core(QObject *parent)
-
-  \param parent Parent widget.
- */
+/// \fn Core::Core(QObject *parent)
+///
+/// \param parent Parent widget.
 Core::Core(QObject *parent): QObject(parent)
 {
+    this->pluginManager.setPipeline("");
+/*
     this->shellManager.setShell("shell.DefaultShell");
     this->deviceManager.deviceEnable("/dev/video0");
 
@@ -88,30 +86,27 @@ Core::Core(QObject *parent): QObject(parent)
     connect(&this->shellManager, SIGNAL(mouseReleased(QMouseEvent *)), &this->spaceManager, SLOT(mouseReleaseEvent(QMouseEvent *)));
 
     connect(&this->mediaStreaming, SIGNAL(captureFrame()), this, SLOT(captureFrame()));
+    */
 }
-
-/*!
-  \internal
-
-  \fn void Core::devicesModified()
-
-  This slot is called when a device is added or removed.
- */
+/*
+/// \internal
+///
+/// \fn void Core::devicesModified()
+///
+/// This slot is called when a device is added or removed.
 void Core::devicesModified()
 {
     this->spaceManager.updateSpaces(this->deviceManager.devicesInfoList());
     this->shellManager.updateDevices(this->deviceManager.devicesInfoList(), this->spaceManager.activeSpaces());
 }
 
-/*!
-  \internal
-
-  \fn void Core::deviceSelected(QString deviceId)
-
-  \param deviceId The unique device identifier.
-
-  This slot is called when the user select a device to be used to capture from.
- */
+/// \internal
+///
+/// \fn void Core::deviceSelected(QString deviceId)
+///
+/// \param deviceId The unique device identifier.
+///
+// This slot is called when the user select a device to be used to capture from.
 void Core::deviceEnable(QString deviceId)
 {
     this->deviceManager.deviceEnable(deviceId);
@@ -129,13 +124,11 @@ void Core::deviceDisable(QString deviceId)
     this->shellManager.updatePlugins(this->pluginManager.toList());
 }
 
-/*!
-  \internal
-
-  \fn void Core::captureFrame()
-
-  This slot is called when a frame is captured.
- */
+/// \internal
+///
+/// \fn void Core::captureFrame()
+///
+/// This slot is called when a frame is captured.
 void Core::captureFrame()
 {
     foreach (QString deviceId, this->deviceManager.activeDevices())
@@ -178,3 +171,4 @@ void Core::unsetEffect(QString pluginId, QString spaceId)
         this->shellManager.updatePlugins(this->pluginManager.toList());
     }
 }
+*/

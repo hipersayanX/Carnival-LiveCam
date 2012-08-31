@@ -22,7 +22,6 @@ CONFIG += qt
 DESTDIR += $$PWD
 
 HEADERS += \
-    include/plugin/plugin.h \
     include/plugin/plugininfo.h \
     include/plugin/pluginmanager.h \
     include/streaming/mediastreaming.h \
@@ -43,7 +42,8 @@ HEADERS += \
     include/space/spacewidget.h \
     include/space/spacecontrols.h \
     include/space/spacemanager.h \
-    include/plugin/pluginfactory.h
+    include/plugin/plugininstance.h \
+    include/plugin/plugin.h
 
 target.path += /usr/bin
 

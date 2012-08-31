@@ -39,7 +39,7 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
     this->m_name = "";
     this->m_version = "";
     this->m_summary = "";
-    this->m_type = Plugin::PluginUnknown;
+    this->m_type = PluginInstance::PluginUnknown;
     this->m_category = "";
     this->m_thumbnail = "";
     this->m_license = "";
@@ -47,7 +47,6 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
     this->m_website = "";
     this->m_mail = "";
     this->m_isConfigurable = false;
-    this->m_configs = QVariant();
 }
 
 /*!
@@ -69,8 +68,7 @@ PluginInfo::PluginInfo(const PluginInfo &object):
     m_author(object.m_author),
     m_website(object.m_website),
     m_mail(object.m_mail),
-    m_isConfigurable(object.m_isConfigurable),
-    m_configs(object.m_configs)
+    m_isConfigurable(object.m_isConfigurable)
 {
 }
 
@@ -113,8 +111,7 @@ PluginInfo::PluginInfo(QString fileName,
                        QString author,
                        QString website,
                        QString mail,
-                       bool isConfigurable,
-                       const QVariant &configs):
+                       bool isConfigurable):
     m_fileName(fileName),
     m_pluginId(pluginId),
     m_name(name),
@@ -127,8 +124,7 @@ PluginInfo::PluginInfo(QString fileName,
     m_author(author),
     m_website(website),
     m_mail(mail),
-    m_isConfigurable(isConfigurable),
-    m_configs(configs)
+    m_isConfigurable(isConfigurable)
 {
 }
 
@@ -154,7 +150,6 @@ PluginInfo& PluginInfo::operator =(const PluginInfo &other)
         this->m_website = other.m_website;
         this->m_mail = other.m_mail;
         this->m_isConfigurable = other.m_isConfigurable;
-        this->m_configs = other.m_configs;
     }
 
     return *this;
@@ -177,7 +172,6 @@ QMap<QString, QVariant> PluginInfo::toMap()
     map["website"] = QVariant(this->m_website);
     map["mail"] = QVariant(this->m_mail);
     map["isConfigurable"] = QVariant(this->m_isConfigurable);
-    map["configs"] = QVariant(this->m_configs);
 
     return map;
 }
@@ -305,11 +299,6 @@ QString PluginInfo::mail()
 bool PluginInfo::isConfigurable()
 {
     return this->m_isConfigurable;
-}
-
-QVariant PluginInfo::configs()
-{
-    return this->m_configs;
 }
 
 /*!
@@ -461,11 +450,6 @@ void PluginInfo::setIsConfigurable(bool isConfigurable)
     this->m_isConfigurable = isConfigurable;
 }
 
-void PluginInfo::setConfigs(const QVariant &configs)
-{
-    this->m_configs = configs;
-}
-
 /*!
   \fn void PluginInfo::resetFileName()
 
@@ -518,7 +502,7 @@ void PluginInfo::resetSummary()
 
 void PluginInfo::resetType()
 {
-    this->m_type = Plugin::PluginUnknown;
+    this->m_type = PluginInstance::PluginUnknown;
 }
 
 /*!
@@ -589,9 +573,4 @@ void PluginInfo::resetMail()
 void PluginInfo::resetIsConfigurable()
 {
     this->m_isConfigurable = false;
-}
-
-void PluginInfo::resetConfigs()
-{
-    this->m_configs = QVariant();
 }

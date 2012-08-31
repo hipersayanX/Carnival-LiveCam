@@ -20,7 +20,7 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
-#include "pluginfactory.h"
+#include "plugin.h"
 #include "plugininfo.h"
 
 class PluginManager: public QObject
@@ -34,19 +34,6 @@ class PluginManager: public QObject
 
     /// Enumerator for pipeline diff operations
     public:
-        typedef enum _DiffOp
-        {
-            DisconnectSignalsAndSlots,
-            DisconnectElement,
-            RemoveElement,
-            ChangeId,
-            AddElement,
-            SetProperties,
-            ResetProperties,
-            ConnectElement,
-            ConnectSignalsAndSlots
-        } DiffOp;
-
         /// Actions to do if some element doesn't exist
         typedef enum _PipelineRoutingMode
         {
@@ -59,12 +46,12 @@ class PluginManager: public QObject
         } PipelineRoutingMode;
 
         explicit PluginManager(QObject *parent = 0);
-        Q_INVOKABLE QList<QVariant> toList();
+        Q_INVOKABLE QList<QVariant> pluginList();
         PipelineRoutingMode pipelineRoutingMode();
 
     private:
         QPluginLoader m_pluginLoader;
-        QHash<QString, Plugin *> m_plugins;
+        QHash<QString, PluginInstance *> m_plugins;
         QHash<QString, PluginInfo> m_pluginsInfo;
         QHash<QString, QVariant> m_pluginConfigs;
 
@@ -76,7 +63,7 @@ class PluginManager: public QObject
         QStringList m_availableElementTypes;
         PipelineRoutingMode m_pipelineRoutingMode;
 
-        Plugin *plugin(QString pluginId);
+        PluginInstance *plugin(QString pluginId);
         bool isLoaded(QString pluginId);
         bool load(QString pluginId);
         bool unload(QString pluginId);
