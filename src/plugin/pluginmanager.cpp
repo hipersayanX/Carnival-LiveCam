@@ -32,6 +32,8 @@
  */
 PluginManager::PluginManager(QObject *parent): QObject(parent)
 {
+    this->m_pipelineRoutingMode = NoCheck;
+
     QDir pluginDir("share/plugins");
 
     foreach (QString dirext, pluginDir.entryList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot, QDir::Name))
@@ -170,6 +172,76 @@ bool PluginManager::unload(QString pluginId)
     return true;
 }
 
+/// Parse a string and returns the native value.
+QVariant PluginManager::parseValue(QString value)
+{
+    // String
+    if (value.startsWith("'") || value.startsWith("\""))
+        return value.mid(1, value.length() - 2);
+    // Dictionary
+    else if (value.startsWith("{"))
+    {
+        QStringList r = value.mid(1, value.length() - 2).split(QRegExp("(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\"[^\"]*\"|" \
+                                                                       "'[^']*'|\\{[^\r^\n]*\\}|\\[[^\r^\n]*\\])" \
+                                                                       " *: *" \
+                                                                       "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\"[^\"]*\"|" \
+                                                                       "'[^']*'|\\{[^\r^\n]*\\}|\\[[^\r^\n]*\\])|" \
+                                                                       ","), QString::SkipEmptyParts);
+
+        QMap<QString, QVariant> d;
+
+        foreach (QString item, r)
+            if (item != ",")
+            {
+                int kv = item.indexOf(":");
+                QString key = item.left(kv);
+                QString value = item.right(item.length() - kv - 1);
+
+                d[this->parseValue(key.trimmed()).toString()] = this->parseValue(value.trimmed());
+            }
+
+        return d;
+    }
+    // List
+    else if (value.startsWith("["))
+    {
+        QStringList r = value.mid(1, value.length() - 2).split(QRegExp("[0-9]+\\.[0-9]+|" \
+                                                                       "\\.[0-9]+|" \
+                                                                       "[0-9]+\\.|" \
+                                                                       "[0-9]+|" \
+                                                                       "\"[^\"]*\"|" \
+                                                                       "'[^']*'|" \
+                                                                       "\\{[^\r^\n]*\\}|" \
+                                                                       "\\[[^\r^\n]*\\]|" \
+                                                                       ","), QString::SkipEmptyParts);
+
+        QList<QVariant> l;
+
+        foreach (QString item, r)
+            if (item != ",")
+                l << this->parseValue(item);
+
+        return l;
+    }
+    else
+    {
+        bool ok;
+
+        int valueInt = value.toInt(&ok);
+
+        if (ok)
+            return valueInt;
+
+        float valueFloat = value.toFloat(&ok);
+
+        if (ok)
+            return valueFloat;
+
+        // String
+        return value;
+    }
+}
+
 void PluginManager::parsePipeline(QString pipeline,
                                   QMap<QString, QVariant> *instances,
                                   QList<QStringList> *connections,
@@ -184,7 +256,14 @@ void PluginManager::parsePipeline(QString pipeline,
     if (ss)
         ss->clear();
 
-    QStringList r = pipeline.split(QRegExp("[0-9a-zA-Z.<>=]+=[\"'][^\r^\n]+[\"']|!{1}|[0-9a-zA-Z.<>=]+"),
+    QStringList r = pipeline.split(QRegExp("[a-zA-Z_][0-9a-zA-Z_]*" \
+                                           "(?:=(?:'[^']+'|\"[^\"]+\"|\\[[^\r^\n]+\\]|" \
+                                           "\\{[^\r^\n]+\\}|[^\r^\n^ ^!]+)|" \
+                                           "(?:\\.[a-zA-Z_]+[0-9a-zA-Z_]*){0,1}" \
+                                           "(?:<|>)[a-zA-Z_]+[0-9a-zA-Z_]*" \
+                                           "(?:\\.[a-zA-Z_]+[0-9a-zA-Z_]*){0,1}|" \
+                                           "\\.{0,1})|" \
+                                           "!{1}"),
                                    QString::SkipEmptyParts);
 
     QList<QVariant> pipes;
@@ -192,23 +271,26 @@ void PluginManager::parsePipeline(QString pipeline,
     QString elementName;
     QMap<QString, QVariant> properties;
 
-    int i = 0;
-    int j = 0;
+    int i = 0; // Column
+    int j = 0; // Row
     int k = 0;
 
     foreach (QString p, r)
     {
+        // Parse property
         if (p.contains("="))
         {
             int eq = p.indexOf("=");
+
             QString key = p.left(eq);
             QString value = p.right(p.length() - eq - 1);
 
-            if (value.startsWith("'") || value.startsWith("\""))
-                value = value.mid(1, value.length() - 2);
-
-            properties[key] = value;
+            properties[key] = this->parseValue(value);
         }
+        // Parse Signals & Slots
+        //
+        // sender receiver.slot<signal
+        // receiver slot<sender.signal
         else if (p.contains("<"))
         {
             int eq = p.indexOf("<");
@@ -222,24 +304,35 @@ void PluginManager::parsePipeline(QString pipeline,
 
             if (s1.contains("."))
             {
-                sender = QString("%1,%2").arg(i).arg(j);
-                signal = s2.mid(1);
                 QStringList receiverSlot = s1.split(".");
                 receiver = receiverSlot[0] + ".";
                 slot = receiverSlot[1];
             }
             else
             {
+                receiver = QString("%1,%2").arg(i).arg(j);
+                slot = s1;
+            }
+
+            if (s2.contains("."))
+            {
                 QStringList senderSignal = s2.split(".");
                 sender = senderSignal[0] + ".";
                 signal = senderSignal[1];
-                receiver = QString("%1,%2").arg(i).arg(j);
-                slot = s1;
+            }
+            else
+            {
+                sender = QString("%1,%2").arg(i).arg(j);
+                signal = s2;
             }
 
             if (ss)
                 *ss << (QStringList() << sender << signal << receiver << slot);
         }
+        // Parse Signals & Slots
+        //
+        // sender signal>receiver.slot
+        // receiver sender.signal>slot
         else if (p.contains(">"))
         {
             int eq = p.indexOf(">");
@@ -251,19 +344,26 @@ void PluginManager::parsePipeline(QString pipeline,
             QString receiver;
             QString slot;
 
-            if (s2.contains("."))
+            if (s1.contains("."))
+            {
+                QStringList senderSignal = s1.split(".");
+                sender = senderSignal[0] + ".";
+                signal = senderSignal[1];
+            }
+            else
             {
                 sender = QString("%1,%2").arg(i).arg(j);
-                signal = s1.mid(1);
+                signal = s1;
+            }
+
+            if (s2.contains("."))
+            {
                 QStringList receiverSlot = s2.split(".");
                 receiver = receiverSlot[0] + ".";
                 slot = receiverSlot[1];
             }
             else
             {
-                QStringList senderSignal = s1.split(".");
-                sender = senderSignal[0] + ".";
-                signal = senderSignal[1];
                 receiver = QString("%1,%2").arg(i).arg(j);
                 slot = s2;
             }
@@ -271,6 +371,7 @@ void PluginManager::parsePipeline(QString pipeline,
             if (ss)
                 *ss << (QStringList() << sender << signal << receiver << slot);
         }
+        // Parse element
         else
         {
             if (!elementName.isEmpty() && elementName != "!")
@@ -278,7 +379,24 @@ void PluginManager::parsePipeline(QString pipeline,
                 QList<QVariant> ep = QList<QVariant>() << elementName << properties;
 
                 if (!elementName.endsWith(".") && instances)
+                {
+                    if (this->m_pipelineRoutingMode == Fail &&
+                        !this->m_availableElementTypes.contains(elementName))
+                    {
+                        if (instances)
+                            *instances = QMap<QString, QVariant>();
+
+                        if (connections)
+                            *connections = QList<QStringList>();
+
+                        if (ss)
+                            *ss = QList<QStringList>();
+
+                        return;
+                    }
+
                     (*instances)[QString("%1,%2").arg(i).arg(j)] = ep;
+                }
 
                 pipe << ep;
                 i++;
@@ -319,6 +437,9 @@ void PluginManager::parsePipeline(QString pipeline,
         k++;
     }
 
+    // Solve references.
+    //
+    // i,j. -> x,y
     QMap<QString, QString> references;
 
     foreach (QVariant pipe, pipes)
@@ -334,6 +455,7 @@ void PluginManager::parsePipeline(QString pipeline,
                         references[name] = instance;
                 }
 
+    // Solve connections between elements.
     j = 0;
 
     foreach (QVariant pipe, pipes)
@@ -369,6 +491,7 @@ void PluginManager::parsePipeline(QString pipeline,
         j++;
     }
 
+    // Solve signals & slots.
     if (ss)
         foreach (QStringList s, *ss)
         {
@@ -378,407 +501,427 @@ void PluginManager::parsePipeline(QString pipeline,
             if (s[2].endsWith("."))
                 s[2] = references[s[2]];
         }
-}
 
-int PluginManager::indexOfSubSequence(QStringList l, QStringList sub)
-{
-    if (sub.length() > l.length())
-        return -1;
-
-    for (int i = 0; i < l.length() - sub.length() + 1; i++)
+    if (this->m_pipelineRoutingMode == Remove ||
+        this->m_pipelineRoutingMode == Force)
     {
-        int j = 0;
-        bool eq = true;
+        QStringList removeId;
+        QString id;
 
-        foreach (QString s, sub)
+        foreach (id, instances->keys())
+            if (!this->m_availableElementTypes.contains((*instances)[id].toList()[0].toString()))
+                removeId << id;
+
+        foreach (id, removeId)
         {
-            if (l[i + j] != s)
-            {
-                eq = false;
+            instances->remove(id);
 
-                break;
-            }
+            QStringList conns;
 
-            j++;
-        }
-
-        if (eq)
-            return i;
-    }
-
-    return -1;
-}
-
-QList<QStringList> PluginManager::sequences(QMap<QString, QVariant> instances, QList<QStringList> connections)
-{
-    QList<QStringList> nextConnections;
-
-    while (true)
-    {
-        nextConnections.clear();
-        bool wasChanged = false;
-
-        foreach (QStringList connection, connections)
-        {
-            bool change = false;
-
-            foreach (QStringList nextConnection, connections)
-                if (nextConnection[0] == connection[connection.length() - 1])
+            for (i = 0; i < connections->length(); i++)
+                if ((*connections)[i][0] == id || (*connections)[i][1] == id)
                 {
-                    nextConnections.append(connection + nextConnection.mid(1));
-                    wasChanged = true;
-                    change = true;
+                    if ((*connections)[i][0] != id)
+                        conns << (*connections)[i][0];
+
+                    if ((*connections)[i][1] != id)
+                        conns << (*connections)[i][1];
+
+                    connections->removeAt(i);
+                    i--;
                 }
 
-            if (!change)
-                nextConnections.append(connection);
-        }
+            if (this->m_pipelineRoutingMode == Force)
+                foreach (QString conn1, conns)
+                    foreach (QString conn2, conns)
+                    {
+                        QStringList c = QStringList() << conn1 << conn2;
 
-        if (wasChanged)
-            connections = nextConnections;
-        else
-            break;
-    }
+                        if (conn1 != conn2 &&
+                            !connections->contains(c) &&
+                            !connections->contains(this->reversed(c)))
+                            *connections << c;
+                    }
 
-    QList<QStringList> sequences;
-
-    foreach (QStringList sequence, nextConnections)
-    {
-        bool repeated = false;
-
-        for (int oldSequence = 0; oldSequence < sequences.length(); oldSequence++)
-        {
-            if (this->indexOfSubSequence(sequences[oldSequence], sequence) >= 0)
-            {
-                repeated = true;
-
-                break;
-            }
-            else if (this->indexOfSubSequence(sequence, sequences[oldSequence]) >= 0)
-            {
-                sequences[oldSequence] = sequence;
-
-                break;
-            }
-        }
-
-        if (!repeated)
-            sequences.append(sequence);
-    }
-
-    foreach (QString instance, instances.keys())
-    {
-        bool has = false;
-
-        foreach (QStringList sequence, sequences)
-            if (sequence.contains(instance))
-            {
-                has = true;
-
-                break;
-            }
-
-        if (!has)
-            sequences << (QStringList() << instance);
-    }
-
-    return sequences;
-}
-
-QStringList PluginManager::lcs(QStringList a, QStringList b)
-{
-    if (a.isEmpty() || b.isEmpty())
-        return QStringList();
-
-    int l = a.length() + b.length() - 1;
-
-    QStringList fill;
-    int f;
-
-    for (f = 0; f < b.length() - 1; f++)
-        fill << "";
-
-    QStringList sa = a + fill;
-
-    fill.clear();
-
-    for (f = 0; f < a.length() - 1; f++)
-        fill << "";
-
-    QStringList sb = fill + b;
-
-    QStringList longest;
-    QStringList cur;
-
-    for (int k = 0; k < l; k++)
-    {
-        cur.clear();
-
-        for (int c = 0; c < l; c++)
-        {
-            if (sa[c] != "" && sb[c] != "" && sa[c] == sb[c])
-                cur.append(sa[c]);
-            else
-            {
-                if (cur.length() > longest.length())
-                    longest = cur;
-
-                cur.clear();
-            }
-        }
-
-        if (cur.length() > longest.length())
-            longest = cur;
-
-        if (sa[sa.length() - 1] == "")
-        {
-            sa.prepend("");
-            sa.removeLast();
-        }
-        else
-        {
-            sb.removeFirst();
-            sb.append("");
-        }
-    }
-
-    return longest;
-}
-
-void PluginManager::alignSequences(QStringList sequence1,
-                                   QStringList sequence2,
-                                   QStringList *aSequence1,
-                                   QStringList *aSequence2)
-{
-    QStringList cs = this->lcs(sequence1, sequence2);
-
-    if (aSequence1)
-        aSequence1->clear();
-
-    if (aSequence2)
-        aSequence2->clear();
-
-    if (cs.isEmpty())
-    {
-        QStringList fill;
-        int f;
-
-        for (f = 0; f < sequence2.length(); f++)
-            fill << "";
-
-        if (aSequence1)
-            *aSequence1 = sequence1 + fill;
-
-        fill.clear();
-
-        for (f = 0; f < sequence1.length(); f++)
-            fill << "";
-
-        if (aSequence2)
-            *aSequence2 = fill + sequence2;
-    }
-    else
-    {
-        QStringList left1 = sequence1.mid(0, this->indexOfSubSequence(sequence1, cs));
-        QStringList left2 = sequence2.mid(0, this->indexOfSubSequence(sequence2, cs));
-
-        QStringList right1 = sequence1.mid(this->indexOfSubSequence(sequence1, cs) + cs.length());
-        QStringList right2 = sequence2.mid(this->indexOfSubSequence(sequence2, cs) + cs.length());
-
-        QStringList als1;
-        QStringList als2;
-        QStringList ars1;
-        QStringList ars2;
-
-        this->alignSequences(left1, left2, &als1, &als2);
-        this->alignSequences(right1, right2, &ars1, &ars2);
-
-        if (aSequence1)
-            *aSequence1 = als1 + cs + ars1;
-
-        if (aSequence2)
-            *aSequence2 = als2 + cs + ars2;
-    }
-}
-
-QStringList PluginManager::unalignSequence(QStringList sequence)
-{
-    QStringList uaSequence;
-
-    foreach (QString element, sequence)
-        if (element != "")
-            uaSequence << element;
-
-    return uaSequence;
-}
-
-int PluginManager::sequenceCount(QList<QStringList> sequences, QStringList sequence)
-{
-    int count = 0;
-
-    foreach (QStringList s, sequences)
-        if (this->unalignSequence(s) == this->unalignSequence(sequence))
-            count++;
-
-    return count;
-}
-
-int PluginManager::alignScore(QStringList aSequence1, QStringList aSequence2)
-{
-    score = 0;
-
-    for (int i = 0; i < aSequence1.length(); i++)
-        if (aSequence1[i] == aSequence2[i])
-            // match
-            score++;
-        else
-            // gap
-            score--;
-
-    return score;
-}
-
-void PluginManager::msa(QList<QStringList> sequences1,
-                        QList<QStringList> sequences2,
-                        QList<QStringList> *sSequences1,
-                        QList<QStringList> *sSequences2)
-{
-    QList<int> scores;
-
-    foreach (QStringList sequence2, sequences2)
-        foreach (QStringList sequence1, sequences1)
-        {
-            QStringList aSequence1;
-            QStringList aSequence2;
-
-            this->alignSequences(sequence1, sequence2, &aSequence1, &aSequence2);
-            int score = this->alignScore(aSequence1, aSequence2);
-
-            if (scores.isEmpty())
-            {
-                if (sSequences1)
-                    (*sSequences1) << aSequence1;
-
-                if (sSequences2)
-                    (*sSequences2) << aSequence2;
-
-                scores << score;
-            }
-            else
-            {
-                int imin = 0;
-                int imax = len(scores) - 1;
-                int imid = (imax + imin) >> 1;
-
-                while (true)
+            for (i = 0; i < ss->length(); i++)
+                if ((*ss)[i][0] == id || (*ss)[i][2] == id)
                 {
-                    if (score == scores[imid])
-                    {
-                        if (sSequences1)
-                            sSequences1->insert(imid + 1, aSequence1);
+                    ss->removeAt(i);
+                    i--;
+                }
+        }
+    }
+}
 
-                        if (sSequences2)
-                            sSequences2->insert(imid + 1, aSequence2);
+void PluginManager::setPipeline(QString pipeline2)
+{
+    QMap<QString, QVariant> instances2;
+    QList<QStringList> connections2;
+    QList<QStringList> ss2;
 
-                        scores->insert(imid + 1, score);
+    this->parsePipeline(pipeline2, &instances2, &connections2, &ss2);
 
-                        break;
-                    }
-                    else if (score < scores[imid])
-                        imax = imid;
-                    else if (score > scores[imid])
-                        imin = imid;
+    QMap<QString, QVariant> cInstances1(this->m_instances1);
+    QMap<QString, QVariant> cInstances2(instances2);
 
-                    imid = (imax + imin) >> 1;
+    QList<QStringList> cConnections1(this->m_connections1);
+    QList<QStringList> cConnections2(connections2);
 
-                    if (imid == imin || imid == imax)
-                    {
-                        if (score < scores[imin])
-                        {
-                            if (sSequences1)
-                                sSequences1->insert(imin, aSequence1);
+    QList<QStringList> cSs1(this->m_ss1);
+    QList<QStringList> cSs2(ss2);
 
-                            if (sSequences2)
-                                sSequences2->insert(imin, aSequence2);
+    QList<QStringList> disconnectSignalsAndSlots;
+    QList<QStringList> disconnectElement;
+    QStringList removeElement;
+    QList<QStringList> changeId;
+    QMap<QString, QMap<QString, QVariant> > setProperties;
+    QMap<QString, QStringList> resetProperties;
+    QList<QStringList> connectElement;
+    QList<QStringList> connectSignalsAndSlots;
 
-                            scores->insert(imin, score);
-                        }
-                        else if (score > scores[imax])
-                        {
-                            if (sSequences1)
-                                sSequences1->insert(imax + 1, aSequence1);
+    int i;
 
-                            if (sSequences2)
-                                sSequences2->insert(imax + 1, aSequence2);
+    while (!cInstances1.isEmpty())
+    {
+        // Get an item from cInstances1.
+        QString key = cInstances1.keys()[0];
+        QVariant value = cInstances1.take(key);
+        QString bestMatchId = "";
 
-                            scores->insert(imax + 1, score);
-                        }
-                        else
-                        {
-                            if (sSequences1)
-                                sSequences1->insert(imin + 1, aSequence1);
+        // Find a similar element.
+        foreach (QString instance2, cInstances2.keys())
+            if (value.toList()[0].toString() == cInstances2[instance2].toList()[0].toString())
+            {
+                if (bestMatchId == "")
+                    bestMatchId = instance2;
+                else if (value.toList()[1].toMap().contains("objectName") &&
+                         cInstances2[instance2].toList()[1].toMap().contains("objectName") &&
+                         value.toList()[1].toMap()["objectName"].toString() ==
+                         cInstances2[instance2].toList()[1].toMap()["objectName"].toString())
+                {
+                    bestMatchId = instance2;
 
-                            if (sSequences2)
-                                sSequences2->insert(imin + 1, aSequence2);
-
-                            scores->insert(imin + 1, score);
-                        }
-
-                        break;
-                    }
+                    break;
                 }
             }
+
+        // There are no similar elements.
+        if (bestMatchId == "")
+        {
+            // Remove it from the previous pipeline.
+            removeElement << key;
+
+            // Remove it's connections.
+            for (i = 0; i < cConnections1.length(); i++)
+                if (cConnections1[i][0] == key ||
+                    cConnections1[i][1] == key)
+                {
+                    disconnectElement << cConnections1[i];
+                    cConnections1.removeAt(i);
+                    i--;
+                }
+
+            // Remove it's signals & slots.
+            for (i = 0; i < cSs1.length(); i++)
+                if (cSs1[i][0] == key || cSs1[i][2] == key)
+                {
+                    disconnectSignalsAndSlots << cSs1[i];
+                    cSs1.removeAt(i);
+                    i--;
+                }
+        }
+        // There are at least one similar element.
+        else
+        {
+            // Change the Id of the element in pipeline1 by the Id of the
+            // element in pipeline2.
+            if (key != bestMatchId)
+            {
+                if (cInstances1.contains(bestMatchId))
+                    // The new Id is used by other element. Change the Id to
+                    // a ghost Id.
+                    changeId << (QStringList() << key << QString(".%1").arg(bestMatchId));
+                else
+                    changeId << (QStringList() << key << bestMatchId);
+            }
+
+            // Copy the properties from pipeline2 to the pipeline1.
+            QMap<QString, QVariant> setProps;
+
+            foreach (QString prop, cInstances2[bestMatchId].toList()[1].toMap().keys())
+                if (!value.toList()[1].toMap().contains(prop) ||
+                    (value.toList()[1].toMap().contains(prop) &&
+                     cInstances2[bestMatchId].toList()[1].toMap()[prop] != value.toList()[1].toMap()[prop]))
+                    setProps[prop] = cInstances2[bestMatchId].toList()[1].toMap()[prop];
+
+            if (!setProps.isEmpty())
+                setProperties[bestMatchId] = setProps;
+
+            QStringList resetProps;
+
+            foreach (QString prop, value.toList()[1].toMap().keys())
+                if (!cInstances2[bestMatchId].toList()[1].toMap().contains(prop))
+                    resetProps << prop;
+
+            if (!resetProps.isEmpty())
+                resetProperties[bestMatchId] = resetProps;
+
+            cInstances2.remove(bestMatchId);
+        }
+    }
+
+    // Converts ghost Id to the final Id.
+    for (i = 0; i < changeId.length(); i++)
+        if (changeId[i][1].startsWith("."))
+        {
+            if (removeElement.contains(changeId[i][1].mid(1)))
+                changeId[i][1] = changeId[i][1].mid(1);
+            else
+                changeId << (QStringList() << changeId[i][1] << changeId[i][1].mid(1));
         }
 
-    if (!sSequences1 || !sSequences2)
-        return;
+    bool fst;
+    bool snd;
+    QStringList dstConnection;
 
-    for (int i = 0; i < scores.length(); i++)
+    // Solve connections
+    for (i = 0; i < cConnections1.length(); i++)
     {
-        int count1 = this->sequenceCount(*sSequences1, (*sSequences1)[i]);
-        int count2 = this->sequenceCount(*sSequences2, (*sSequences2)[i]);
+        dstConnection = QStringList(cConnections1[i]);
+        fst = false;
+        snd = false;
 
-        if (count1 > 1 && count2 > 1)
+        foreach (QStringList change, changeId)
         {
-            sSequences1->removeAt(i);
-            sSequences2->removeAt(i);
-            scores->removeAt(i);
+            QString dst = change[1].startsWith(".")? change[1].mid(1): change[1];
 
+            if (!fst && dstConnection[0] == change[0])
+            {
+                dstConnection[0] = dst;
+                fst = true;
+            }
+
+            if (!snd && dstConnection[1] == change[0])
+            {
+                dstConnection[1] = dst;
+                snd = true;
+            }
+
+            if (fst && snd)
+                break;
+        }
+
+        if (!cConnections2.contains(dstConnection) &&
+            !cConnections2.contains(reversed(dstConnection)))
+        {
+            disconnectElement << cConnections1[i];
+            cConnections1.removeAt(i);
             i--;
         }
-        else if (count1 > 1 && count2 < 2)
-        {
-            (*sSequences2)[i] = this->unalignSequence((*sSequences2)[i]);
-            (*sSequences1)[i].clear();
+    }
 
-            for (int j = 0; j < (*sSequences2)[i].length(); j++)
-                (*sSequences1)[i] << "";
+    for (i = 0; i < cConnections2.length(); i++)
+    {
+        dstConnection = QStringList(cConnections2[i]);
+        fst = false;
+        snd = false;
+
+        foreach (QStringList change, changeId)
+        {
+            QString src = change[1].startsWith(".")? change[1].mid(1): change[1];
+
+            if (!fst && dstConnection[0] == src)
+            {
+                dstConnection[0] = change[0];
+                fst = true;
+            }
+
+            if (!snd && dstConnection[1] == src)
+            {
+                dstConnection[1] = change[0];
+                snd = true;
+            }
+
+            if (fst && snd)
+                break;
         }
-        else if (count1 < 2 && count2 > 1)
-        {
-            (*sSequences1)[i] = this->unalignSequence((*sSequences1)[i]);
-            (*sSequences2)[i].clear();
 
-            for (int j = 0; j < (*sSequences1)[i].length(); j++)
-                (*sSequences2)[i] << "";
+        if (!cConnections1.contains(dstConnection) &&
+            !cConnections1.contains(reversed(dstConnection)))
+        {
+            connectElement << cConnections2[i];
+            cConnections2.removeAt(i);
+            i--;
         }
     }
-}
 
-void PluginManager::setPipeline(QString pipeline)
-{
-    pipeline = "element1 objectName=el1 prop1=10 prop2=val2 " \
-               "el1. ! element2 .signal1>el5.slot1 " \
-               "el1. ! element3 prop3='Hello, world !!!' ! element1 ! element5 ! el5. " \
-               "element4 prop1=3.14 slot5<el5.signal5 ! el5. " \
-               "element5 objectName=el5 el1.signal2>slot2 ! element6 prop1=val1 el1.slot1<.signal1";
+    QStringList dstSs;
 
-    // Signals & Slots sintax:
-    //
-    // sender .signal>receiver.slot
-    // receiver sender.signal>slot
-    // sender receiver.slot<.signal
-    // receiver slot<sender.signal
+    // Solve signals & slots.
+    for (i = 0; i < cSs1.length(); i++)
+    {
+        dstSs = QStringList(cSs1[i]);
+        fst = false;
+        snd = false;
+
+        foreach (QStringList change, changeId)
+        {
+            QString dst = change[1].startsWith(".")? change[1].mid(1): change[1];
+
+            if (!fst && dstSs[0] == change[0])
+            {
+                dstSs[0] = dst;
+                fst = true;
+            }
+
+            if (!snd && dstSs[2] == change[0])
+            {
+                dstSs[2] = dst;
+                snd = true;
+            }
+
+            if (fst && snd)
+                break;
+        }
+
+        if (!cSs2.contains(dstSs))
+        {
+            disconnectSignalsAndSlots << cSs1[i];
+            cSs1.removeAt(i);
+            i--;
+        }
+    }
+
+    for (i = 0; i < cSs2.length(); i++)
+    {
+        dstSs = QStringList(cSs2[i]);
+        fst = false;
+        snd = false;
+
+        foreach (QStringList change, changeId)
+        {
+            QString src = change[1].startsWith(".")? change[1].mid(1): change[1];
+
+            if (!fst && dstSs[0] == src)
+            {
+                dstSs[0] = change[0];
+                fst = true;
+            }
+
+            if (!snd && dstSs[2] == src)
+            {
+                dstSs[2] = change[0];
+                snd = true;
+            }
+
+            if (fst && snd)
+                break;
+        }
+
+        if (!cSs1.contains(dstSs))
+        {
+            connectSignalsAndSlots << cSs2[i];
+            cSs2.removeAt(i);
+            i--;
+        }
+    }
+
+    // Add elements in pipeline2 to pipeline1.
+    QMap<QString, QString> addElement;
+
+    foreach (QString instance, cInstances2.keys())
+    {
+        addElement[instance] = cInstances2[instance].toList()[0].toString();
+
+        if (!cInstances2[instance].toList()[1].toMap().isEmpty())
+            setProperties[instance] = cInstances2[instance].toList()[1].toMap();
+
+        for (i = 0; i < cConnections2.length(); i++)
+            if (cConnections2[i][0] == instance ||
+                cConnections2[i][1] == instance)
+            {
+                connectElement << cConnections2[i];
+                cConnections2.removeAt(i);
+                i--;
+            }
+
+        for (i = 0; i < cSs2.length(); i++)
+            if (cSs2[i][0] == instance || cSs2[i][2] == instance)
+            {
+                connectSignalsAndSlots << cSs2[i];
+                cSs2.removeAt(i);
+                i--;
+            }
+    }
+
+    foreach (QStringList ss, disconnectSignalsAndSlots)
+    {
+    }
+
+    foreach (QStringList connection, disconnectElement)
+    {
+    }
+
+    foreach (QString elementId, removeElement)
+    {
+    }
+
+    foreach (QStringList change, changeId)
+    {
+    }
+
+    foreach (QString elementId, addElement.keys())
+    {
+    }
+
+    foreach (QString elementId, setProperties.keys())
+        foreach (QString prop, setProperties[elementId].keys())
+        {
+        }
+
+    foreach (QString elementId, resetProperties.keys())
+        foreach (QString prop, resetProperties[elementId])
+        {
+        }
+
+    foreach (QStringList connection, connectElement)
+    {
+    }
+
+    foreach (QStringList ss, connectSignalsAndSlots)
+    {
+    }
+
+    // Set pipeline2 as the new pipeline.
+    this->m_instances1 = instances2;
+    this->m_connections1 = connections2;
+    this->m_ss1 = ss2;
 
     // http://lists.trolltech.com/qt-interest/2005-12/msg00281.html
+}
+
+template <typename T> QList<T> PluginManager::reversed(const QList<T> &list)
+{
+    QList<T> result;
+
+    result.reserve(list.size());
+
+    std::reverse_copy(list.begin(), list.end(), std::back_inserter(result));
+
+    return result;
+}
+
+PluginManager::PipelineRoutingMode PluginManager::pipelineRoutingMode()
+{
+    return this->m_pipelineRoutingMode;
+}
+
+void PluginManager::setPipelineRoutingMode(PipelineRoutingMode mode)
+{
+    this->m_pipelineRoutingMode = mode;
+}
+
+void PluginManager::resetPipelineRoutingMode()
+{
+    this->m_pipelineRoutingMode = NoCheck;
 }

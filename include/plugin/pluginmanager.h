@@ -27,9 +27,40 @@ class PluginManager: public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(PipelineRoutingMode pipelineRoutingMode
+               READ pipelineRoutingMode
+               WRITE setPipelineRoutingMode
+               RESET resetPipelineRoutingMode)
+
+    /// Enumerator for pipeline diff operations
     public:
+        typedef enum _DiffOp
+        {
+            DisconnectSignalsAndSlots,
+            DisconnectElement,
+            RemoveElement,
+            ChangeId,
+            AddElement,
+            SetProperties,
+            ResetProperties,
+            ConnectElement,
+            ConnectSignalsAndSlots
+        } DiffOp;
+
+        /// Actions to do if some element doesn't exist
+        typedef enum _PipelineRoutingMode
+        {
+            NoCheck, // Build the pipeline as is.
+            Fail,    // If an element doesn't exist return a void graph.
+            Remove,  // If an element doesn't exist return a graph without the
+                     // element and it's connections.
+            Force    // If an element doesn't exist try to connect all elements
+                     // connected to the lost element.
+        } PipelineRoutingMode;
+
         explicit PluginManager(QObject *parent = 0);
         Q_INVOKABLE QList<QVariant> toList();
+        PipelineRoutingMode pipelineRoutingMode();
 
     private:
         QPluginLoader m_pluginLoader;
@@ -37,36 +68,32 @@ class PluginManager: public QObject
         QHash<QString, PluginInfo> m_pluginsInfo;
         QHash<QString, QVariant> m_pluginConfigs;
 
+        // Previous pipeline graph.
+        QMap<QString, QVariant> m_instances1; // Nodes
+        QList<QStringList> m_connections1;    // Edges
+        QList<QStringList> m_ss1;             // Signals & Slots
+
+        QStringList m_availableElementTypes;
+        PipelineRoutingMode m_pipelineRoutingMode;
+
         Plugin *plugin(QString pluginId);
         bool isLoaded(QString pluginId);
         bool load(QString pluginId);
         bool unload(QString pluginId);
+
+        QVariant parseValue(QString value);
 
         void parsePipeline(QString pipeline,
                            QMap<QString, QVariant> *instances = NULL,
                            QList<QStringList> *connections = NULL,
                            QList<QStringList> *ss = NULL);
 
-        int indexOfSubSequence(QStringList l, QStringList sub);
-        QList<QStringList> sequences(QMap<QString, QVariant> instances, QList<QStringList> connections);
-        QStringList lcs(QStringList a, QStringList b);
-
-        void alignSequences(QStringList sequence1,
-                            QStringList sequence2,
-                            QStringList *aSequence1 = NULL,
-                            QStringList *aSequence2 = NULL);
-
-        QStringList unalignSequence(QStringList sequence);
-        int sequenceCount(QList<QStringList> sequences, QStringList sequence);
-        int alignScore(QStringList aSequence1, QStringList aSequence2);
-
-        void msa(QList<QStringList> sequences1,
-                 QList<QStringList> sequences2,
-                 QList<QStringList> *sSequences1 = NULL,
-                 QList<QStringList> *sSequences2 = NULL);
+        template <typename T> QList<T> reversed(const QList<T> &list);
 
     public slots:
-        void setPipeline(QString pipeline);
+        void setPipeline(QString pipeline2);
+        void setPipelineRoutingMode(PipelineRoutingMode mode);
+        void resetPipelineRoutingMode();
 };
 
 #endif // PLUGINMANAGER_H
