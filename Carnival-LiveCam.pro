@@ -42,8 +42,8 @@ HEADERS += \
     include/space/spacewidget.h \
     include/space/spacecontrols.h \
     include/space/spacemanager.h \
-    include/plugin/plugininstance.h \
-    include/plugin/plugin.h
+    include/plugin/plugin.h \
+    include/plugin/pluginobject.h
 
 target.path += /usr/bin
 

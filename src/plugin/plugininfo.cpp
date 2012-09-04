@@ -39,7 +39,7 @@ PluginInfo::PluginInfo(QObject *parent): QObject(parent)
     this->m_name = "";
     this->m_version = "";
     this->m_summary = "";
-    this->m_type = PluginInstance::PluginUnknown;
+    this->m_type = "";
     this->m_category = "";
     this->m_thumbnail = "";
     this->m_license = "";
@@ -104,7 +104,7 @@ PluginInfo::PluginInfo(QString fileName,
                        QString name,
                        QString version,
                        QString summary,
-                       Plugin::PluginType type,
+                       QString type,
                        QString category,
                        QString thumbnail,
                        QString license,
@@ -226,7 +226,7 @@ QString PluginInfo::summary()
     return this->m_summary;
 }
 
-Plugin::PluginType PluginInfo::type()
+QString PluginInfo::type()
 {
     return this->m_type;
 }
@@ -361,7 +361,7 @@ void PluginInfo::setSummary(QString summary)
     this->m_summary = summary;
 }
 
-void PluginInfo::setType(Plugin::PluginType type)
+void PluginInfo::setType(QString type)
 {
     this->m_type = type;
 }
@@ -502,7 +502,7 @@ void PluginInfo::resetSummary()
 
 void PluginInfo::resetType()
 {
-    this->m_type = PluginInstance::PluginUnknown;
+    this->m_type = "";
 }
 
 /*!

@@ -31,7 +31,7 @@ class PluginInfo: public QObject
     Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
     Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
     Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
-    Q_PROPERTY(Plugin::PluginType type READ type WRITE setType RESET resetType)
+    Q_PROPERTY(QString type READ type WRITE setType RESET resetType)
     Q_PROPERTY(QString category READ category WRITE setCategory RESET resetCategory)
     Q_PROPERTY(QString thumbnail READ thumbnail WRITE setThumbnail RESET resetThumbnail)
     Q_PROPERTY(QString license READ license WRITE setLicense RESET resetLicense)
@@ -49,7 +49,7 @@ class PluginInfo: public QObject
                    QString name,
                    QString version,
                    QString summary,
-                   Plugin::PluginType type,
+                   QString type,
                    QString category,
                    QString thumbnail,
                    QString license,
@@ -67,7 +67,7 @@ class PluginInfo: public QObject
         QString name();
         QString version();
         QString summary();
-        Plugin::PluginType type();
+        QString type();
         QString category();
         QString thumbnail();
         QString license();
@@ -82,7 +82,7 @@ class PluginInfo: public QObject
         QString m_name;
         QString m_version;
         QString m_summary;
-        Plugin::PluginType m_type;
+        QString m_type;
         QString m_category;
         QString m_thumbnail;
         QString m_license;
@@ -97,7 +97,7 @@ class PluginInfo: public QObject
         void setName(QString name);
         void setVersion(QString version);
         void setSummary(QString summary);
-        void setType(Plugin::PluginType type);
+        void setType(QString type);
         void setCategory(QString category);
         void setThumbnail(QString thumbnail);
         void setLicense(QString license);

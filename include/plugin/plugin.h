@@ -28,21 +28,11 @@
 
 #include <QtPlugin>
 
-#include "plugininstance.h"
+#include "pluginobject.h"
 
 class Plugin
 {
     public:
-        typedef enum _PluginType
-        {
-            PluginUnknown,
-            PluginDriver,
-            PluginShell,
-            PluginAudioEffect,
-            PluginVideoEffect,
-            PluginStream
-        } PluginType;
-
         /// Returns the unique plugin identifier.
         ///
         /// \return The unique plugin identifier.
@@ -66,7 +56,7 @@ class Plugin
         /// Returns the type of the driver.
         ///
         /// \return Type of the driver.
-        virtual PluginType type() = 0;
+        virtual QString type() = 0;
 
         /// Returns the category of the plugin.
         ///
@@ -76,7 +66,7 @@ class Plugin
         /// Returns the thumbnail of the plugin.
         ///
         /// \return thumbnail of the plugin.
-        virtual QImage thumbnail() = 0;
+        virtual QString thumbnail() = 0;
 
         /// Returns the license of the plugin.
         ///
@@ -104,7 +94,9 @@ class Plugin
         /// \retval false if has not a configuration.
         virtual bool isConfigurable() = 0;
 
-        virtual PluginInstance *newInstance() = 0;
+        virtual PluginObject *newObject() = 0;
+
+        virtual ~Plugin() = 0;
 };
 
 Q_DECLARE_INTERFACE(Plugin, "CarnivalLiveCam.Plugin")

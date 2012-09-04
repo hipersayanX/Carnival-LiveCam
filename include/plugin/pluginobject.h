@@ -23,13 +23,13 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef PLUGININSTANCE_H
-#define PLUGININSTANCE_H
+#ifndef PLUGINOBJECT_H
+#define PLUGINOBJECT_H
 
 #include <QtGui>
 
 /// Plugin template.
-class PluginInstance: public QObject
+class PluginObject: public QObject
 {
     Q_OBJECT
 
@@ -44,9 +44,9 @@ class PluginInstance: public QObject
 
     signals:
         // Output Channels
-        void oVideo(QImage *frame, QString senderObjectName, QString receiverObjectName);
-        //void oAudio(???, QString senderObjectName, QString receiverObjectName);
-        void oEvent(QEvent *event, QString senderObjectName, QString receiverObjectName);
+        void oVideo(QImage *frame, QStringList receiverObjectName);
+        //void oAudio(???, QStringList receiverObjectName);
+        void oEvent(QEvent *event, QStringList receiverObjectName);
 
         void setPipeline(QString pipeline);
         void getPluginList();
@@ -76,7 +76,7 @@ class PluginInstance: public QObject
 
         virtual void resetConfigs() = 0;
 
-        void setPluginList(QList<QVariant> list);
+        virtual void setPluginList(QList<QVariant> list) = 0;
 };
 
-#endif // PLUGININSTANCE_H
+#endif // PLUGINOBJECT_H

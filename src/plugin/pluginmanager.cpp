@@ -63,31 +63,26 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
             if (!pluginInstance)
                 continue;
 
-            Plugin *pluginFactory = qobject_cast<Plugin *>(pluginInstance);
-
-            if (!pluginFactory)
-                continue;
-
-            PluginInstance *plugin = pluginFactory->newInstance();
+            Plugin *plugin = qobject_cast<Plugin *>(pluginInstance);
 
             if (!plugin)
                 continue;
 
             this->m_pluginsInfo[plugin->pluginId()] = PluginInfo(fileName,
-                                                           plugin->pluginId(),
-                                                           plugin->name(),
-                                                           plugin->version(),
-                                                           plugin->summary(),
-                                                           plugin->type(),
-                                                           plugin->category(),
-                                                           plugin->thumbnail(),
-                                                           plugin->license(),
-                                                           plugin->author(),
-                                                           plugin->website(),
-                                                           plugin->mail(),
-                                                           plugin->isConfigurable(),
-                                                           plugin->configs());
+                                                                 plugin->pluginId(),
+                                                                 plugin->name(),
+                                                                 plugin->version(),
+                                                                 plugin->summary(),
+                                                                 plugin->type(),
+                                                                 plugin->category(),
+                                                                 plugin->thumbnail(),
+                                                                 plugin->license(),
+                                                                 plugin->author(),
+                                                                 plugin->website(),
+                                                                 plugin->mail(),
+                                                                 plugin->isConfigurable());
 
+            this->m_availableElementTypes << plugin->pluginId();
             this->m_pluginLoader.unload();
         }
 
@@ -112,7 +107,7 @@ QList<QVariant> PluginManager::pluginList()
     return list;
 }
 
-PluginInstance *PluginManager::plugin(QString pluginId)
+Plugin *PluginManager::plugin(QString pluginId)
 {
     return this->isLoaded(pluginId)? this->m_plugins[pluginId]: NULL;
 }
@@ -125,7 +120,7 @@ bool PluginManager::isLoaded(QString pluginId)
 bool PluginManager::load(QString pluginId)
 {
     if (this->isLoaded(pluginId))
-        return false;
+        return true;
 
     this->m_pluginLoader.setFileName(this->m_pluginsInfo[pluginId].fileName());
 
@@ -137,22 +132,12 @@ bool PluginManager::load(QString pluginId)
     if (!pluginInstance)
         return false;
 
-    Plugin *pluginFactory = qobject_cast<Plugin *>(pluginInstance);
-
-    if (!pluginFactory)
-        return false;
-
-    PluginInstance *plugin = pluginFactory->newInstance();
+    Plugin *plugin = qobject_cast<Plugin *>(pluginInstance);
 
     if (!plugin)
         return false;
 
-    if (this->m_pluginConfigs.contains(pluginId))
-        plugin->setConfigs(this->m_pluginConfigs[pluginId]);
-
     this->m_plugins[pluginId] = plugin;
-
-    plugin->begin();
 
     return true;
 }
@@ -160,14 +145,70 @@ bool PluginManager::load(QString pluginId)
 bool PluginManager::unload(QString pluginId)
 {
     if(!this->isLoaded(pluginId))
-         return false;
+         return true;
 
-    this->m_pluginConfigs[pluginId] = this->m_plugins[pluginId]->configs();
-    this->m_plugins[pluginId]->end();
     delete this->m_plugins[pluginId];
     this->m_plugins.remove(pluginId);
     this->m_pluginLoader.setFileName(this->m_pluginsInfo[pluginId].fileName());
     this->m_pluginLoader.unload();
+
+    return true;
+}
+
+bool PluginManager::addElement(QString elementId, QString pluginId)
+{
+    if (!this->load(pluginId))
+        return false;
+
+    PluginObject *element = this->m_plugins[pluginId]->newObject();
+
+    if (!element)
+        return false;
+
+    this->m_elements[elementId] = element;
+
+    if (this->m_pluginConfigs.contains(pluginId))
+        this->m_elements[elementId]->setConfigs(this->m_pluginConfigs[pluginId]);
+
+    this->m_elements[elementId]->begin();
+
+    return true;
+}
+
+bool PluginManager::removeElement(QString elementId)
+{
+    if (!this->m_elements.contains(elementId))
+        return true;
+
+    QString pluginId = this->m_instances1[elementId].toList()[0].toString();
+    this->m_pluginConfigs[pluginId] = this->m_elements[elementId]->configs();
+    this->m_elements[elementId]->end();
+    delete this->m_elements[elementId];
+    this->m_elements.remove(elementId);
+
+    bool unUsed = true;
+
+    foreach (QVariant value, this->m_instances1)
+        if (value.toList()[0].toString() == pluginId)
+        {
+            unUsed = false;
+
+            break;
+        }
+
+    if (unUsed)
+        this->unload(pluginId);
+
+    return true;
+}
+
+bool PluginManager::changeElementId(QString oldElementId, QString newElementId)
+{
+    if (!this->m_elements.contains(oldElementId))
+        return false;
+
+    this->m_elements[newElementId] = this->m_elements[oldElementId];
+    this->m_elements.remove(oldElementId);
 
     return true;
 }
@@ -256,15 +297,20 @@ void PluginManager::parsePipeline(QString pipeline,
     if (ss)
         ss->clear();
 
-    QStringList r = pipeline.split(QRegExp("[a-zA-Z_][0-9a-zA-Z_]*" \
-                                           "(?:=(?:'[^']+'|\"[^\"]+\"|\\[[^\r^\n]+\\]|" \
-                                           "\\{[^\r^\n]+\\}|[^\r^\n^ ^!]+)|" \
-                                           "(?:\\.[a-zA-Z_]+[0-9a-zA-Z_]*){0,1}" \
-                                           "(?:<|>)[a-zA-Z_]+[0-9a-zA-Z_]*" \
-                                           "(?:\\.[a-zA-Z_]+[0-9a-zA-Z_]*){0,1}|" \
-                                           "\\.{0,1})|" \
+    QStringList r = pipeline.split(QRegExp("[a-zA-Z_][0-9a-zA-Z_]*\\ *=\\ *(?:'[^']+'|\"[^\"]+\"|" \
+                                           "\\[[^\r^\n]+\\]|\\{[^\r^\n]+\\}|[^\r^\n^ ^!]+)|" \
+                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.){0,1}" \
+                                           "[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
+                                           "\\(\\ *(?:[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
+                                           "(?:,\\ *[a-zA-Z_][0-9a-zA-Z_]*)*){0,1}\\ *\\)" \
+                                           "\\ *(?:<|>)\\ *" \
+                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.){0,1}" \
+                                           "[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
+                                           "\\(\\ *(?:[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
+                                           "(?:,\\ *[a-zA-Z_][0-9a-zA-Z_]*)*){0,1}\\ *\\)|" \
+                                           "[a-zA-Z_][0-9a-zA-Z_]*\\.{0,1}|" \
                                            "!{1}"),
-                                   QString::SkipEmptyParts);
+                                           QString::SkipEmptyParts);
 
     QList<QVariant> pipes;
     QList<QVariant> pipe;
@@ -282,20 +328,20 @@ void PluginManager::parsePipeline(QString pipeline,
         {
             int eq = p.indexOf("=");
 
-            QString key = p.left(eq);
-            QString value = p.right(p.length() - eq - 1);
+            QString key = p.left(eq).trimmed();
+            QString value = p.right(p.length() - eq - 1).trimmed();
 
             properties[key] = this->parseValue(value);
         }
         // Parse Signals & Slots
         //
-        // sender receiver.slot<signal
-        // receiver slot<sender.signal
+        // sender receiver.slot([type1, tipe2, ...])<signal([type1, tipe2, ...])
+        // receiver slot([type1, tipe2, ...])<sender.signal([type1, tipe2, ...])
         else if (p.contains("<"))
         {
             int eq = p.indexOf("<");
-            QString s1 = p.left(eq);
-            QString s2 = p.right(p.length() - eq - 1);
+            QString s1 = p.left(eq).trimmed();
+            QString s2 = p.right(p.length() - eq - 1).trimmed();
 
             QString sender;
             QString signal;
@@ -326,18 +372,21 @@ void PluginManager::parsePipeline(QString pipeline,
                 signal = s2;
             }
 
+            signal = signal.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
+            slot = slot.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
+
             if (ss)
                 *ss << (QStringList() << sender << signal << receiver << slot);
         }
         // Parse Signals & Slots
         //
-        // sender signal>receiver.slot
-        // receiver sender.signal>slot
+        // sender signal([type1, tipe2, ...])>receiver.slot([type1, tipe2, ...])
+        // receiver sender.signal([type1, tipe2, ...])>slot([type1, tipe2, ...])
         else if (p.contains(">"))
         {
             int eq = p.indexOf(">");
-            QString s1 = p.left(eq);
-            QString s2 = p.right(p.length() - eq - 1);
+            QString s1 = p.left(eq).trimmed();
+            QString s2 = p.right(p.length() - eq - 1).trimmed();
 
             QString sender;
             QString signal;
@@ -367,6 +416,9 @@ void PluginManager::parsePipeline(QString pipeline,
                 receiver = QString("%1,%2").arg(i).arg(j);
                 slot = s2;
             }
+
+            signal = signal.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
+            slot = slot.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
 
             if (ss)
                 *ss << (QStringList() << sender << signal << receiver << slot);
@@ -854,6 +906,11 @@ void PluginManager::setPipeline(QString pipeline2)
             }
     }
 
+    // Set pipeline2 as the new pipeline.
+    this->m_instances1 = instances2;
+    this->m_connections1 = connections2;
+    this->m_ss1 = ss2;
+
     foreach (QStringList ss, disconnectSignalsAndSlots)
     {
     }
@@ -863,16 +920,13 @@ void PluginManager::setPipeline(QString pipeline2)
     }
 
     foreach (QString elementId, removeElement)
-    {
-    }
+        this->removeElement(elementId);
 
     foreach (QStringList change, changeId)
-    {
-    }
+        this->changeElementId(change[0], change[1]);
 
     foreach (QString elementId, addElement.keys())
-    {
-    }
+        this->addElement(elementId, addElement[elementId]);
 
     foreach (QString elementId, setProperties.keys())
         foreach (QString prop, setProperties[elementId].keys())
@@ -891,13 +945,6 @@ void PluginManager::setPipeline(QString pipeline2)
     foreach (QStringList ss, connectSignalsAndSlots)
     {
     }
-
-    // Set pipeline2 as the new pipeline.
-    this->m_instances1 = instances2;
-    this->m_connections1 = connections2;
-    this->m_ss1 = ss2;
-
-    // http://lists.trolltech.com/qt-interest/2005-12/msg00281.html
 }
 
 template <typename T> QList<T> PluginManager::reversed(const QList<T> &list)

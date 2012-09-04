@@ -51,9 +51,10 @@ class PluginManager: public QObject
 
     private:
         QPluginLoader m_pluginLoader;
-        QHash<QString, PluginInstance *> m_plugins;
-        QHash<QString, PluginInfo> m_pluginsInfo;
-        QHash<QString, QVariant> m_pluginConfigs;
+        QMap<QString, Plugin *> m_plugins;
+        QMap<QString, PluginObject *> m_elements;
+        QMap<QString, PluginInfo> m_pluginsInfo;
+        QMap<QString, QVariant> m_pluginConfigs;
 
         // Previous pipeline graph.
         QMap<QString, QVariant> m_instances1; // Nodes
@@ -63,10 +64,14 @@ class PluginManager: public QObject
         QStringList m_availableElementTypes;
         PipelineRoutingMode m_pipelineRoutingMode;
 
-        PluginInstance *plugin(QString pluginId);
+        Plugin *plugin(QString pluginId);
         bool isLoaded(QString pluginId);
         bool load(QString pluginId);
         bool unload(QString pluginId);
+
+        bool addElement(QString elementId, QString pluginId);
+        bool removeElement(QString elementId);
+        bool changeElementId(QString oldElementId, QString newElementId);
 
         QVariant parseValue(QString value);
 
