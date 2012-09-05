@@ -72,6 +72,10 @@ class PluginManager: public QObject
         bool addElement(QString elementId, QString pluginId);
         bool removeElement(QString elementId);
         bool changeElementId(QString oldElementId, QString newElementId);
+        bool setElementProperty(QString elementId, QString property, QVariant value);
+        bool resetElementProperty(QString elementId, QString property);
+        bool connectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
+        bool disconnectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
 
         QVariant parseValue(QString value);
 
@@ -79,8 +83,6 @@ class PluginManager: public QObject
                            QMap<QString, QVariant> *instances = NULL,
                            QList<QStringList> *connections = NULL,
                            QList<QStringList> *ss = NULL);
-
-        template <typename T> QList<T> reversed(const QList<T> &list);
 
     public slots:
         void setPipeline(QString pipeline2);

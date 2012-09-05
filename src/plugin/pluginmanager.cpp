@@ -213,6 +213,75 @@ bool PluginManager::changeElementId(QString oldElementId, QString newElementId)
     return true;
 }
 
+bool PluginManager::setElementProperty(QString elementId, QString property, QVariant value)
+{
+    if (!this->m_elements.contains(elementId))
+        return false;
+
+    this->m_elements[elementId]->setProperty(property.toUtf8().constData(), value);
+
+    return true;
+}
+
+bool PluginManager::resetElementProperty(QString elementId, QString property)
+{
+    if (!this->m_elements.contains(elementId))
+        return false;
+
+    QString resetMethod = QString("reset%1%2").arg(property.left(1).toUpper()).arg(property.mid(1));
+
+    if (this->m_elements[elementId]->metaObject()->indexOfMethod(resetMethod.toUtf8().constData()) < 0)
+        return false;
+
+    QMetaObject::invokeMethod(this->m_elements[elementId], resetMethod.toUtf8().constData());
+
+    return true;
+}
+
+bool PluginManager::connectElementsSS(QString senderId, QString signal, QString receiverId, QString slot)
+{
+    if (!this->m_elements.contains(senderId) || !this->m_elements.contains(receiverId))
+        return false;
+
+    const char *cSignal = QMetaObject::normalizedSignature(signal.toUtf8().constData()).constData();
+    const char *cSlot = QMetaObject::normalizedSignature(slot.toUtf8().constData()).constData();
+
+    int s = this->m_elements[senderId]->metaObject()->indexOfSignal(cSignal);
+    int r = this->m_elements[receiverId]->metaObject()->indexOfSlot(cSlot);
+
+    if (r < 0 || s < 0)
+        return false;
+
+    QObject::connect(this->m_elements[senderId],
+                     this->m_elements[senderId]->metaObject()->method(s),
+                     this->m_elements[receiverId],
+                     this->m_elements[receiverId]->metaObject()->method(r));
+
+    return true;
+}
+
+bool PluginManager::disconnectElementsSS(QString senderId, QString signal, QString receiverId, QString slot)
+{
+    if (!this->m_elements.contains(senderId) || !this->m_elements.contains(receiverId))
+        return false;
+
+    const char *cSignal = QMetaObject::normalizedSignature(signal.toUtf8().constData()).constData();
+    const char *cSlot = QMetaObject::normalizedSignature(slot.toUtf8().constData()).constData();
+
+    int s = this->m_elements[senderId]->metaObject()->indexOfSignal(cSignal);
+    int r = this->m_elements[receiverId]->metaObject()->indexOfSlot(cSlot);
+
+    if (r < 0 || s < 0)
+        return false;
+
+    QObject::disconnect(this->m_elements[senderId],
+                        this->m_elements[senderId]->metaObject()->method(s),
+                        this->m_elements[receiverId],
+                        this->m_elements[receiverId]->metaObject()->method(r));
+
+    return true;
+}
+
 /// Parse a string and returns the native value.
 QVariant PluginManager::parseValue(QString value)
 {
@@ -222,11 +291,11 @@ QVariant PluginManager::parseValue(QString value)
     // Dictionary
     else if (value.startsWith("{"))
     {
-        QStringList r = value.mid(1, value.length() - 2).split(QRegExp("(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\"[^\"]*\"|" \
-                                                                       "'[^']*'|\\{[^\r^\n]*\\}|\\[[^\r^\n]*\\])" \
+        QStringList r = value.mid(1, value.length() - 2).split(QRegExp("(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\".*\"|" \
+                                                                       "'.*'|\\{.*\\}|\\[.*\\])" \
                                                                        " *: *" \
-                                                                       "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\"[^\"]*\"|" \
-                                                                       "'[^']*'|\\{[^\r^\n]*\\}|\\[[^\r^\n]*\\])|" \
+                                                                       "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\".*\"|" \
+                                                                       "'.*'|\\{.*\\}|\\[.*\\])|" \
                                                                        ","), QString::SkipEmptyParts);
 
         QMap<QString, QVariant> d;
@@ -250,10 +319,10 @@ QVariant PluginManager::parseValue(QString value)
                                                                        "\\.[0-9]+|" \
                                                                        "[0-9]+\\.|" \
                                                                        "[0-9]+|" \
-                                                                       "\"[^\"]*\"|" \
-                                                                       "'[^']*'|" \
-                                                                       "\\{[^\r^\n]*\\}|" \
-                                                                       "\\[[^\r^\n]*\\]|" \
+                                                                       "\".*\"|" \
+                                                                       "'.*'|" \
+                                                                       "\\{.*\\}|" \
+                                                                       "\\[.*\\]|" \
                                                                        ","), QString::SkipEmptyParts);
 
         QList<QVariant> l;
@@ -297,19 +366,19 @@ void PluginManager::parsePipeline(QString pipeline,
     if (ss)
         ss->clear();
 
-    QStringList r = pipeline.split(QRegExp("[a-zA-Z_][0-9a-zA-Z_]*\\ *=\\ *(?:'[^']+'|\"[^\"]+\"|" \
-                                           "\\[[^\r^\n]+\\]|\\{[^\r^\n]+\\}|[^\r^\n^ ^!]+)|" \
-                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.){0,1}" \
-                                           "[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
-                                           "\\(\\ *(?:[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
-                                           "(?:,\\ *[a-zA-Z_][0-9a-zA-Z_]*)*){0,1}\\ *\\)" \
-                                           "\\ *(?:<|>)\\ *" \
-                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.){0,1}" \
-                                           "[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
-                                           "\\(\\ *(?:[a-zA-Z_][0-9a-zA-Z_]*\\ *" \
-                                           "(?:,\\ *[a-zA-Z_][0-9a-zA-Z_]*)*){0,1}\\ *\\)|" \
-                                           "[a-zA-Z_][0-9a-zA-Z_]*\\.{0,1}|" \
-                                           "!{1}"),
+    QStringList r = pipeline.split(QRegExp("[a-zA-Z_][0-9a-zA-Z_]* *= *(?:'.*'|\".*\"|" \
+                                           "\\[.*\\]|\\{.*\\}|[^\r^\n^ ^!]+)|" \
+                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                                           "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                           "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                           "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)" \
+                                           " *(?:<|>) *" \
+                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                                           "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                           "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                           "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)|" \
+                                           "[a-zA-Z_][0-9a-zA-Z_]*\\.?|" \
+                                           "!"),
                                            QString::SkipEmptyParts);
 
     QList<QVariant> pipes;
@@ -324,7 +393,12 @@ void PluginManager::parsePipeline(QString pipeline,
     foreach (QString p, r)
     {
         // Parse property
-        if (p.contains("="))
+        if (QRegExp("[a-zA-Z_][0-9a-zA-Z_]* *= *" \
+                    "(?:'.*'|" \
+                    "\".*\"|" \
+                    "\\[.*\\]|" \
+                    "\\{.*\\}|" \
+                    "[^\r^\n^ ^!]+)").exactMatch(p))
         {
             int eq = p.indexOf("=");
 
@@ -337,7 +411,15 @@ void PluginManager::parsePipeline(QString pipeline,
         //
         // sender receiver.slot([type1, tipe2, ...])<signal([type1, tipe2, ...])
         // receiver slot([type1, tipe2, ...])<sender.signal([type1, tipe2, ...])
-        else if (p.contains("<"))
+        else if (QRegExp("(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                         "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)" \
+                         " *< *" \
+                         "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                         "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)").exactMatch(p))
         {
             int eq = p.indexOf("<");
             QString s1 = p.left(eq).trimmed();
@@ -382,7 +464,15 @@ void PluginManager::parsePipeline(QString pipeline,
         //
         // sender signal([type1, tipe2, ...])>receiver.slot([type1, tipe2, ...])
         // receiver sender.signal([type1, tipe2, ...])>slot([type1, tipe2, ...])
-        else if (p.contains(">"))
+        else if (QRegExp("(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                         "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)" \
+                         " *> *" \
+                         "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                         "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                         "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)").exactMatch(p))
         {
             int eq = p.indexOf(">");
             QString s1 = p.left(eq).trimmed();
@@ -590,8 +680,7 @@ void PluginManager::parsePipeline(QString pipeline,
                         QStringList c = QStringList() << conn1 << conn2;
 
                         if (conn1 != conn2 &&
-                            !connections->contains(c) &&
-                            !connections->contains(this->reversed(c)))
+                            !connections->contains(c))
                             *connections << c;
                     }
 
@@ -763,8 +852,7 @@ void PluginManager::setPipeline(QString pipeline2)
                 break;
         }
 
-        if (!cConnections2.contains(dstConnection) &&
-            !cConnections2.contains(reversed(dstConnection)))
+        if (!cConnections2.contains(dstConnection))
         {
             disconnectElement << cConnections1[i];
             cConnections1.removeAt(i);
@@ -798,8 +886,7 @@ void PluginManager::setPipeline(QString pipeline2)
                 break;
         }
 
-        if (!cConnections1.contains(dstConnection) &&
-            !cConnections1.contains(reversed(dstConnection)))
+        if (!cConnections1.contains(dstConnection))
         {
             connectElement << cConnections2[i];
             cConnections2.removeAt(i);
@@ -912,8 +999,7 @@ void PluginManager::setPipeline(QString pipeline2)
     this->m_ss1 = ss2;
 
     foreach (QStringList ss, disconnectSignalsAndSlots)
-    {
-    }
+        this->disconnectElementsSS(ss[0], ss[1], ss[2], ss[3]);
 
     foreach (QStringList connection, disconnectElement)
     {
@@ -930,32 +1016,18 @@ void PluginManager::setPipeline(QString pipeline2)
 
     foreach (QString elementId, setProperties.keys())
         foreach (QString prop, setProperties[elementId].keys())
-        {
-        }
+            this->setElementProperty(elementId, prop, setProperties[elementId][prop]);
 
     foreach (QString elementId, resetProperties.keys())
         foreach (QString prop, resetProperties[elementId])
-        {
-        }
+            this->resetElementProperty(elementId, prop);
 
     foreach (QStringList connection, connectElement)
     {
     }
 
     foreach (QStringList ss, connectSignalsAndSlots)
-    {
-    }
-}
-
-template <typename T> QList<T> PluginManager::reversed(const QList<T> &list)
-{
-    QList<T> result;
-
-    result.reserve(list.size());
-
-    std::reverse_copy(list.begin(), list.end(), std::back_inserter(result));
-
-    return result;
+       this->connectElementsSS(ss[0], ss[1], ss[2], ss[3]);
 }
 
 PluginManager::PipelineRoutingMode PluginManager::pipelineRoutingMode()

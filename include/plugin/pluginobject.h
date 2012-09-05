@@ -44,18 +44,16 @@ class PluginObject: public QObject
 
     signals:
         // Output Channels
-        void oVideo(QImage *frame, QStringList receiverObjectName);
-        //void oAudio(???, QStringList receiverObjectName);
-        void oEvent(QEvent *event, QStringList receiverObjectName);
+        void oVideo(QImage *frame);
+        void oAudio(QByteArray *frame);
 
         void setPipeline(QString pipeline);
         void getPluginList();
 
     public slots:
         // Input Channels
-        virtual void iVideo(QImage *frame, QString senderObjectName) = 0;
-        //virtual void iAudio(???, QString senderObjectName) = 0;
-        virtual void iEvent(QEvent *event, QString senderObjectName) = 0;
+        virtual void iVideo(QImage *frame) = 0;
+        virtual void iAudio(QByteArray *frame) = 0;
 
         /// This function is called after Plugin::setConfigs().
         /// This method executes the initialization code for the plugin.
