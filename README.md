@@ -1,12 +1,12 @@
 # Carnival LiveCam, augmented reality made easy #
 
-![Example of the snow plugin](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/mainscreen.png)
+![Example of the snow plugin](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/images/mainscreen.png)
 
 ## Intro ##
 
-After a long time to be developing in the background, finally present my most ambitious project [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam).
-[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can capture images from multiple sources (webcams, video files, image files), and apply various effects such as effects of rain, fire, masks, 3D effects and 2D of all kinds. And also can take pictures and record video.
-[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is still in an early stage of development (Alpha), but it shows many of the features that are able to offer. Is the ideal time to join the the development.
+After a long time to be developing in the background, finally present my most ambitious project [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam).  
+[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) can capture images from multiple sources (webcams, video files, image files), and apply various effects such as effects of rain, fire, masks, 3D effects and 2D of all kinds. And also can take pictures and record video.  
+[Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is still in an early stage of development (Alpha), but it shows many of the features that are able to offer. Is the ideal time to join the the development.  
 [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is licensed under GPLv3 and hosted on [github](https://github.com/).
 
 ## Basics ##
@@ -29,19 +29,19 @@ At the bottom center of [Carnival LiveCam](https://github.com/hipersayanX/Carniv
 * Set the window to full screen.
 * Information about the program.
 
-![Controls Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/controlsbar.png)
+![Controls Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/images/controlsbar.png)
 
 One of the most important fetures of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is the ability to show many capture devices, modify it's position and apply several effects at same time. Is also possible to interact with some effects using a mouse or any pointer device.
 
-![The Effect Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/spacesandplugins.png)
+![The Effect Bar](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/images/spacesandplugins.png)
 
 The another most important fetures is the Effects selection dialog. Here you can select what effects will be applied to each capture device.
 
-![The Effect Stack](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/effects.png)
+![The Effect Stack](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/images/effects.png)
 
 Here we see one of the configuration dialogs of a driver in this case the driver of images. With a simple design intended for an _point&click_ experience.
 
-![This is the configuration dialog for the image driver](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/screenshots/imageselect.png)
+![This is the configuration dialog for the image driver](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/images/imageselect.png)
 
 ## Obtain and test Carnival LiveCam ##
 
@@ -70,9 +70,9 @@ May be you can compile and use [Carnival LiveCam](https://github.com/hipersayanX
 
 ## What we have and what we need ##
 
-In principle, the base of the program is almost finished, so far there are only 3 effects available for trial, which give a small sample of what can be done with the program, a effect that shows how to integrate OpenSceneGraph with [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) for create 3D effects, one showing how to use OpenCV to create effects based on face detection, and finally one that shows how to perform simple 2D effects.
-Then there are available a basic driver to capture images from your webcam, and another 2 to capture images from image files and video.
-And finally the shell designed in QML.
+In principle, the base of the program is almost finished, so far there are only 3 effects available for trial, which give a small sample of what can be done with the program, a effect that shows how to integrate OpenSceneGraph with [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) for create 3D effects, one showing how to use OpenCV to create effects based on face detection, and finally one that shows how to perform simple 2D effects.  
+Then there are available a basic driver to capture images from your webcam, and another 2 to capture images from image files and video.  
+And finally the shell designed in QML.  
 From what we have left to do:
 
 * As a high priority is the creation of the webcam drivers for Mac OS X and Windows.
@@ -87,7 +87,7 @@ It would be ideal to have more shells, such as a web interface, a plasmoid for K
 
 ## And finally... ##
 
-In general, if you know how to use Git then you know how to collaborate with the project. Just clone the repository and start working on your copy and when you have everything up and running do a push request.
+In general, if you know how to use Git then you know how to collaborate with the project. Just clone the repository and start working on your copy and when you have everything up and running do a push request.  
 Here I leave some links on how to use Git:
 
 * [Pro Git](http://progit.org/book/)
