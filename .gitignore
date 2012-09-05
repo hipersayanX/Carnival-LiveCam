@@ -71,6 +71,7 @@ Makefile*
 ######################
 extras
 build
+share/docs
 
 # Files to ignore #
 ###################

@@ -62,15 +62,11 @@ To compile and run [Carnival LiveCam](https://github.com/hipersayanX/Carnival-Li
 * [OpenCV](http://opencv.willowgarage.com/) >= 2.3.x
 * [FFmpeg](http://ffmpeg.org/)
 * [ffmpegthumbnailer](http://code.google.com/p/ffmpegthumbnailer/) >= 2.xx
-* [Doxygen](http://www.doxygen.org/) >= 1.7.5.x
-* [Graphviz](http://www.graphviz.org/) >= 2.28.x
-* [Texlive-bin](http://www.tug.org/texlive/) >= 2011.x
 * [Git](http://git-scm.com/) >= 1.7.x
-* [Mscgen](http://www.mcternan.me.uk/mscgen/) >= 0.22
 
 May be you can compile and use [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) with an older versions of the recommended software, I don't know. The environment in which I am currently developing [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is [Arch Linux](http://www.archlinux.org/) x86_64. The packages needed by Arch Linux are:
 
-    yaourt -S qt openscenegraph opencv ffmpeg ffmpegthumbnailer doxygen graphviz texlive-bin git mscgen
+    yaourt -S qt openscenegraph opencv ffmpeg ffmpegthumbnailer git
 
 ## What we have and what we need ##
 

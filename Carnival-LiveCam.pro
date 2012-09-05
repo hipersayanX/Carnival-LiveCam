@@ -17,6 +17,8 @@
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
+#include(share/plugins/plugins.pro)
+
 CONFIG += qt
 
 DESTDIR += $$PWD
