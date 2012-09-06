@@ -94,7 +94,7 @@ class Plugin
         /// \retval false if has not a configuration.
         virtual bool isConfigurable() = 0;
 
-        virtual Element *newObject() = 0;
+        virtual Element *newElement() = 0;
 
         virtual ~Plugin() = 0;
 };

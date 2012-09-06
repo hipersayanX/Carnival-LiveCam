@@ -25,7 +25,7 @@ DESTDIR += $$PWD
 
 HEADERS += \
     include/plugin.h \
-    include/element \
+    include/element.h \
     include/snowfall.h \
     include/snowflake.h \
     include/snow.h \

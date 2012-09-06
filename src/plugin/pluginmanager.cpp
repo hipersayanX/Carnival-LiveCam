@@ -160,7 +160,7 @@ bool PluginManager::addElement(QString elementId, QString pluginId)
     if (!this->load(pluginId))
         return false;
 
-    Element *element = this->m_plugins[pluginId]->newObject();
+    Element *element = this->m_plugins[pluginId]->newElement();
 
     if (!element)
         return false;
