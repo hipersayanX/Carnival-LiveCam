@@ -160,12 +160,17 @@ bool PluginManager::addElement(QString elementId, QString pluginId)
     if (!this->load(pluginId))
         return false;
 
-    PluginObject *element = this->m_plugins[pluginId]->newObject();
+    Element *element = this->m_plugins[pluginId]->newObject();
 
     if (!element)
         return false;
 
     this->m_elements[elementId] = element;
+
+    QObject::connect(element, SIGNAL(setPipeline(QString)), this, SLOT(setPipeline(QString)));
+    QObject::connect(element, SIGNAL(setPipelineRoutingMode(QString)), this, SLOT(setPipelineRoutingMode(QString)));
+    QObject::connect(element, SIGNAL(resetPipelineRoutingMode()), this, SLOT(resetPipelineRoutingMode()));
+    QObject::connect(element, SIGNAL(requestPluginList()), this, SLOT(sendPluginList()));
 
     if (this->m_pluginConfigs.contains(pluginId))
         this->m_elements[elementId]->setConfigs(this->m_pluginConfigs[pluginId]);
@@ -181,9 +186,16 @@ bool PluginManager::removeElement(QString elementId)
         return true;
 
     QString pluginId = this->m_instances1[elementId].toList()[0].toString();
-    this->m_pluginConfigs[pluginId] = this->m_elements[elementId]->configs();
-    this->m_elements[elementId]->end();
-    delete this->m_elements[elementId];
+    Element *element = this->m_elements[elementId];
+    this->m_pluginConfigs[pluginId] = element->configs();
+    element->end();
+
+    QObject::disconnect(element, SIGNAL(setPipeline(QString)), this, SLOT(setPipeline(QString)));
+    QObject::disconnect(element, SIGNAL(setPipelineRoutingMode(QString)), this, SLOT(setPipelineRoutingMode(QString)));
+    QObject::disconnect(element, SIGNAL(resetPipelineRoutingMode()), this, SLOT(resetPipelineRoutingMode()));
+    QObject::disconnect(element, SIGNAL(requestPluginList()), this, SLOT(sendPluginList()));
+
+    delete element;
     this->m_elements.remove(elementId);
 
     bool unUsed = true;
@@ -282,14 +294,32 @@ bool PluginManager::disconnectElementsSS(QString senderId, QString signal, QStri
     return true;
 }
 
+bool PluginManager::connectElements(QString senderId, QString receiverId)
+{
+    if (this->connectElementsSS(senderId, "oVideo(QImage *)", receiverId, "iVideo(QImage *)") &&
+        this->connectElementsSS(senderId, "oAudio(QByteArray *)", receiverId, "iAudio(QByteArray *)"))
+        return true;
+    else
+        return false;
+}
+
+bool PluginManager::disconnectElements(QString senderId, QString receiverId)
+{
+    if (this->disconnectElementsSS(senderId, "oVideo(QImage *)", receiverId, "iVideo(QImage *)") &&
+        this->disconnectElementsSS(senderId, "oAudio(QByteArray *)", receiverId, "iAudio(QByteArray *)"))
+        return true;
+    else
+        return false;
+}
+
 /// Parse a string and returns the native value.
 QVariant PluginManager::parseValue(QString value)
 {
     // String
-    if (value.startsWith("'") || value.startsWith("\""))
+    if (QRegExp("'.*'|\".*\"").exactMatch(value))
         return value.mid(1, value.length() - 2);
     // Dictionary
-    else if (value.startsWith("{"))
+    else if (QRegExp("\\{.*\\}").exactMatch(value))
     {
         QStringList r = value.mid(1, value.length() - 2).split(QRegExp("(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\".*\"|" \
                                                                        "'.*'|\\{.*\\}|\\[.*\\])" \
@@ -313,7 +343,7 @@ QVariant PluginManager::parseValue(QString value)
         return d;
     }
     // List
-    else if (value.startsWith("["))
+    else if (QRegExp("\\[.*\\]").exactMatch(value))
     {
         QStringList r = value.mid(1, value.length() - 2).split(QRegExp("[0-9]+\\.[0-9]+|" \
                                                                        "\\.[0-9]+|" \
@@ -658,28 +688,29 @@ void PluginManager::parsePipeline(QString pipeline,
         {
             instances->remove(id);
 
-            QStringList conns;
+            QStringList iConns;
+            QStringList oConns;
 
             for (i = 0; i < connections->length(); i++)
                 if ((*connections)[i][0] == id || (*connections)[i][1] == id)
                 {
                     if ((*connections)[i][0] != id)
-                        conns << (*connections)[i][0];
+                        iConns << (*connections)[i][0];
 
                     if ((*connections)[i][1] != id)
-                        conns << (*connections)[i][1];
+                        oConns << (*connections)[i][1];
 
                     connections->removeAt(i);
                     i--;
                 }
 
             if (this->m_pipelineRoutingMode == Force)
-                foreach (QString conn1, conns)
-                    foreach (QString conn2, conns)
+                foreach (QString iConn, iConns)
+                    foreach (QString oConn, oConns)
                     {
-                        QStringList c = QStringList() << conn1 << conn2;
+                        QStringList c = QStringList() << iConn << oConn;
 
-                        if (conn1 != conn2 &&
+                        if (iConn != oConn &&
                             !connections->contains(c))
                             *connections << c;
                     }
@@ -1002,8 +1033,7 @@ void PluginManager::setPipeline(QString pipeline2)
         this->disconnectElementsSS(ss[0], ss[1], ss[2], ss[3]);
 
     foreach (QStringList connection, disconnectElement)
-    {
-    }
+        this->disconnectElements(connection[0], connection[1]);
 
     foreach (QString elementId, removeElement)
         this->removeElement(elementId);
@@ -1023,8 +1053,7 @@ void PluginManager::setPipeline(QString pipeline2)
             this->resetElementProperty(elementId, prop);
 
     foreach (QStringList connection, connectElement)
-    {
-    }
+        this->connectElements(connection[0], connection[1]);
 
     foreach (QStringList ss, connectSignalsAndSlots)
        this->connectElementsSS(ss[0], ss[1], ss[2], ss[3]);
@@ -1035,6 +1064,18 @@ PluginManager::PipelineRoutingMode PluginManager::pipelineRoutingMode()
     return this->m_pipelineRoutingMode;
 }
 
+void PluginManager::setPipelineRoutingMode(QString mode)
+{
+    if (mode == "Fail")
+        this->setPipelineRoutingMode(Fail);
+    else if (mode == "Remove")
+        this->setPipelineRoutingMode(Remove);
+    else if (mode == "Force")
+        this->setPipelineRoutingMode(Force);
+    else
+        this->setPipelineRoutingMode(NoCheck);
+}
+
 void PluginManager::setPipelineRoutingMode(PipelineRoutingMode mode)
 {
     this->m_pipelineRoutingMode = mode;
@@ -1043,4 +1084,12 @@ void PluginManager::setPipelineRoutingMode(PipelineRoutingMode mode)
 void PluginManager::resetPipelineRoutingMode()
 {
     this->m_pipelineRoutingMode = NoCheck;
+}
+
+void PluginManager::sendPluginList()
+{
+    Element *element = qobject_cast<Element *>(this->sender());
+
+    if (element)
+        element->setPluginList(this->pluginList());
 }

@@ -24,8 +24,8 @@ CONFIG += plugin
 DESTDIR += $$PWD
 
 HEADERS += \
-    include/driver.h \
-    include/driverfactory.h \
+    include/plugin.h \
+    include/element.h \
     include/webcamlinux.h \
     include/webcamlinuxfactory.h \
     include/sleep.h

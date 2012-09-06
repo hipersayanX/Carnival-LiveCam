@@ -52,7 +52,7 @@ class PluginManager: public QObject
     private:
         QPluginLoader m_pluginLoader;
         QMap<QString, Plugin *> m_plugins;
-        QMap<QString, PluginObject *> m_elements;
+        QMap<QString, Element *> m_elements;
         QMap<QString, PluginInfo> m_pluginsInfo;
         QMap<QString, QVariant> m_pluginConfigs;
 
@@ -76,6 +76,8 @@ class PluginManager: public QObject
         bool resetElementProperty(QString elementId, QString property);
         bool connectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
         bool disconnectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
+        bool connectElements(QString senderId, QString receiverId);
+        bool disconnectElements(QString senderId, QString receiverId);
 
         QVariant parseValue(QString value);
 
@@ -86,8 +88,12 @@ class PluginManager: public QObject
 
     public slots:
         void setPipeline(QString pipeline2);
+        void setPipelineRoutingMode(QString mode);
         void setPipelineRoutingMode(PipelineRoutingMode mode);
         void resetPipelineRoutingMode();
+
+    private slots:
+        void sendPluginList();
 };
 
 #endif // PLUGINMANAGER_H

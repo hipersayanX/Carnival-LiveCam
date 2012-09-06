@@ -25,6 +25,7 @@ DESTDIR += $$PWD
 
 HEADERS += \
     include/plugin.h \
+    include/element \
     include/thecow.h \
     include/qosgwidget.h
 

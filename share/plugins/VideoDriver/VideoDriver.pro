@@ -24,8 +24,8 @@ CONFIG += plugin
 DESTDIR += $$PWD
 
 HEADERS += \
-    include/driver.h \
-    include/driverfactory.h \
+    include/plugin.h \
+    include/element.h \
     include/config.h \
     include/videodriver.h \
     include/videodriverfactory.h

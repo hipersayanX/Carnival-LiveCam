@@ -24,8 +24,8 @@ CONFIG += plugin
 DESTDIR += $$PWD
 
 HEADERS += \
-    include/shell.h \
-    include/shellfactory.h \
+    include/plugin.h \
+    include/element.h \
     include/defaultshell.h \
     include/defaultshellfactory.h \
     include/webcamimageprovider.h \

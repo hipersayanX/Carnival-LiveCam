@@ -25,6 +25,7 @@ DESTDIR += $$PWD
 
 HEADERS += \
     include/plugin.h \
+    include/element \
     include/themask.h \
     include/mask.h \
     include/space.h

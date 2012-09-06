@@ -23,13 +23,13 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef PLUGINOBJECT_H
-#define PLUGINOBJECT_H
+#ifndef ELEMENT_H
+#define ELEMENT_H
 
 #include <QtGui>
 
 /// Plugin template.
-class PluginObject: public QObject
+class Element: public QObject
 {
     Q_OBJECT
 
@@ -48,7 +48,9 @@ class PluginObject: public QObject
         void oAudio(QByteArray *frame);
 
         void setPipeline(QString pipeline);
-        void getPluginList();
+        void setPipelineRoutingMode(QString mode);
+        void resetPipelineRoutingMode();
+        void requestPluginList();
 
     public slots:
         // Input Channels
@@ -77,4 +79,4 @@ class PluginObject: public QObject
         virtual void setPluginList(QList<QVariant> list) = 0;
 };
 
-#endif // PLUGINOBJECT_H
+#endif // ELEMENT_H

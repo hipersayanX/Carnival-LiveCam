@@ -28,7 +28,7 @@
 
 #include <QtPlugin>
 
-#include "pluginobject.h"
+#include "element.h"
 
 class Plugin
 {
@@ -94,7 +94,7 @@ class Plugin
         /// \retval false if has not a configuration.
         virtual bool isConfigurable() = 0;
 
-        virtual PluginObject *newObject() = 0;
+        virtual Element *newObject() = 0;
 
         virtual ~Plugin() = 0;
 };

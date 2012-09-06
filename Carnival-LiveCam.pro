@@ -17,7 +17,7 @@
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include(share/plugins/plugins.pro)
+include(share/plugins/plugins.pro)
 
 CONFIG += qt
 
@@ -45,15 +45,11 @@ HEADERS += \
     include/space/spacecontrols.h \
     include/space/spacemanager.h \
     include/plugin/plugin.h \
-    include/plugin/pluginobject.h
-
-target.path += /usr/bin
-
-plugins.files = share/*
-plugins.path = /usr/share/$$TARGET
+    include/plugin/element.h
 
 INSTALLS += target \
-            plugins
+            docs \
+            data
 
 MOC_DIR += $$PWD/build
 
@@ -86,3 +82,17 @@ TEMPLATE += app
 UI_DIR += $$PWD/build
 
 FORMS += share/ui/spacecontrols.ui
+
+# Build rules
+
+docs.commands = qdoc3 $$TARGET.qdocconf
+docs.files += share/docs/*
+docs.path += /usr/share/docs/$$TARGET
+
+# Install rules
+
+target.files += $$TARGET
+target.path += /usr/bin/$$TARGET
+
+data.files = share/*
+data.path = /usr/share/$$TARGET

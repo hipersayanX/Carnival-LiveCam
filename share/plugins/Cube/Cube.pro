@@ -24,6 +24,7 @@ CONFIG += plugin
 DESTDIR += $$PWD
 
 HEADERS += \
+    include/element.h \
     include/plugin.h \
     include/cube.h \
     include/ogl.h
