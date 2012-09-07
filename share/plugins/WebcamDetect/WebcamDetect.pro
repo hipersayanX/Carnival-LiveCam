@@ -17,17 +17,30 @@
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-TEMPLATE = subdirs
+CONFIG += plugin
 
-CONFIG += ordered
+DESTDIR += $$PWD
 
-#SUBDIRS += share/plugins/Cube \
-#           share/plugins/DefaultShell \
-#           share/plugins/ImageDriver \
-#           share/plugins/SnowFall \
-#           share/plugins/TheCow \
-#           share/plugins/TheMask \
-#           share/plugins/VideoDriver \
+HEADERS += \
+    include/plugin.h \
+    include/element.h \
+    include/sleep.h \
+    include/webcamdetect.h \
+    include/webcamdetectelement.h
 
-SUBDIRS += share/plugins/WebcamDetect \
-           share/plugins/WebcamSource
+MOC_DIR += $$PWD/build
+
+OBJECTS_DIR += $$PWD/build
+
+QT += core gui
+
+RCC_DIR += $$PWD/build
+
+SOURCES += \
+    src/sleep.cpp \
+    src/webcamdetect.cpp \
+    src/webcamdetectelement.cpp
+
+TEMPLATE = lib
+
+UI_DIR += $$PWD/build
