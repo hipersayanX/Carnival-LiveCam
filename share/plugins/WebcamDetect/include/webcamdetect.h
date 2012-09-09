@@ -42,7 +42,7 @@ class WebcamDetect: public QObject, public Plugin
         QString mail();
         bool isConfigurable();
 
-        WebcamDetectElement *newElement();
+        Element *newElement();
 
         ~WebcamDetect();
 };

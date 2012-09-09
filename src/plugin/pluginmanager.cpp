@@ -155,6 +155,22 @@ bool PluginManager::unload(QString pluginId)
     return true;
 }
 
+bool PluginManager::startElement(QString elementId)
+{
+    if (!this->m_elements.contains(elementId))
+        return false;
+
+    return this->m_elements[elementId]->start();
+}
+
+bool PluginManager::stopElement(QString elementId)
+{
+    if (!this->m_elements.contains(elementId))
+        return false;
+
+    return this->m_elements[elementId]->stop();
+}
+
 bool PluginManager::addElement(QString elementId, QString pluginId)
 {
     if (!this->load(pluginId))
@@ -172,11 +188,6 @@ bool PluginManager::addElement(QString elementId, QString pluginId)
     QObject::connect(element, SIGNAL(resetPipelineRoutingMode()), this, SLOT(resetPipelineRoutingMode()));
     QObject::connect(element, SIGNAL(requestPluginList()), this, SLOT(sendPluginList()));
 
-    if (this->m_pluginConfigs.contains(pluginId))
-        this->m_elements[elementId]->setConfigs(this->m_pluginConfigs[pluginId]);
-
-    this->m_elements[elementId]->begin();
-
     return true;
 }
 
@@ -187,8 +198,6 @@ bool PluginManager::removeElement(QString elementId)
 
     QString pluginId = this->m_instances1[elementId].toList()[0].toString();
     Element *element = this->m_elements[elementId];
-    this->m_pluginConfigs[pluginId] = element->configs();
-    element->end();
 
     QObject::disconnect(element, SIGNAL(setPipeline(QString)), this, SLOT(setPipeline(QString)));
     QObject::disconnect(element, SIGNAL(setPipelineRoutingMode(QString)), this, SLOT(setPipelineRoutingMode(QString)));
@@ -1029,6 +1038,9 @@ void PluginManager::setPipeline(QString pipeline2)
     this->m_connections1 = connections2;
     this->m_ss1 = ss2;
 
+    foreach (QString elementId, removeElement)
+        this->stopElement(elementId);
+
     foreach (QStringList ss, disconnectSignalsAndSlots)
         this->disconnectElementsSS(ss[0], ss[1], ss[2], ss[3]);
 
@@ -1057,6 +1069,9 @@ void PluginManager::setPipeline(QString pipeline2)
 
     foreach (QStringList ss, connectSignalsAndSlots)
        this->connectElementsSS(ss[0], ss[1], ss[2], ss[3]);
+
+    foreach (QString elementId, addElement.keys())
+        this->startElement(elementId);
 }
 
 PluginManager::PipelineRoutingMode PluginManager::pipelineRoutingMode()
@@ -1072,7 +1087,7 @@ void PluginManager::setPipelineRoutingMode(QString mode)
         this->setPipelineRoutingMode(Remove);
     else if (mode == "Force")
         this->setPipelineRoutingMode(Force);
-    else
+    else if (mode == "NoCheck")
         this->setPipelineRoutingMode(NoCheck);
 }
 

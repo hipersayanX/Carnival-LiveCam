@@ -17,77 +17,77 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/webcamdetect.h"
+#include "../include/webcamsource.h"
 
-QString WebcamDetect::pluginId()
+QString WebcamSource::pluginId()
 {
-    return "WebcamDetect";
+    return "WebcamSource";
 }
 
-QString WebcamDetect::name()
+QString WebcamSource::name()
 {
-    return "Webcam detect";
+    return "Webcam Source";
 }
 
-QString WebcamDetect::version()
+QString WebcamSource::version()
 {
     return "1.0.0";
 }
 
-QString WebcamDetect::summary()
+QString WebcamSource::summary()
 {
-    return "Detect all available webcam devices";
+    return "Capture video from a webcam";
 }
 
-QString WebcamDetect::type()
+QString WebcamSource::type()
 {
-    return "utils";
+    return "video";
 }
 
-QString WebcamDetect::category()
+QString WebcamSource::category()
 {
     return "webcam";
 }
 
-QString WebcamDetect::thumbnail()
+QString WebcamSource::thumbnail()
 {
     return "../../../../../share/drivers/WebcamLinux/share/icons/camera-web.png";
 }
 
-QString WebcamDetect::license()
+QString WebcamSource::license()
 {
     return "GPLv3";
 }
 
-QString WebcamDetect::author()
+QString WebcamSource::author()
 {
     return "Gonzalo Exequiel Pedone";
 }
 
-QString WebcamDetect::website()
+QString WebcamSource::website()
 {
     return "https://github.com/hipersayanX/Carnival-LiveCam";
 }
 
-QString WebcamDetect::mail()
+QString WebcamSource::mail()
 {
     return "hipersayan DOT x AT gmail DOT com";
 }
 
-bool WebcamDetect::isConfigurable()
+bool WebcamSource::isConfigurable()
 {
     return false;
 }
 
-Element *WebcamDetect::newElement()
+Element *WebcamSource::newElement()
 {
-    WebcamDetectElement *element = new WebcamDetectElement();
+    WebcamSourceElement *element = new WebcamSourceElement();
 
     return qobject_cast<Element *>(element);
 }
 
-WebcamDetect::~WebcamDetect()
+WebcamSource::~WebcamSource()
 {
 }
 
-Q_EXPORT_PLUGIN2(WebcamDetect, WebcamDetect)
+Q_EXPORT_PLUGIN2(WebcamSource, WebcamSource)

@@ -17,18 +17,34 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/webcamlinux.h"
-#include "../include/webcamlinuxfactory.h"
+#ifndef WEBCAMSOURCE_H
+#define WEBCAMSOURCE_H
 
-/*!
-  \class WebcamLinuxFactory
+#include "plugin.h"
+#include "webcamsourceelement.h"
 
-  \brief WebcamLinux factory.
- */
-
-Driver* WebcamLinuxFactory::driver()
+class WebcamSource: public QObject, public Plugin
 {
-    return new WebcamLinux();
-}
+    Q_OBJECT
+    Q_INTERFACES(Plugin)
 
-Q_EXPORT_PLUGIN2(WebcamLinux, WebcamLinuxFactory)
+    public:
+        QString pluginId();
+        QString name();
+        QString version();
+        QString summary();
+        QString type();
+        QString category();
+        QString thumbnail();
+        QString license();
+        QString author();
+        QString website();
+        QString mail();
+        bool isConfigurable();
+
+        Element *newElement();
+
+        ~WebcamSource();
+};
+
+#endif // WEBCAMSOURCE_H

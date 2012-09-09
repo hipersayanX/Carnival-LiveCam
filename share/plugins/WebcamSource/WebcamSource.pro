@@ -26,9 +26,8 @@ DESTDIR += $$PWD
 HEADERS += \
     include/plugin.h \
     include/element.h \
-    include/webcamlinux.h \
-    include/webcamlinuxfactory.h \
-    include/sleep.h
+    include/webcamsource.h \
+    include/webcamsourceelement.h
 
 unix {
     CONFIG += link_pkgconfig
@@ -44,9 +43,8 @@ QT += core gui
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/webcamlinux.cpp \
-    src/webcamlinuxfactory.cpp \
-    src/sleep.cpp
+    src/webcamsource.cpp \
+    src/webcamsourceelement.cpp
 
 TEMPLATE = lib
 

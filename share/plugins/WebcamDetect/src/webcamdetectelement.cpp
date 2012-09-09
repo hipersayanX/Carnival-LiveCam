@@ -21,8 +21,12 @@
 #include <linux/videodev2.h>
 
 #include "../include/sleep.h"
-
 #include "../include/webcamdetectelement.h"
+
+WebcamDetectElement::WebcamDetectElement(): Element()
+{
+    this->m_devicesPath = "/dev";
+}
 
 QList<QStringList> WebcamDetectElement::webcams(QString dir)
 {
@@ -69,14 +73,17 @@ void WebcamDetectElement::iAudio(QByteArray *frame)
     Q_UNUSED(frame)
 }
 
-void WebcamDetectElement::begin()
+void WebcamDetectElement::start()
 {
-    this->m_devicesPath = "/dev";
     this->m_fsWatcher = new QFileSystemWatcher(QStringList(this->m_devicesPath), this);
+
+    if (!this->m_fsWatcher)
+        return;
+
     QObject::connect(this->m_fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(devicesChanged(QString)));
 }
 
-void WebcamDetectElement::end()
+void WebcamDetectElement::stop()
 {
     if (!this->m_fsWatcher)
         return;
@@ -84,20 +91,6 @@ void WebcamDetectElement::end()
     QObject::disconnect(this->m_fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(devicesChanged(QString)));
     delete this->m_fsWatcher;
     this->m_fsWatcher = NULL;
-}
-
-QVariant WebcamDetectElement::configs()
-{
-    return QVariant();
-}
-
-void WebcamDetectElement::setConfigs(const QVariant &configs)
-{
-    Q_UNUSED(configs)
-}
-
-void WebcamDetectElement::resetConfigs()
-{
 }
 
 void WebcamDetectElement::configure()
@@ -146,4 +139,25 @@ void WebcamDetectElement::updateWebcams()
     this->m_fsWatcher->removePath(this->m_devicesPath);
     this->devicesChanged(this->m_devicesPath);
     this->m_fsWatcher->addPath(this->m_devicesPath);
+}
+
+QString WebcamDetectElement::devicesPath()
+{
+    return this->m_devicesPath;
+}
+
+void WebcamDetectElement::setDevicesPath(QString devicesPath)
+{
+    if (this->m_fsWatcher)
+    {
+        this->m_fsWatcher->removePath(this->m_devicesPath);
+        this->m_fsWatcher->addPath(devicesPath);
+    }
+
+    this->m_devicesPath = devicesPath;
+}
+
+void WebcamDetectElement::resetDevicesPath()
+{
+    this->setDevicesPath("/dev");
 }

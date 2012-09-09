@@ -17,35 +17,37 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef WEBCAMDETECTELEMENT_H
-#define WEBCAMDETECTELEMENT_H
+#ifndef WEBCAMSOURCEELEMENT_H
+#define WEBCAMSOURCEELEMENT_H
 
-#include <QFileSystemWatcher>
+#include <opencv2/opencv.hpp>
 
 #include "element.h"
 
-class WebcamDetectElement: public Element
+class WebcamSourceElement: public Element
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString devicesPath READ devicesPath WRITE setDevicesPath RESET resetDevicesPath)
+    Q_PROPERTY(QString device READ device WRITE setDevice RESET resetDevice)
+    Q_PROPERTY(QSize size READ size WRITE setSize RESET resetSize)
+    Q_PROPERTY(int fps READ fps WRITE setFps RESET resetFps)
 
     public:
-        WebcamDetectElement();
-        QString devicesPath();
+        WebcamSourceElement();
+        QString device();
+        QSize size();
+        int fps();
 
     private:
-        QFileSystemWatcher *m_fsWatcher;
-        QList<QStringList> m_webcams;
-        QString m_devicesPath;
-
-        QList<QStringList> webcams(QString dir);
-        template <typename T>  QList<T> substractList(QList<T> a, QList<T> b);
+        QString m_device;
+        QSize m_size;
+        int m_fps;
+        cv::VideoCapture m_webcam;
+        QTimer m_timer;
+        QImage m_curFrame;
 
     signals:
-        void webcamsUpdated(QList<QStringList> webcams);
-        void webcamsAdded(QList<QStringList> webcams);
-        void webcamsRemoved(QList<QStringList> webcams);
+        void fail();
 
     public slots:
         // Input Channels
@@ -59,13 +61,15 @@ class WebcamDetectElement: public Element
 
         void setPluginList(QList<QVariant> list);
 
-        void updateWebcams();
-
-        void setDevicesPath(QString devicesPath);
-        void resetDevicesPath();
+        void setDevice(QString device);
+        void setSize(QSize size);
+        void setFps(int fps);
+        void resetDevice();
+        void resetSize();
+        void resetFps();
 
     private slots:
-        void devicesChanged(QString path);
+        void timeout();
 };
 
-#endif // WEBCAMDETECTELEMENT_H
+#endif // WEBCAMSOURCEELEMENT_H

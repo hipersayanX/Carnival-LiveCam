@@ -33,15 +33,6 @@ class Element: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QVariant configs READ configs WRITE setConfigs RESET resetConfigs)
-
-    public:
-        /// This method is called before Plugin::end().
-        /// Must return all significant data that the plugin wants to reload again.
-        ///
-        /// \return Plugin configurations.
-        virtual QVariant configs() = 0;
-
     signals:
         // Output Channels
         void oVideo(QImage *frame);
@@ -59,22 +50,14 @@ class Element: public QObject
 
         /// This function is called after Plugin::setConfigs().
         /// This method executes the initialization code for the plugin.
-        virtual void begin() = 0;
+        virtual void start() = 0;
 
         /// This function is called after Plugin::configs(), and before unload the plugin.
         /// This method executes the finalization code for the plugin.
-        virtual void end() = 0;
+        virtual void stop() = 0;
 
         /// Calls the configuration dialog of the plugin.
         virtual void configure() = 0;
-
-        /// This method is called before Plugin::begin().
-        /// Set all configurations presaved with Plugin::configs().
-        ///
-        /// \param configs Plugin configurations.
-        virtual void setConfigs(const QVariant &configs) = 0;
-
-        virtual void resetConfigs() = 0;
 
         virtual void setPluginList(QList<QVariant> list) = 0;
 };

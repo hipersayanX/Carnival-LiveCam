@@ -23,11 +23,11 @@ CONFIG += ordered
 
 #SUBDIRS += share/plugins/Cube \
 #           share/plugins/DefaultShell \
-#           share/plugins/ImageDriver \
 #           share/plugins/SnowFall \
 #           share/plugins/TheCow \
 #           share/plugins/TheMask \
 #           share/plugins/VideoDriver \
 
-SUBDIRS += share/plugins/WebcamDetect \
+SUBDIRS += share/plugins/ImageDriver \
+           share/plugins/WebcamDetect \
            share/plugins/WebcamSource
