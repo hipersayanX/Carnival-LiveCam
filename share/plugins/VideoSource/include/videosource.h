@@ -17,18 +17,34 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef IMAGEDRIVERFACTORY_H
-#define IMAGEDRIVERFACTORY_H
+#ifndef VIDEOSOURCE_H
+#define VIDEOSOURCE_H
 
-#include "driverfactory.h"
+#include "plugin.h"
+#include "videosourceelement.h"
 
-class ImageDriverFactory: public QObject, public DriverFactory
+class VideoSource: public QObject, public Plugin
 {
     Q_OBJECT
-    Q_INTERFACES(DriverFactory)
+    Q_INTERFACES(Plugin)
 
     public:
-        Driver* driver();
+        QString pluginId();
+        QString name();
+        QString version();
+        QString summary();
+        QString type();
+        QString category();
+        QString thumbnail();
+        QString license();
+        QString author();
+        QString website();
+        QString mail();
+        bool isConfigurable();
+
+        Element *newElement();
+
+        ~VideoSource();
 };
 
-#endif // IMAGEDRIVERFACTORY_H
+#endif // VIDEOSOURCE_H

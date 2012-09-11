@@ -17,18 +17,53 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/imagedriver.h"
-#include "../include/imagedriverfactory.h"
+#include "../include/imagesourceelement.h"
 
-/*!
-  \class ImageDriverFactory
-
-  \brief ImageDriver factory.
- */
-
-Driver* ImageDriverFactory::driver()
+ImageSourceElement::ImageSourceElement()
 {
-    return new ImageDriver();
+    this->m_fileName = "";
 }
 
-Q_EXPORT_PLUGIN2(ImageDriver, ImageDriverFactory)
+void ImageSourceElement::iVideo(QImage *frame)
+{
+    Q_UNUSED(frame)
+}
+
+void ImageSourceElement::iAudio(QByteArray *frame)
+{
+    Q_UNUSED(frame)
+}
+
+void ImageSourceElement::start()
+{
+    emit(oVideo(&this->m_image));
+}
+
+void ImageSourceElement::stop()
+{
+}
+
+void ImageSourceElement::configure()
+{
+}
+
+void ImageSourceElement::setPluginList(QList<QVariant> list)
+{
+    Q_UNUSED(list)
+}
+
+QString ImageSourceElement::fileName()
+{
+    return this->m_fileName;
+}
+
+void ImageSourceElement::setFileName(QString fileSource)
+{
+    this->m_fileName = fileSource;
+    this->m_image = QImage(this->m_fileName);
+}
+
+void ImageSourceElement::resetFileName()
+{
+    this->setFileName("");
+}

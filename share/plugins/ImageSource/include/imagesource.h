@@ -17,39 +17,34 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef IMAGESOURCE_H
+#define IMAGESOURCE_H
 
-#include <QDialog>
+#include "plugin.h"
+#include "imagesourceelement.h"
 
-#include "ui_config.h"
-
-class Config: public QDialog, private Ui::Config
+class ImageSource: public QObject, public Plugin
 {
     Q_OBJECT
-    Q_PROPERTY(QStringList *videoDevices READ videoDevices WRITE setVideoDevices RESET resetVideoDevices)
+    Q_INTERFACES(Plugin)
 
     public:
-        explicit Config(QWidget *parent = 0);
-        ~Config();
-        QStringList *videoDevices();
+        QString pluginId();
+        QString name();
+        QString version();
+        QString summary();
+        QString type();
+        QString category();
+        QString thumbnail();
+        QString license();
+        QString author();
+        QString website();
+        QString mail();
+        bool isConfigurable();
 
-    private:
-        QStringList *m_videoDevices;
+        Element *newElement();
 
-        void setFiles(QStringList files);
-        QString makeThumbnail(QString fileName);
-
-    public slots:
-        void setVideoDevices(QStringList *videoDevices);
-        void resetVideoDevices();
-
-    protected:
-        void changeEvent(QEvent *e);
-
-    private slots:
-        void on_btnAdd_clicked();
-        void on_btnRemove_clicked();
+        ~ImageSource();
 };
 
-#endif // CONFIG_H
+#endif // IMAGESOURCE_H

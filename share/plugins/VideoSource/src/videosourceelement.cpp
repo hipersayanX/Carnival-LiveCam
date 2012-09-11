@@ -16,54 +16,43 @@
 //
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
-/*
-#include <sys/ioctl.h>
-#include <linux/videodev2.h>
-#include <QDir>
-*/
-#include "../include/webcamsourceelement.h"
 
-WebcamSourceElement::WebcamSourceElement(): Element()
+#include <QFileInfo>
+
+#include "../include/videosourceelement.h"
+
+VideoSourceElement::VideoSourceElement()
 {
-    this->m_device = "/dev/video0";
-    this->m_size = QSize(640, 480);
+    this->m_fileName = "";
     this->m_fps = 30;
 
-    this->m_webcam.set(CV_CAP_PROP_FRAME_WIDTH, this->m_size.width());
-    this->m_webcam.set(CV_CAP_PROP_FRAME_HEIGHT, this->m_size.height());
     this->m_timer.setInterval((int)(1000.0 / (float) this->m_fps));
     QObject::connect(&this->m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
-QString WebcamSourceElement::device()
+QString VideoSourceElement::fileName()
 {
-    return this->m_device;
+    return this->m_fileName;
 }
 
-QSize WebcamSourceElement::size()
-{
-    return this->m_size;
-}
-
-int WebcamSourceElement::fps()
+int VideoSourceElement::fps()
 {
     return this->m_fps;
 }
 
-void WebcamSourceElement::iVideo(QImage *frame)
+void VideoSourceElement::iVideo(QImage *frame)
 {
     Q_UNUSED(frame)
 }
 
-void WebcamSourceElement::iAudio(QByteArray *frame)
+void VideoSourceElement::iAudio(QByteArray *frame)
 {
     Q_UNUSED(frame)
 }
 
-void WebcamSourceElement::start()
+void VideoSourceElement::start()
 {
-    // Try to open webcam device,
-    if (!this->m_webcam.open(QString(this->m_device).remove("/dev/video").toInt()))
+    if (!this->m_video.open(this->m_fileName.toUtf8().constData()))
     {
         emit(fail());
 
@@ -73,86 +62,66 @@ void WebcamSourceElement::start()
     this->m_timer.start();
 }
 
-void WebcamSourceElement::stop()
+void VideoSourceElement::stop()
 {
     if (this->m_timer.isActive())
     {
         this->m_timer.stop();
-        this->m_webcam.release();
+        this->m_video.release();
     }
 }
 
-void WebcamSourceElement::configure()
+void VideoSourceElement::configure()
 {
 }
 
-void WebcamSourceElement::setPluginList(QList<QVariant> list)
+void VideoSourceElement::setPluginList(QList<QVariant> list)
 {
     Q_UNUSED(list)
 }
 
-void WebcamSourceElement::setDevice(QString device)
+void VideoSourceElement::setFileName(QString fileName)
 {
     bool active = this->m_timer.isActive();
 
     if (active)
         this->stop();
 
-    this->m_device = device;
+    this->m_fileName = fileName;
 
-    if (active && device != "")
+    if (active && fileName != "")
         this->start();
 }
 
-void WebcamSourceElement::setSize(QSize size)
-{
-    bool active = this->m_timer.isActive();
-
-    if (active)
-        this->stop();
-
-    this->m_size = size;
-    this->m_webcam.set(CV_CAP_PROP_FRAME_WIDTH, this->m_size.width());
-    this->m_webcam.set(CV_CAP_PROP_FRAME_HEIGHT, this->m_size.height());
-
-    if (active)
-        this->start();
-}
-
-void WebcamSourceElement::setFps(int fps)
+void VideoSourceElement::setFps(int fps)
 {
     this->m_fps = fps;
 
     this->m_timer.setInterval((int)(1000.0 / (float) this->m_fps));
 }
 
-void WebcamSourceElement::resetDevice()
+void VideoSourceElement::resetFileName()
 {
-    this->m_device = "/dev/video0";
-    this->setDevice(this->m_device);
+    this->m_fileName = "";
+    this->setFileName(this->m_fileName);
 }
 
-void WebcamSourceElement::resetSize()
-{
-    this->setSize(QSize(640, 480));
-}
-
-void WebcamSourceElement::resetFps()
+void VideoSourceElement::resetFps()
 {
     this->m_fps = 30;
 
     this->m_timer.setInterval((int)(1000.0 / (float) this->m_fps));
 }
 
-void WebcamSourceElement::timeout()
+void VideoSourceElement::timeout()
 {
-    if (!this->m_webcam.isOpened())
+    if (!this->m_video.isOpened())
         return;
 
     cv::Mat matFrame;
 
     // Capture a frame in cvMat format...
-    this->m_webcam >> matFrame;
+    this->m_video >> matFrame;
 
     // and convert it to QImage.
     QImage qtFrame((const uchar *)matFrame.data, matFrame.cols, matFrame.rows, QImage::Format_RGB888);

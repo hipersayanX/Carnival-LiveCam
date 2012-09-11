@@ -17,7 +17,7 @@
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 #
-# Image driver for linux
+# Video driver for linux
 
 CONFIG += plugin
 
@@ -26,9 +26,13 @@ DESTDIR += $$PWD
 HEADERS += \
     include/plugin.h \
     include/element.h \
-    include/imagedriver.h \
-    include/imagedriverfactory.h \
-    include/config.h
+    include/videosourceelement.h \
+    include/videosource.h
+
+unix {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += opencv
+}
 
 MOC_DIR += $$PWD/build
 
@@ -39,16 +43,13 @@ QT += core gui
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/imagedriverfactory.cpp \
-    src/imagedriver.cpp \
-    src/config.cpp
+    src/videosource.cpp \
+    src/videosourceelement.cpp
 
 TEMPLATE = lib
 
 UI_DIR += $$PWD/build
 
-FORMS += \
-    share/ui/config.ui
+FORMS +=
 
-RESOURCES += \
-    share/icons.qrc
+RESOURCES +=

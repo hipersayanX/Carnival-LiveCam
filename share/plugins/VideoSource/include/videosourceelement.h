@@ -17,37 +17,51 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef VIDEOSOURCEELEMENT_H
+#define VIDEOSOURCEELEMENT_H
 
-#include <QDialog>
+#include <opencv2/opencv.hpp>
 
-#include "ui_config.h"
+#include "element.h"
 
-class Config: public QDialog, private Ui::Config
+class VideoSourceElement: public Element
 {
     Q_OBJECT
-    Q_PROPERTY(QStringList *imageDevices READ imageDevices WRITE setImageDevices RESET resetImageDevices)
+        Q_PROPERTY(QString fileName READ fileName WRITE setFileName RESET resetFileName)
+        Q_PROPERTY(int fps READ fps WRITE setFps RESET resetFps)
 
     public:
-        explicit Config(QWidget *parent = 0);
-        QStringList *imageDevices();
+        VideoSourceElement();
+        QString fileName();
+        int fps();
 
     private:
-        QStringList *m_imageDevices;
+        QString m_fileName;
+        int m_fps;
+        cv::VideoCapture m_video;
+        QTimer m_timer;
+        QImage m_curFrame;
 
-        void setFiles(QStringList files);
+    signals:
+        void fail();
 
     public slots:
-        void setImageDevices(QStringList *imageDevices);
-        void resetImageDevices();
+        // Input Channels
+        void iVideo(QImage *frame);
+        void iAudio(QByteArray *frame);
 
-    protected:
-        void changeEvent(QEvent *e);
+        void start();
+        void stop();
+        void configure();
+        void setPluginList(QList<QVariant> list);
+
+        void setFileName(QString fileName);
+        void setFps(int fps);
+        void resetFileName();
+        void resetFps();
 
     private slots:
-        void on_btnAdd_clicked();
-        void on_btnRemove_clicked();
+        void timeout();
 };
 
-#endif // CONFIG_H
+#endif // VIDEOSOURCEELEMENT_H
