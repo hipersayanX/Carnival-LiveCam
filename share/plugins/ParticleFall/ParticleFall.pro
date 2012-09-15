@@ -26,31 +26,32 @@ DESTDIR += $$PWD
 HEADERS += \
     include/plugin.h \
     include/element.h \
-    include/snowfall.h \
-    include/snowflake.h \
-    include/snow.h \
-    include/config.h
+    include/particle.h \
+    include/particlefall.h \
+    include/particlefallelement.h
 
 MOC_DIR += $$PWD/build
 
 OBJECTS_DIR += $$PWD/build
 
 OTHER_FILES += \
-    share/thumbnail-128x96.png
+    share/thumbnail-128x96.png \
+    share/sprites/flake0.png \
+    share/sprites/flake1.png \
+    share/sprites/flake2.png \
+    share/sprites/flake3.png
 
 QT += core gui
 
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/snowfall.cpp \
-    src/snowflake.cpp \
-    src/snow.cpp \
-    src/config.cpp
+    src/particle.cpp \
+    src/particlefall.cpp \
+    src/particlefallelement.cpp
 
 TEMPLATE = lib
 
 UI_DIR += $$PWD/build
 
-FORMS += \
-    share/ui/config.ui
+FORMS +=

@@ -17,7 +17,7 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/webcamdetect.h"
+#include "include/webcamdetect.h"
 
 QString WebcamDetect::pluginId()
 {

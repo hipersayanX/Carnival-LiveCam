@@ -17,36 +17,11 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/cube.h"
+#include "include/cube.h"
 
-QString Cube::author()
+QString Cube::pluginId()
 {
-    return "hipersayan_x";
-}
-
-QString Cube::mail()
-{
-    return "hipersayan.x@gmail.com";
-}
-
-QString Cube::website()
-{
-    return "hipersayanx.blogspot.com";
-}
-
-QString Cube::category()
-{
-    return "OpenGL";
-}
-
-QString Cube::id()
-{
-    return "videoplugin.Cube";
-}
-
-QString Cube::license()
-{
-    return "GPLv3";
+    return "Cube";
 }
 
 QString Cube::name()
@@ -54,9 +29,24 @@ QString Cube::name()
     return "Cube";
 }
 
+QString Cube::version()
+{
+    return "1.0.0";
+}
+
 QString Cube::summary()
 {
     return "Render the webcam image in a cube.";
+}
+
+QString Cube::type()
+{
+    return "video";
+}
+
+QString Cube::category()
+{
+    return "plugin";
 }
 
 QString Cube::thumbnail()
@@ -64,14 +54,24 @@ QString Cube::thumbnail()
     return "../../../../../share/plugins/Cube/share/thumbnail-128x96.png";
 }
 
-bool Cube::is3D()
+QString Cube::license()
 {
-    return true;
+    return "GPLv3";
 }
 
-QString Cube::version()
+QString Cube::author()
 {
-    return "1.0.0";
+    return "Gonzalo Exequiel Pedone";
+}
+
+QString Cube::website()
+{
+    return "https://github.com/hipersayanX/Carnival-LiveCam";
+}
+
+QString Cube::mail()
+{
+    return "hipersayan DOT x AT gmail DOT com";
 }
 
 bool Cube::isConfigurable()
@@ -79,79 +79,15 @@ bool Cube::isConfigurable()
     return false;
 }
 
-void Cube::begin()
+Element *Cube::newElement()
 {
+    CubeElement *element = new CubeElement();
+
+    return qobject_cast<Element *>(element);
 }
 
-void Cube::addSpace(QString spaceId, QSize frameSize)
+Cube::~Cube()
 {
-    this->glWidget[spaceId] = new OGL();
-    this->glWidget[spaceId]->resize(frameSize);
-}
-
-void Cube::removeSpace(QString spaceId)
-{
-    delete this->glWidget[spaceId];
-    this->glWidget.remove(spaceId);
-}
-
-QImage Cube::render(QString spaceId, const QImage &image)
-{
-    if (this->glWidget.contains(spaceId))
-    {
-        this->glWidget[spaceId]->setWebcamImage(image);
-
-        return this->glWidget[spaceId]->renderPixmap(this->glWidget[spaceId]->width(),
-                                                     this->glWidget[spaceId]->height()).toImage();
-    }
-
-    return image;
-}
-
-void Cube::end()
-{
-    QStringList spaces = this->glWidget.keys();
-
-    foreach (QString spaceId, spaces)
-        this->removeSpace(spaceId);
-}
-
-void Cube::configure()
-{
-}
-
-QVariant Cube::configs()
-{
-    return QVariant();
-}
-
-void Cube::setConfigs(QVariant configs)
-{
-    Q_UNUSED(configs)
-}
-
-void Cube::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
-{
-    if (this->glWidget.contains(spaceId))
-        this->glWidget[spaceId]->mouseDoubleClick(event);
-}
-
-void Cube::mouseMoveEvent(QString spaceId, QMouseEvent *event)
-{
-    if (this->glWidget.contains(spaceId))
-        this->glWidget[spaceId]->mouseMove(event);
-}
-
-void Cube::mousePressEvent(QString spaceId, QMouseEvent *event)
-{
-    if (this->glWidget.contains(spaceId))
-        this->glWidget[spaceId]->mousePress(event);
-}
-
-void Cube::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
-{
-    if (this->glWidget.contains(spaceId))
-        this->glWidget[spaceId]->mouseRelease(event);
 }
 
 Q_EXPORT_PLUGIN2(Cube, Cube)

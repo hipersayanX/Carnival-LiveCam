@@ -17,7 +17,7 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../../include/plugin/pluginmanager.h"
+#include "include/plugin/pluginmanager.h"
 
 /*!
   \class PluginManager
@@ -182,11 +182,7 @@ bool PluginManager::addElement(QString elementId, QString pluginId)
         return false;
 
     this->m_elements[elementId] = element;
-
-    QObject::connect(element, SIGNAL(setPipeline(QString)), this, SLOT(setPipeline(QString)));
-    QObject::connect(element, SIGNAL(setPipelineRoutingMode(QString)), this, SLOT(setPipelineRoutingMode(QString)));
-    QObject::connect(element, SIGNAL(resetPipelineRoutingMode()), this, SLOT(resetPipelineRoutingMode()));
-    QObject::connect(element, SIGNAL(requestPluginList()), this, SLOT(sendPluginList()));
+    this->m_elements[elementId]->setManager(qobject_cast<QObject *>(this));
 
     return true;
 }
@@ -198,11 +194,6 @@ bool PluginManager::removeElement(QString elementId)
 
     QString pluginId = this->m_instances1[elementId].toList()[0].toString();
     Element *element = this->m_elements[elementId];
-
-    QObject::disconnect(element, SIGNAL(setPipeline(QString)), this, SLOT(setPipeline(QString)));
-    QObject::disconnect(element, SIGNAL(setPipelineRoutingMode(QString)), this, SLOT(setPipelineRoutingMode(QString)));
-    QObject::disconnect(element, SIGNAL(resetPipelineRoutingMode()), this, SLOT(resetPipelineRoutingMode()));
-    QObject::disconnect(element, SIGNAL(requestPluginList()), this, SLOT(sendPluginList()));
 
     delete element;
     this->m_elements.remove(elementId);
@@ -1099,12 +1090,4 @@ void PluginManager::setPipelineRoutingMode(PipelineRoutingMode mode)
 void PluginManager::resetPipelineRoutingMode()
 {
     this->m_pipelineRoutingMode = NoCheck;
-}
-
-void PluginManager::sendPluginList()
-{
-    Element *element = qobject_cast<Element *>(this->sender());
-
-    if (element)
-        element->setPluginList(this->pluginList());
 }

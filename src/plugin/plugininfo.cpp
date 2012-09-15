@@ -17,7 +17,7 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../../include/plugin/plugininfo.h"
+#include "include/plugin/plugininfo.h"
 
 /*!
   \class PluginInfo
@@ -34,19 +34,19 @@
  */
 PluginInfo::PluginInfo(QObject *parent): QObject(parent)
 {
-    this->m_fileName = "";
-    this->m_pluginId = "";
-    this->m_name = "";
-    this->m_version = "";
-    this->m_summary = "";
-    this->m_type = "";
-    this->m_category = "";
-    this->m_thumbnail = "";
-    this->m_license = "";
-    this->m_author = "";
-    this->m_website = "";
-    this->m_mail = "";
-    this->m_isConfigurable = false;
+    this->resetFileName();
+    this->resetPluginId();
+    this->resetName();
+    this->resetVersion();
+    this->resetSummary();
+    this->resetType();
+    this->resetCategory();
+    this->resetThumbnail();
+    this->resetLicense();
+    this->resetAuthor();
+    this->resetWebsite();
+    this->resetMail();
+    this->resetIsConfigurable();
 }
 
 /*!
@@ -457,7 +457,7 @@ void PluginInfo::setIsConfigurable(bool isConfigurable)
  */
 void PluginInfo::resetFileName()
 {
-    this->m_fileName = "";
+    this->setFileName("");
 }
 
 /*!
@@ -467,7 +467,7 @@ void PluginInfo::resetFileName()
  */
 void PluginInfo::resetPluginId()
 {
-    this->m_pluginId = "";
+    this->setPluginId("");
 }
 
 /*!
@@ -477,7 +477,7 @@ void PluginInfo::resetPluginId()
  */
 void PluginInfo::resetName()
 {
-    this->m_name = "";
+    this->setName("");
 }
 
 /*!
@@ -487,7 +487,7 @@ void PluginInfo::resetName()
  */
 void PluginInfo::resetVersion()
 {
-    this->m_version = "";
+    this->setVersion("");
 }
 
 /*!
@@ -497,12 +497,12 @@ void PluginInfo::resetVersion()
  */
 void PluginInfo::resetSummary()
 {
-    this->m_summary = "";
+    this->setSummary("");
 }
 
 void PluginInfo::resetType()
 {
-    this->m_type = "";
+    this->setType("");
 }
 
 /*!
@@ -512,7 +512,7 @@ void PluginInfo::resetType()
  */
 void PluginInfo::resetCategory()
 {
-    this->m_category = "";
+    this->setCategory("");
 }
 
 /*!
@@ -522,7 +522,7 @@ void PluginInfo::resetCategory()
  */
 void PluginInfo::resetThumbnail()
 {
-    this->m_thumbnail = "";
+    this->setThumbnail("");
 }
 
 /*!
@@ -532,7 +532,7 @@ void PluginInfo::resetThumbnail()
  */
 void PluginInfo::resetLicense()
 {
-    this->m_license = "";
+    this->setLicense("");
 }
 
 /*!
@@ -542,7 +542,7 @@ void PluginInfo::resetLicense()
  */
 void PluginInfo::resetAuthor()
 {
-    this->m_author = "";
+    this->setAuthor("");
 }
 
 /*!
@@ -552,7 +552,7 @@ void PluginInfo::resetAuthor()
  */
 void PluginInfo::resetWebsite()
 {
-    this->m_website = "";
+    this->setWebsite("");
 }
 
 /*!
@@ -562,7 +562,7 @@ void PluginInfo::resetWebsite()
  */
 void PluginInfo::resetMail()
 {
-    this->m_mail = "";
+    this->setMail("");
 }
 
 /*!
@@ -572,5 +572,5 @@ void PluginInfo::resetMail()
  */
 void PluginInfo::resetIsConfigurable()
 {
-    this->m_isConfigurable = false;
+    this->setIsConfigurable(false);
 }

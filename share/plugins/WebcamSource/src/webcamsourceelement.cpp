@@ -16,23 +16,16 @@
 //
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
-/*
-#include <sys/ioctl.h>
-#include <linux/videodev2.h>
-#include <QDir>
-*/
-#include "../include/webcamsourceelement.h"
+
+#include "include/webcamsourceelement.h"
 
 WebcamSourceElement::WebcamSourceElement(): Element()
 {
-    this->m_device = "/dev/video0";
-    this->m_size = QSize(640, 480);
-    this->m_fps = 30;
-
-    this->m_webcam.set(CV_CAP_PROP_FRAME_WIDTH, this->m_size.width());
-    this->m_webcam.set(CV_CAP_PROP_FRAME_HEIGHT, this->m_size.height());
-    this->m_timer.setInterval((int)(1000.0 / (float) this->m_fps));
     QObject::connect(&this->m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+
+    this->resetDevice();
+    this->resetSize();
+    this->resetFps();
 }
 
 QString WebcamSourceElement::device()
@@ -60,35 +53,39 @@ void WebcamSourceElement::iAudio(QByteArray *frame)
     Q_UNUSED(frame)
 }
 
-void WebcamSourceElement::start()
+bool WebcamSourceElement::start()
 {
     // Try to open webcam device,
     if (!this->m_webcam.open(QString(this->m_device).remove("/dev/video").toInt()))
     {
         emit(fail());
 
-        return;
+        return false;
     }
 
     this->m_timer.start();
+
+    return true;
 }
 
-void WebcamSourceElement::stop()
+bool WebcamSourceElement::stop()
 {
     if (this->m_timer.isActive())
     {
         this->m_timer.stop();
         this->m_webcam.release();
     }
+
+    return true;
 }
 
 void WebcamSourceElement::configure()
 {
 }
 
-void WebcamSourceElement::setPluginList(QList<QVariant> list)
+void WebcamSourceElement::setManager(QObject *manager)
 {
-    Q_UNUSED(list)
+    Q_UNUSED(manager)
 }
 
 void WebcamSourceElement::setDevice(QString device)
@@ -128,8 +125,7 @@ void WebcamSourceElement::setFps(int fps)
 
 void WebcamSourceElement::resetDevice()
 {
-    this->m_device = "/dev/video0";
-    this->setDevice(this->m_device);
+    this->setDevice("/dev/video0");
 }
 
 void WebcamSourceElement::resetSize()
@@ -139,9 +135,7 @@ void WebcamSourceElement::resetSize()
 
 void WebcamSourceElement::resetFps()
 {
-    this->m_fps = 30;
-
-    this->m_timer.setInterval((int)(1000.0 / (float) this->m_fps));
+    this->setFps(30);
 }
 
 void WebcamSourceElement::timeout()

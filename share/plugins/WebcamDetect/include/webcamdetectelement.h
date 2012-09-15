@@ -33,6 +33,8 @@ class WebcamDetectElement: public Element
     public:
         WebcamDetectElement();
         QString devicesPath();
+        Q_INVOKABLE bool start();
+        Q_INVOKABLE bool stop();
 
     private:
         QFileSystemWatcher *m_fsWatcher;
@@ -52,12 +54,8 @@ class WebcamDetectElement: public Element
         void iVideo(QImage *frame);
         void iAudio(QByteArray *frame);
 
-        void start();
-        void stop();
-
         void configure();
-
-        void setPluginList(QList<QVariant> list);
+        void setManager(QObject *manager);
 
         void updateWebcams();
 

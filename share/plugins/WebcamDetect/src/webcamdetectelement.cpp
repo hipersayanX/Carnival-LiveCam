@@ -20,12 +20,12 @@
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 
-#include "../include/sleep.h"
-#include "../include/webcamdetectelement.h"
+#include "include/sleep.h"
+#include "include/webcamdetectelement.h"
 
 WebcamDetectElement::WebcamDetectElement(): Element()
 {
-    this->m_devicesPath = "/dev";
+    this->resetDevicesPath();
 }
 
 QList<QStringList> WebcamDetectElement::webcams(QString dir)
@@ -73,33 +73,37 @@ void WebcamDetectElement::iAudio(QByteArray *frame)
     Q_UNUSED(frame)
 }
 
-void WebcamDetectElement::start()
+bool WebcamDetectElement::start()
 {
     this->m_fsWatcher = new QFileSystemWatcher(QStringList(this->m_devicesPath), this);
 
     if (!this->m_fsWatcher)
-        return;
+        return false;
 
     QObject::connect(this->m_fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(devicesChanged(QString)));
+
+    return true;
 }
 
-void WebcamDetectElement::stop()
+bool WebcamDetectElement::stop()
 {
     if (!this->m_fsWatcher)
-        return;
+        return true;
 
     QObject::disconnect(this->m_fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(devicesChanged(QString)));
     delete this->m_fsWatcher;
     this->m_fsWatcher = NULL;
+
+    return true;
 }
 
 void WebcamDetectElement::configure()
 {
 }
 
-void WebcamDetectElement::setPluginList(QList<QVariant> list)
+void WebcamDetectElement::setManager(QObject *manager)
 {
-    Q_UNUSED(list)
+    Q_UNUSED(manager)
 }
 
 template <typename T>  QList<T> WebcamDetectElement::substractList(QList<T> a, QList<T> b)

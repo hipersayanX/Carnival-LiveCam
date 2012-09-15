@@ -32,6 +32,9 @@ class ImageSourceElement: public Element
         ImageSourceElement();
         QString fileName();
 
+        Q_INVOKABLE bool start();
+        Q_INVOKABLE bool stop();
+
     private:
         QString m_fileName;
         QImage m_image;
@@ -41,10 +44,8 @@ class ImageSourceElement: public Element
         void iVideo(QImage *frame);
         void iAudio(QByteArray *frame);
 
-        void start();
-        void stop();
         void configure();
-        void setPluginList(QList<QVariant> list);
+        void setManager(QObject *manager);
 
         void setFileName(QString fileName);
         void resetFileName();

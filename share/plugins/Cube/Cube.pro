@@ -27,6 +27,7 @@ HEADERS += \
     include/element.h \
     include/plugin.h \
     include/cube.h \
+    include/cubeelement.h \
     include/ogl.h
 
 MOC_DIR += $$PWD/build
@@ -41,6 +42,7 @@ RCC_DIR += $$PWD/build
 
 SOURCES += \
     src/cube.cpp \
+    src/cubeelement.cpp \
     src/ogl.cpp
 
 TEMPLATE = lib

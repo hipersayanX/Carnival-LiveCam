@@ -1,46 +1,12 @@
-// Carnival LiveCam, Augmented reality made easy.
-// Copyright (C) 2011-2012  Gonzalo Exequiel Pedone
-//
-// Carnival LiveCam is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Carnival LiveCam is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Carnival LiveCam.  If not, see <http://www.gnu.org/licenses/>.
-//
-// Email   : hipersayan DOT x AT gmail DOT com
-// Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
-
 #include <GL/glu.h>
 
-#include "../include/ogl.h"
+#include "include/ogl.h"
 
-OGL::OGL(QWidget *parent): QGLWidget(parent)
+OGL::OGL(): QGLWidget()
 {
     this->m_mousePressed = false;
     this->m_xrot = 30.0f;
     this->m_yrot = 60.0f;
-}
-
-QImage OGL::webcamImage()
-{
-    return this->m_webcamImage;
-}
-
-void OGL::setWebcamImage(const QImage &image)
-{
-    this->m_webcamImage = image;
-}
-
-void OGL::resetWebcamImage()
-{
-    this->m_webcamImage = QImage();
 }
 
 void OGL::initializeGL()
@@ -78,7 +44,7 @@ void OGL::paintGL()
     glRotatef(this->m_yrot, 0.0f, 1.0f, 0.0f);
     glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
 
-    GLuint texture = this->bindTexture(this->m_webcamImage, GL_TEXTURE_2D, GL_RGBA);
+    GLuint texture = this->bindTexture(this->m_image, GL_TEXTURE_2D, GL_RGBA);
 
     glBegin(GL_QUADS);
         // Front
@@ -122,11 +88,6 @@ void OGL::paintGL()
     this->deleteTexture(texture);
 }
 
-void OGL::mouseDoubleClick(QMouseEvent *event)
-{
-    Q_UNUSED(event);
-}
-
 void OGL::mouseMove(QMouseEvent *event)
 {
     if (this->m_mousePressed)
@@ -149,4 +110,51 @@ void OGL::mouseRelease(QMouseEvent *event)
     Q_UNUSED(event);
 
     this->m_mousePressed = false;
+}
+
+QImage OGL::image()
+{
+    return this->m_image;
+}
+
+float OGL::xrot()
+{
+    return this->m_xrot;
+}
+
+float OGL::yrot()
+{
+    return this->m_yrot;
+}
+
+void OGL::setImage(const QImage &image)
+{
+    this->m_image = image;
+}
+
+void OGL::setXrot(float xrot)
+{
+    this->m_xrot = xrot;
+    emit(xrotChanged(xrot));
+}
+
+void OGL::setYrot(float yrot)
+{
+    this->m_yrot = yrot;
+    emit(yrotChanged(yrot));
+}
+
+void OGL::resetImage()
+{
+    this->m_image = QImage();
+}
+
+void OGL::resetXrot()
+{
+    this->setXrot(30.0f);
+}
+
+void OGL::resetYrot()
+{
+    this->setYrot(60.0f);
 }

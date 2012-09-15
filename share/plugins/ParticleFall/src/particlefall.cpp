@@ -17,77 +17,77 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/webcamsource.h"
+#include "include/particlefall.h"
 
-QString WebcamSource::pluginId()
+QString ParticleFall::pluginId()
 {
-    return "WebcamSource";
+    return "ParticleFall";
 }
 
-QString WebcamSource::name()
+QString ParticleFall::name()
 {
-    return "Webcam Source";
+    return "Particle Fall";
 }
 
-QString WebcamSource::version()
+QString ParticleFall::version()
 {
     return "1.0.0";
 }
 
-QString WebcamSource::summary()
+QString ParticleFall::summary()
 {
-    return "Capture video from a webcam";
+    return "Falling particles";
 }
 
-QString WebcamSource::type()
+QString ParticleFall::type()
 {
     return "video";
 }
 
-QString WebcamSource::category()
+QString ParticleFall::category()
 {
-    return "webcam";
+    return "plugin";
 }
 
-QString WebcamSource::thumbnail()
+QString ParticleFall::thumbnail()
 {
-    return "../../../../../share/drivers/WebcamLinux/share/icons/camera-web.png";
+    return "../../../../../share/plugins/ParticleFall/share/thumbnail-128x96.png";
 }
 
-QString WebcamSource::license()
+QString ParticleFall::license()
 {
     return "GPLv3";
 }
 
-QString WebcamSource::author()
+QString ParticleFall::author()
 {
     return "Gonzalo Exequiel Pedone";
 }
 
-QString WebcamSource::website()
+QString ParticleFall::website()
 {
     return "https://github.com/hipersayanX/Carnival-LiveCam";
 }
 
-QString WebcamSource::mail()
+QString ParticleFall::mail()
 {
     return "hipersayan DOT x AT gmail DOT com";
 }
 
-bool WebcamSource::isConfigurable()
+bool ParticleFall::isConfigurable()
 {
     return false;
 }
 
-Element *WebcamSource::newElement()
+Element *ParticleFall::newElement()
 {
-    WebcamSourceElement *element = new WebcamSourceElement();
+    ParticleFallElement *element = new ParticleFallElement();
 
     return qobject_cast<Element *>(element);
 }
 
-WebcamSource::~WebcamSource()
+ParticleFall::~ParticleFall()
 {
 }
 
-Q_EXPORT_PLUGIN2(WebcamSource, WebcamSource)
+Q_EXPORT_PLUGIN2(ParticleFall, ParticleFall)

@@ -17,46 +17,34 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/sleep.h"
+#ifndef PARTICLEFALL_H
+#define PARTICLEFALL_H
 
-/*!
-  \class Sleep
+#include "plugin.h"
+#include "particlefallelement.h"
 
-  \brief This class stop the program execution by a desired amount of time.
- */
-
-/*!
-  \fn void Sleep::usleep(unsigned long usecs)
-
-  \param usecs Micro seconds.
-
-  \brief Causes the program to sleep for \i usecs milliseconds.
- */
-void Sleep::usleep(unsigned long usecs)
+class ParticleFall: public QObject, public Plugin
 {
-    QThread::usleep(usecs);
-}
+    Q_OBJECT
+    Q_INTERFACES(Plugin)
 
-/*!
-  \fn void Sleep::msleep(unsigned long msecs)
+    public:
+        QString pluginId();
+        QString name();
+        QString version();
+        QString summary();
+        QString type();
+        QString category();
+        QString thumbnail();
+        QString license();
+        QString author();
+        QString website();
+        QString mail();
+        bool isConfigurable();
 
-  \param msecs Mili seconds.
+        Element *newElement();
 
-  \brief Causes the program to sleep for \i msecs milliseconds.
- */
-void Sleep::msleep(unsigned long msecs)
-{
-    QThread::msleep(msecs);
-}
+        ~ParticleFall();
+};
 
-/*!
-  \fn void Sleep::sleep(unsigned long secs)
-
-  \param secs Seconds.
-
-  \brief Causes the program to sleep for \i secs milliseconds.
- */
-void Sleep::sleep(unsigned long secs)
-{
-    QThread::sleep(secs);
-}
+#endif // PARTICLEFALL_H

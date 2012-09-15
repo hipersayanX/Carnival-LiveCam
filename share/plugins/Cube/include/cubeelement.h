@@ -17,40 +17,31 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef WEBCAMSOURCEELEMENT_H
-#define WEBCAMSOURCEELEMENT_H
-
-#include <opencv2/opencv.hpp>
+#ifndef CUBEELEMENT_H
+#define CUBEELEMENT_H
 
 #include "element.h"
+#include "ogl.h"
 
-class WebcamSourceElement: public Element
+class CubeElement: public Element
 {
     Q_OBJECT
-
-    Q_PROPERTY(QString device READ device WRITE setDevice RESET resetDevice)
-    Q_PROPERTY(QSize size READ size WRITE setSize RESET resetSize)
-    Q_PROPERTY(int fps READ fps WRITE setFps RESET resetFps)
+    Q_PROPERTY(float xrot READ xrot WRITE setXrot RESET resetXrot)
+    Q_PROPERTY(float yrot READ yrot WRITE setYrot RESET resetYrot)
 
     public:
-        WebcamSourceElement();
-        QString device();
-        QSize size();
-        int fps();
+        explicit CubeElement();
+        float xrot();
+        float yrot();
 
         Q_INVOKABLE bool start();
         Q_INVOKABLE bool stop();
 
     private:
-        QString m_device;
-        QSize m_size;
-        int m_fps;
-        cv::VideoCapture m_webcam;
-        QTimer m_timer;
-        QImage m_curFrame;
-
-    signals:
-        void fail();
+        OGL *m_ogl;
+        QImage m_image;
+        GLfloat m_xrot;
+        GLfloat m_yrot;
 
     public slots:
         // Input Channels
@@ -60,15 +51,14 @@ class WebcamSourceElement: public Element
         void configure();
         void setManager(QObject *manager);
 
-        void setDevice(QString device);
-        void setSize(QSize size);
-        void setFps(int fps);
-        void resetDevice();
-        void resetSize();
-        void resetFps();
+        void setXrot(float xrot);
+        void setYrot(float yrot);
+        void resetXrot();
+        void resetYrot();
 
-    private slots:
-        void timeout();
+        void mouseMove(QMouseEvent *event);
+        void mousePress(QMouseEvent *event);
+        void mouseRelease(QMouseEvent *event);
 };
 
-#endif // WEBCAMSOURCEELEMENT_H
+#endif // CUBEELEMENT_H

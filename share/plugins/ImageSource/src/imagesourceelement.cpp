@@ -17,11 +17,11 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/imagesourceelement.h"
+#include "include/imagesourceelement.h"
 
 ImageSourceElement::ImageSourceElement()
 {
-    this->m_fileName = "";
+    this->resetFileName();
 }
 
 void ImageSourceElement::iVideo(QImage *frame)
@@ -34,22 +34,25 @@ void ImageSourceElement::iAudio(QByteArray *frame)
     Q_UNUSED(frame)
 }
 
-void ImageSourceElement::start()
+bool ImageSourceElement::start()
 {
     emit(oVideo(&this->m_image));
+
+    return true;
 }
 
-void ImageSourceElement::stop()
+bool ImageSourceElement::stop()
 {
+    return true;
 }
 
 void ImageSourceElement::configure()
 {
 }
 
-void ImageSourceElement::setPluginList(QList<QVariant> list)
+void ImageSourceElement::setManager(QObject *manager)
 {
-    Q_UNUSED(list)
+    Q_UNUSED(manager)
 }
 
 QString ImageSourceElement::fileName()

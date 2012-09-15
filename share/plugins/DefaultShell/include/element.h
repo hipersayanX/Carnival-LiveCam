@@ -33,33 +33,29 @@ class Element: public QObject
 {
     Q_OBJECT
 
+    public:
+        /// This function is called after Plugin::setConfigs().
+        /// This method executes the initialization code for the plugin.
+        Q_INVOKABLE virtual bool start() = 0;
+
+        /// This function is called after Plugin::configs(), and before unload the plugin.
+        /// This method executes the finalization code for the plugin.
+        Q_INVOKABLE virtual bool stop() = 0;
+
     signals:
         // Output Channels
         void oVideo(QImage *frame);
         void oAudio(QByteArray *frame);
-
-        void setPipeline(QString pipeline);
-        void setPipelineRoutingMode(QString mode);
-        void resetPipelineRoutingMode();
-        void requestPluginList();
 
     public slots:
         // Input Channels
         virtual void iVideo(QImage *frame) = 0;
         virtual void iAudio(QByteArray *frame) = 0;
 
-        /// This function is called after Plugin::setConfigs().
-        /// This method executes the initialization code for the plugin.
-        virtual void start() = 0;
-
-        /// This function is called after Plugin::configs(), and before unload the plugin.
-        /// This method executes the finalization code for the plugin.
-        virtual void stop() = 0;
-
         /// Calls the configuration dialog of the plugin.
         virtual void configure() = 0;
 
-        virtual void setPluginList(QList<QVariant> list) = 0;
+        virtual void setManager(QObject *manager) = 0;
 };
 
 #endif // ELEMENT_H

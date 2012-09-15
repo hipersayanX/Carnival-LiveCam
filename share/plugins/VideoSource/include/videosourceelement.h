@@ -35,6 +35,9 @@ class VideoSourceElement: public Element
         QString fileName();
         int fps();
 
+        Q_INVOKABLE bool start();
+        Q_INVOKABLE bool stop();
+
     private:
         QString m_fileName;
         int m_fps;
@@ -50,10 +53,8 @@ class VideoSourceElement: public Element
         void iVideo(QImage *frame);
         void iAudio(QByteArray *frame);
 
-        void start();
-        void stop();
         void configure();
-        void setPluginList(QList<QVariant> list);
+        void setManager(QObject *manager);
 
         void setFileName(QString fileName);
         void setFps(int fps);

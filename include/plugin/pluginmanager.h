@@ -92,9 +92,6 @@ class PluginManager: public QObject
         void setPipelineRoutingMode(QString mode);
         void setPipelineRoutingMode(PipelineRoutingMode mode);
         void resetPipelineRoutingMode();
-
-    private slots:
-        void sendPluginList();
 };
 
 #endif // PLUGINMANAGER_H

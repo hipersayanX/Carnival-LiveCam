@@ -17,13 +17,11 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef DEFAULTPLUGIN_H
-#define DEFAULTPLUGIN_H
-
-#include <QVariant>
+#ifndef CUBE_H
+#define CUBE_H
 
 #include "plugin.h"
-#include "ogl.h"
+#include "cubeelement.h"
 
 class Cube: public QObject, public Plugin
 {
@@ -31,36 +29,22 @@ class Cube: public QObject, public Plugin
     Q_INTERFACES(Plugin)
 
     public:
-        QString author();
-        QString mail();
-        QString website();
-        QString category();
-        QString id();
-        QString license();
+        QString pluginId();
         QString name();
-        QString summary();
-        QString  thumbnail();
-        bool is3D();
         QString version();
+        QString summary();
+        QString type();
+        QString category();
+        QString thumbnail();
+        QString license();
+        QString author();
+        QString website();
+        QString mail();
         bool isConfigurable();
 
-        void begin();
-        void addSpace(QString spaceId, QSize frameSize);
-        void removeSpace(QString spaceId);
-        QImage render(QString spaceId, const QImage &image);
-        void end();
+        Element *newElement();
 
-        void configure();
-        QVariant configs();
-        void setConfigs(QVariant configs);
-
-        void mouseDoubleClickEvent(QString spaceId, QMouseEvent *event);
-        void mouseMoveEvent(QString spaceId, QMouseEvent *event);
-        void mousePressEvent(QString spaceId, QMouseEvent *event);
-        void mouseReleaseEvent(QString spaceId, QMouseEvent *event);
-
-    private:
-        QHash<QString, OGL *> glWidget;
+        ~Cube();
 };
 
-#endif // DEFAULTPLUGIN_H
+#endif // CUBE_H

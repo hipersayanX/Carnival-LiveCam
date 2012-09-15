@@ -17,17 +17,14 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include <QFileInfo>
-
-#include "../include/videosourceelement.h"
+#include "include/videosourceelement.h"
 
 VideoSourceElement::VideoSourceElement()
 {
-    this->m_fileName = "";
-    this->m_fps = 30;
-
-    this->m_timer.setInterval((int)(1000.0 / (float) this->m_fps));
     QObject::connect(&this->m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+
+    this->resetFileName();
+    this->resetFps();
 }
 
 QString VideoSourceElement::fileName()
@@ -50,34 +47,38 @@ void VideoSourceElement::iAudio(QByteArray *frame)
     Q_UNUSED(frame)
 }
 
-void VideoSourceElement::start()
+bool VideoSourceElement::start()
 {
     if (!this->m_video.open(this->m_fileName.toUtf8().constData()))
     {
         emit(fail());
 
-        return;
+        return false;
     }
 
     this->m_timer.start();
+
+    return true;
 }
 
-void VideoSourceElement::stop()
+bool VideoSourceElement::stop()
 {
     if (this->m_timer.isActive())
     {
         this->m_timer.stop();
         this->m_video.release();
     }
+
+    return true;
 }
 
 void VideoSourceElement::configure()
 {
 }
 
-void VideoSourceElement::setPluginList(QList<QVariant> list)
+void VideoSourceElement::setManager(QObject *manager)
 {
-    Q_UNUSED(list)
+    Q_UNUSED(manager)
 }
 
 void VideoSourceElement::setFileName(QString fileName)
@@ -102,15 +103,12 @@ void VideoSourceElement::setFps(int fps)
 
 void VideoSourceElement::resetFileName()
 {
-    this->m_fileName = "";
-    this->setFileName(this->m_fileName);
+    this->setFileName("");
 }
 
 void VideoSourceElement::resetFps()
 {
-    this->m_fps = 30;
-
-    this->m_timer.setInterval((int)(1000.0 / (float) this->m_fps));
+    this->setFps(30);
 }
 
 void VideoSourceElement::timeout()
