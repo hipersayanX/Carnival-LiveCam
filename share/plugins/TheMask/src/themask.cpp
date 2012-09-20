@@ -17,36 +17,11 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/themask.h"
+#include "include/themask.h"
 
-QString TheMask::author()
+QString TheMask::pluginId()
 {
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString TheMask::mail()
-{
-    return "hipersayan.x@gmail.com";
-}
-
-QString TheMask::website()
-{
-    return "hipersayanx.blogspot.com";
-}
-
-QString TheMask::category()
-{
-    return "OpenCV";
-}
-
-QString TheMask::id()
-{
-    return "plugin.TheMask";
-}
-
-QString TheMask::license()
-{
-    return "GPLv3";
+    return "TheMask";
 }
 
 QString TheMask::name()
@@ -54,9 +29,24 @@ QString TheMask::name()
     return "The Mask";
 }
 
+QString TheMask::version()
+{
+    return "1.0.0";
+}
+
 QString TheMask::summary()
 {
     return "Cover your face with a mask";
+}
+
+QString TheMask::type()
+{
+    return "video";
+}
+
+QString TheMask::category()
+{
+    return "OpenCV";
 }
 
 QString TheMask::thumbnail()
@@ -64,14 +54,24 @@ QString TheMask::thumbnail()
     return "../../../../../share/plugins/TheMask/share/thumbnail-128x96.png";
 }
 
-bool TheMask::is3D()
+QString TheMask::license()
 {
-    return false;
+    return "GPLv3";
 }
 
-QString TheMask::version()
+QString TheMask::author()
 {
-    return "1.0.0";
+    return "Gonzalo Exequiel Pedone";
+}
+
+QString TheMask::website()
+{
+    return "https://github.com/hipersayanX/Carnival-LiveCam";
+}
+
+QString TheMask::mail()
+{
+    return "hipersayan DOT x AT gmail DOT com";
 }
 
 bool TheMask::isConfigurable()
@@ -79,72 +79,13 @@ bool TheMask::isConfigurable()
     return false;
 }
 
-void TheMask::begin()
+Element *TheMask::newElement()
 {
+    return new TheMaskElement();
 }
 
-void TheMask::addSpace(QString spaceId, QSize frameSize)
+TheMask::~TheMask()
 {
-    this->spaces[spaceId] = Space(QImage("share/plugins/TheMask/share/masks/cow.png"), frameSize);
-}
-
-void TheMask::removeSpace(QString spaceId)
-{
-    this->spaces.remove(spaceId);
-}
-
-QImage TheMask::render(QString spaceId, const QImage &image)
-{
-    if (this->spaces.contains(spaceId))
-    {
-        this->mask.setMaskImage(this->spaces[spaceId].maskImage());
-
-        return this->mask.render(image);
-    }
-    else
-        return image;
-}
-
-void TheMask::end()
-{
-}
-
-void TheMask::configure()
-{
-}
-
-QVariant TheMask::configs()
-{
-    return QVariant();
-}
-
-void TheMask::setConfigs(QVariant configs)
-{
-    Q_UNUSED(configs)
-}
-
-void TheMask::mouseDoubleClickEvent(QString spaceId, QMouseEvent *event)
-{
-    Q_UNUSED(spaceId)
-    Q_UNUSED(event)
-}
-
-void TheMask::mouseMoveEvent(QString spaceId, QMouseEvent *event)
-{
-    Q_UNUSED(spaceId)
-    Q_UNUSED(event)
-}
-
-void TheMask::mousePressEvent(QString spaceId, QMouseEvent *event)
-{
-    Q_UNUSED(spaceId)
-    Q_UNUSED(event)
-}
-
-void TheMask::mouseReleaseEvent(QString spaceId, QMouseEvent *event)
-{
-    Q_UNUSED(spaceId)
-    Q_UNUSED(event)
 }
 
 Q_EXPORT_PLUGIN2(TheMask, TheMask)

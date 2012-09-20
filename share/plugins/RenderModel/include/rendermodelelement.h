@@ -17,75 +17,41 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/cube.h"
+#ifndef RENDERMODELELEMENT_H
+#define RENDERMODELELEMENT_H
 
-QString Cube::pluginId()
+#include "element.h"
+#include "rendermodelgl.h"
+
+class RenderModelElement: public Element
 {
-    return "Cube";
-}
+    Q_OBJECT
 
-QString Cube::name()
-{
-    return "Cube";
-}
+    Q_PROPERTY(QString modelFileName READ modelFileName WRITE setModelFileName RESET resetModelFileName)
 
-QString Cube::version()
-{
-    return "1.0.0";
-}
+    public:
+        explicit RenderModelElement();
 
-QString Cube::summary()
-{
-    return "Render the webcam image in a cube.";
-}
+        QString modelFileName();
 
-QString Cube::type()
-{
-    return "video";
-}
+        Q_INVOKABLE bool start();
+        Q_INVOKABLE bool stop();
 
-QString Cube::category()
-{
-    return "plugin";
-}
+    private:
+        QString m_modelFileName;
+        OGL m_ogl;
+        QImage m_image;
 
-QString Cube::thumbnail()
-{
-    return "../../../../../share/plugins/Cube/share/thumbnail-128x96.png";
-}
+    public slots:
+        // Input Channels
+        void iVideo(QImage *frame);
+        void iAudio(QByteArray *frame);
 
-QString Cube::license()
-{
-    return "GPLv3";
-}
+        void configure();
+        void setManager(QObject *manager);
 
-QString Cube::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
+        void setModelFileName(QString modelFileName);
+        void resetModelFileName();
+};
 
-QString Cube::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString Cube::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool Cube::isConfigurable()
-{
-    return false;
-}
-
-Element *Cube::newElement()
-{
-    return new CubeElement();
-}
-
-Cube::~Cube()
-{
-}
-
-Q_EXPORT_PLUGIN2(Cube, Cube)
+#endif // RENDERMODELELEMENT_H

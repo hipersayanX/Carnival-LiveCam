@@ -17,75 +17,73 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/videosource.h"
+#include "include/mediarecorder.h"
 
-QString VideoSource::pluginId()
+QString MediaRecorder::pluginId()
 {
-    return "VideoSource";
+    return "MediaRecorder";
 }
 
-QString VideoSource::name()
+QString MediaRecorder::name()
 {
-    return "Video Source";
+    return "Media Recorder";
 }
 
-QString VideoSource::version()
+QString MediaRecorder::version()
 {
     return "1.0.0";
 }
 
-QString VideoSource::summary()
+QString MediaRecorder::summary()
 {
-    return "Captures images from a video file.";
+    return "Record video using FFmpeg";
 }
 
-QString VideoSource::type()
-{
-    return "video";
-}
-
-QString VideoSource::category()
+QString MediaRecorder::type()
 {
     return "video";
 }
 
-QString VideoSource::thumbnail()
+QString MediaRecorder::category()
+{
+    return "utils";
+}
+
+QString MediaRecorder::thumbnail()
 {
     return "";
 }
 
-QString VideoSource::license()
+QString MediaRecorder::license()
 {
     return "GPLv3";
 }
 
-QString VideoSource::author()
+QString MediaRecorder::author()
 {
     return "Gonzalo Exequiel Pedone";
 }
 
-QString VideoSource::website()
+QString MediaRecorder::website()
 {
     return "https://github.com/hipersayanX/Carnival-LiveCam";
 }
 
-QString VideoSource::mail()
+QString MediaRecorder::mail()
 {
     return "hipersayan DOT x AT gmail DOT com";
 }
 
-bool VideoSource::isConfigurable()
+bool MediaRecorder::isConfigurable()
 {
     return false;
 }
 
-Element *VideoSource::newElement()
+Element *MediaRecorder::newElement()
 {
-    return new VideoSourceElement();
+    return new MediaRecorderElement();
 }
 
-VideoSource::~VideoSource()
+MediaRecorder::~MediaRecorder()
 {
 }
-
-Q_EXPORT_PLUGIN2(VideoSource, VideoSource)

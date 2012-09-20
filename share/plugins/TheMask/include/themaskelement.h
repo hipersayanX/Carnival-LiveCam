@@ -17,48 +17,46 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef CUBEELEMENT_H
-#define CUBEELEMENT_H
+#ifndef THEMASKELEMENT_H
+#define THEMASKELEMENT_H
+
+#include <opencv2/opencv.hpp>
 
 #include "element.h"
-#include "ogl.h"
 
-class CubeElement: public Element
+class TheMaskElement: public Element
 {
     Q_OBJECT
-    Q_PROPERTY(float xrot READ xrot WRITE setXrot RESET resetXrot)
-    Q_PROPERTY(float yrot READ yrot WRITE setYrot RESET resetYrot)
+
+    Q_PROPERTY(QString haarCascadeFile READ haarCascadeFile WRITE setHaarCascadeFile RESET resetHaarCascadeFile)
+    Q_PROPERTY(QString sprite READ sprite WRITE setSprite RESET resetSprite)
 
     public:
-        explicit CubeElement();
-        float xrot();
-        float yrot();
+        explicit TheMaskElement();
+
+        QString haarCascadeFile();
+        QString sprite();
 
         Q_INVOKABLE bool start();
         Q_INVOKABLE bool stop();
 
     private:
-        OGL m_ogl;
-        QImage m_image;
-        GLfloat m_xrot;
-        GLfloat m_yrot;
+        QString m_haarCascadeFile;
+        QString m_sprite;
+        QImage m_curFrame;
+        QImage m_maskImage;
+        cv::CascadeClassifier m_cascadeClassifier;
 
     public slots:
-        // Input Channels
+        void setHaarCascadeFile(QString haarCascadeFile);
+        void setSprite(QString sprite);
+        void resetHaarCascadeFile();
+        void resetSprite();
+
         void iVideo(QImage *frame);
         void iAudio(QByteArray *frame);
-
         void configure();
         void setManager(QObject *manager);
-
-        void setXrot(float xrot);
-        void setYrot(float yrot);
-        void resetXrot();
-        void resetYrot();
-
-        void mouseMove(QMouseEvent *event);
-        void mousePress(QMouseEvent *event);
-        void mouseRelease(QMouseEvent *event);
 };
 
-#endif // CUBEELEMENT_H
+#endif // THEMASKELEMENT_H

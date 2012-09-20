@@ -17,13 +17,13 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef THEMASK_H
-#define THEMASK_H
+#ifndef RENDERMODEL_H
+#define RENDERMODEL_H
 
 #include "plugin.h"
-#include "themaskelement.h"
+#include "rendermodelelement.h"
 
-class TheMask: public QObject, public Plugin
+class RenderModel: public QObject, public Plugin
 {
     Q_OBJECT
     Q_INTERFACES(Plugin)
@@ -44,7 +44,7 @@ class TheMask: public QObject, public Plugin
 
         Element *newElement();
 
-        ~TheMask();
+        ~RenderModel();
 };
 
-#endif // THEMASK_H
+#endif // RENDERMODEL_H

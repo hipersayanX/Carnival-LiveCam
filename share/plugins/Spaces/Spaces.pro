@@ -17,7 +17,7 @@
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 #
-# OpenGL test plugin
+# Image driver for linux
 
 CONFIG += plugin
 
@@ -26,25 +26,30 @@ DESTDIR += $$PWD
 HEADERS += \
     include/element.h \
     include/plugin.h \
-    include/cube.h \
-    include/cubeelement.h \
-    include/cubegl.h
+    include/space.h \
+    include/spacecontrols.h \
+    include/spacemanager.h \
+    include/spacemodel.h \
+    include/spacewidget.h
 
 MOC_DIR += $$PWD/build
 
 OBJECTS_DIR += $$PWD/build
 
-QT += core gui opengl
-
-LIBS += -lGLU
+QT += core gui
 
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/cube.cpp \
-    src/cubeelement.cpp \
-    src/cubegl.cpp
+    src/space.cpp \
+    src/spacecontrols.cpp \
+    src/spacemanager.cpp \
+    src/spacemodel.cpp \
+    src/spacewidget.cpp
 
 TEMPLATE = lib
 
 UI_DIR += $$PWD/build
+
+FORMS += \
+    ui/spacecontrols.ui

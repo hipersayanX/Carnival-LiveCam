@@ -67,7 +67,7 @@ Particle::Particle(QRect rect,
                    float maxDirection,
                    QSize minSize,
                    QSize maxSize,
-                   QList<QImage> *sprites,
+                   const QList<QImage> *sprites,
                    float inc):
     m_rect(rect),
     m_minSpeed(minSpeed),
@@ -156,7 +156,7 @@ QSize Particle::maxSize()
     return this->m_maxSize;
 }
 
-QList<QImage> *Particle::sprites()
+const QList<QImage> *Particle::sprites()
 {
     return this->m_sprites;
 }
@@ -285,7 +285,7 @@ void Particle::setMaxSize(QSize maxSize)
 
 void Particle::setSprites(const QList<QImage> *sprites)
 {
-    this->m_sprites = (QList<QImage> *) sprites;
+    this->m_sprites = sprites;
 
     if (this->m_sprites)
     {

@@ -17,75 +17,75 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/videosource.h"
+#include "include/rendermodel.h"
 
-QString VideoSource::pluginId()
+QString RenderModel::pluginId()
 {
-    return "VideoSource";
+    return "RenderModel";
 }
 
-QString VideoSource::name()
+QString RenderModel::name()
 {
-    return "Video Source";
+    return "Render Model";
 }
 
-QString VideoSource::version()
+QString RenderModel::version()
 {
     return "1.0.0";
 }
 
-QString VideoSource::summary()
+QString RenderModel::summary()
 {
-    return "Captures images from a video file.";
+    return "This plugin shows a 3D model";
 }
 
-QString VideoSource::type()
-{
-    return "video";
-}
-
-QString VideoSource::category()
+QString RenderModel::type()
 {
     return "video";
 }
 
-QString VideoSource::thumbnail()
+QString RenderModel::category()
 {
-    return "";
+    return "plugin";
 }
 
-QString VideoSource::license()
+QString RenderModel::thumbnail()
+{
+    return "../../../../../share/plugins/RenderModel/share/thumbnail-128x96.png";
+}
+
+QString RenderModel::license()
 {
     return "GPLv3";
 }
 
-QString VideoSource::author()
+QString RenderModel::author()
 {
     return "Gonzalo Exequiel Pedone";
 }
 
-QString VideoSource::website()
+QString RenderModel::website()
 {
     return "https://github.com/hipersayanX/Carnival-LiveCam";
 }
 
-QString VideoSource::mail()
+QString RenderModel::mail()
 {
     return "hipersayan DOT x AT gmail DOT com";
 }
 
-bool VideoSource::isConfigurable()
+bool RenderModel::isConfigurable()
 {
     return false;
 }
 
-Element *VideoSource::newElement()
+Element *RenderModel::newElement()
 {
-    return new VideoSourceElement();
+    return new RenderModelElement();
 }
 
-VideoSource::~VideoSource()
+RenderModel::~RenderModel()
 {
 }
 
-Q_EXPORT_PLUGIN2(VideoSource, VideoSource)
+Q_EXPORT_PLUGIN2(RenderModel, RenderModel)

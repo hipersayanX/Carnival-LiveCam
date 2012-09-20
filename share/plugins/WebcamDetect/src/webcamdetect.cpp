@@ -81,9 +81,7 @@ bool WebcamDetect::isConfigurable()
 
 Element *WebcamDetect::newElement()
 {
-    WebcamDetectElement *element = new WebcamDetectElement();
-
-    return qobject_cast<Element *>(element);
+    return new WebcamDetectElement();
 }
 
 WebcamDetect::~WebcamDetect()

@@ -34,7 +34,7 @@ class Particle: public QObject
     Q_PROPERTY(float maxDirection READ maxDirection WRITE setMaxDirection RESET resetMaxDirection)
     Q_PROPERTY(QSize minSize READ minSize WRITE setMinSize RESET resetMinSize)
     Q_PROPERTY(QSize maxSize READ maxSize WRITE setMaxSize RESET resetMaxSize)
-    Q_PROPERTY(QList<QImage> *sprites READ sprites WRITE setSprites RESET resetSprites)
+    Q_PROPERTY(const QList<QImage> *sprites READ sprites WRITE setSprites RESET resetSprites)
     Q_PROPERTY(QImage sprite READ sprite WRITE setSprite RESET resetSprite)
     Q_PROPERTY(float inc READ inc WRITE setInc RESET resetInc)
 
@@ -49,7 +49,7 @@ class Particle: public QObject
                  float maxDirection,
                  QSize minSize,
                  QSize maxSize,
-                 QList<QImage> *sprites,
+                 const QList<QImage> *sprites,
                  float inc);
 
         Particle& operator =(const Particle &other);
@@ -61,7 +61,7 @@ class Particle: public QObject
         float maxDirection();
         QSize minSize();
         QSize maxSize();
-        QList<QImage> *sprites();
+        const QList<QImage> *sprites();
         QImage sprite();
         float inc();
 
@@ -78,7 +78,7 @@ class Particle: public QObject
         float m_direction;
         QSize m_minSize;
         QSize m_maxSize;
-        QList<QImage> *m_sprites;
+        const QList<QImage> *m_sprites;
         QImage m_sprite;
         float m_inc;
 

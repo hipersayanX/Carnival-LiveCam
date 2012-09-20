@@ -16,19 +16,22 @@
 #
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
-#
-# OpenGL test plugin
 
 CONFIG += plugin
 
 DESTDIR += $$PWD
 
 HEADERS += \
-    include/element.h \
     include/plugin.h \
-    include/cube.h \
-    include/cubeelement.h \
-    include/cubegl.h
+    include/element.h \
+    include/rendermodel.h \
+    include/rendermodelelement.h \
+    include/rendermodelgl.h
+
+unix {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += openscenegraph openscenegraph-osgViewer
+}
 
 MOC_DIR += $$PWD/build
 
@@ -36,14 +39,12 @@ OBJECTS_DIR += $$PWD/build
 
 QT += core gui opengl
 
-LIBS += -lGLU
-
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/cube.cpp \
-    src/cubeelement.cpp \
-    src/cubegl.cpp
+    src/rendermodel.cpp \
+    src/rendermodelelement.cpp \
+    src/rendermodelgl.cpp
 
 TEMPLATE = lib
 

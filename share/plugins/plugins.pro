@@ -21,12 +21,15 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-#SUBDIRS += share/plugins/TheCow \
-#           share/plugins/DefaultShell
+#SUBDIRS += \
+#           share/plugins/DefaultShell \
+#           share/plugins/Spaces
 
 SUBDIRS += share/plugins/Cube \
            share/plugins/ImageSource \
+           share/plugins/MediaRecorder \
            share/plugins/ParticleFall \
+           share/plugins/RenderModel \
            share/plugins/TheMask \
            share/plugins/VideoSource \
            share/plugins/WebcamDetect \

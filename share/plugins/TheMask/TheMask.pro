@@ -27,8 +27,8 @@ HEADERS += \
     include/plugin.h \
     include/element.h \
     include/themask.h \
-    include/mask.h \
-    include/space.h
+    include/space.h \
+    include/themaskelement.h
 
 unix {
     CONFIG += link_pkgconfig
@@ -40,7 +40,13 @@ MOC_DIR += $$PWD/build
 OBJECTS_DIR += $$PWD/build
 
 OTHER_FILES += \
-    share/thumbnail-128x96.png
+    share/thumbnail-128x96.png \
+    share/masks/cow.png \
+    share/haars/aGest.xml \
+    share/haars/haarcascade_eye_tree_eyeglasses.xml \
+    share/haars/haarcascade_frontalface_alt.xml \
+    share/haars/haarcascade_frontalface_alt_tree.xml \
+    share/haars/haarcascade_mcs_eyepair_big.xml
 
 QT += core gui
 
@@ -48,8 +54,8 @@ RCC_DIR += $$PWD/build
 
 SOURCES += \
     src/themask.cpp \
-    src/mask.cpp \
-    src/space.cpp
+    src/space.cpp \
+    src/themaskelement.cpp
 
 TEMPLATE = lib
 

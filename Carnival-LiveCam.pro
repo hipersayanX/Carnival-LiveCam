@@ -24,28 +24,15 @@ CONFIG += qt
 DESTDIR += $$PWD
 
 HEADERS += \
+    include/core/core.h \
+    include/plugin/plugin.h \
+    include/plugin/element.h \
     include/plugin/plugininfo.h \
     include/plugin/pluginmanager.h \
-    include/streaming/mediastreaming.h \
-    include/streaming/outputformat.h \
-    include/driver/driver.h \
-    include/driver/driverfactory.h \
-    include/driver/driverinfo.h \
-    include/driver/deviceinfo.h \
-    include/driver/drivermanager.h \
-    include/driver/devicemanager.h \
     include/shell/shell.h \
     include/shell/shellfactory.h \
     include/shell/shellmanager.h \
-    include/shell/shellinfo.h \
-    include/core/core.h \
-    include/space/space.h \
-    include/space/spacemodel.h \
-    include/space/spacewidget.h \
-    include/space/spacecontrols.h \
-    include/space/spacemanager.h \
-    include/plugin/plugin.h \
-    include/plugin/element.h
+    include/shell/shellinfo.h
 
 INSTALLS += target \
             docs \
@@ -60,28 +47,15 @@ QT += core gui
 RCC_DIR += $$PWD/build
 
 SOURCES += src/main.cpp \
+    src/core/core.cpp \
     src/plugin/plugininfo.cpp \
     src/plugin/pluginmanager.cpp \
-    src/streaming/mediastreaming.cpp \
-    src/streaming/outputformat.cpp \
-    src/driver/driverinfo.cpp \
-    src/driver/deviceinfo.cpp \
-    src/driver/drivermanager.cpp \
-    src/driver/devicemanager.cpp \
     src/shell/shellmanager.cpp \
-    src/shell/shellinfo.cpp \
-    src/core/core.cpp \
-    src/space/space.cpp \
-    src/space/spacemodel.cpp \
-    src/space/spacewidget.cpp \
-    src/space/spacecontrols.cpp \
-    src/space/spacemanager.cpp
+    src/shell/shellinfo.cpp
 
 TEMPLATE += app
 
 UI_DIR += $$PWD/build
-
-FORMS += share/ui/spacecontrols.ui
 
 # Build rules
 

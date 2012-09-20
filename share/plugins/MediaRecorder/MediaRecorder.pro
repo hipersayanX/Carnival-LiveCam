@@ -16,8 +16,6 @@
 #
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
-#
-# OpenGL test plugin
 
 CONFIG += plugin
 
@@ -26,24 +24,22 @@ DESTDIR += $$PWD
 HEADERS += \
     include/element.h \
     include/plugin.h \
-    include/cube.h \
-    include/cubeelement.h \
-    include/cubegl.h
+    include/outputformat.h \
+    include/mediarecorder.h \
+    include/mediarecorderelement.h
 
 MOC_DIR += $$PWD/build
 
 OBJECTS_DIR += $$PWD/build
 
-QT += core gui opengl
-
-LIBS += -lGLU
+QT += core gui
 
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/cube.cpp \
-    src/cubeelement.cpp \
-    src/cubegl.cpp
+    src/outputformat.cpp \
+    src/mediarecorder.cpp \
+    src/mediarecorderelement.cpp
 
 TEMPLATE = lib
 

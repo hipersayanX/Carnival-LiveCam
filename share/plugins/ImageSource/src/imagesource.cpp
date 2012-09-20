@@ -81,9 +81,7 @@ bool ImageSource::isConfigurable()
 
 Element *ImageSource::newElement()
 {
-    ImageSourceElement *element = new ImageSourceElement();
-
-    return qobject_cast<Element *>(element);
+    return new ImageSourceElement();
 }
 
 ImageSource::~ImageSource()

@@ -81,9 +81,7 @@ bool WebcamSource::isConfigurable()
 
 Element *WebcamSource::newElement()
 {
-    WebcamSourceElement *element = new WebcamSourceElement();
-
-    return qobject_cast<Element *>(element);
+    return new WebcamSourceElement();
 }
 
 WebcamSource::~WebcamSource()

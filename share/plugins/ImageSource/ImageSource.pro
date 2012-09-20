@@ -44,7 +44,3 @@ SOURCES += \
 TEMPLATE = lib
 
 UI_DIR += $$PWD/build
-
-FORMS +=
-
-RESOURCES +=

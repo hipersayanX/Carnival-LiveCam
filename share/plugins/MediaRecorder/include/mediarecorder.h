@@ -17,13 +17,13 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef THEMASK_H
-#define THEMASK_H
+#ifndef MEDIARECORDER_H
+#define MEDIARECORDER_H
 
 #include "plugin.h"
-#include "themaskelement.h"
+#include "mediarecorderelement.h"
 
-class TheMask: public QObject, public Plugin
+class MediaRecorder: public QObject, public Plugin
 {
     Q_OBJECT
     Q_INTERFACES(Plugin)
@@ -44,7 +44,7 @@ class TheMask: public QObject, public Plugin
 
         Element *newElement();
 
-        ~TheMask();
+        ~MediaRecorder();
 };
 
-#endif // THEMASK_H
+#endif // MEDIARECORDER_H

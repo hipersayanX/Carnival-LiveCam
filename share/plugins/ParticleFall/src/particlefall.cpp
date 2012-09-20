@@ -81,9 +81,7 @@ bool ParticleFall::isConfigurable()
 
 Element *ParticleFall::newElement()
 {
-    ParticleFallElement *element = new ParticleFallElement();
-
-    return qobject_cast<Element *>(element);
+    return new ParticleFallElement();
 }
 
 ParticleFall::~ParticleFall()

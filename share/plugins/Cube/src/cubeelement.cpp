@@ -21,78 +21,8 @@
 
 CubeElement::CubeElement(): Element()
 {
-    this->m_ogl = NULL;
     this->m_xrot = 30.0f;
     this->m_yrot = 60.0f;
-}
-
-void CubeElement::mouseMove(QMouseEvent *event)
-{
-    if (this->m_ogl)
-        this->m_ogl->mouseMove(event);
-}
-
-void CubeElement::mousePress(QMouseEvent *event)
-{
-    if (this->m_ogl)
-        this->m_ogl->mousePress(event);
-}
-
-void CubeElement::mouseRelease(QMouseEvent *event)
-{
-    if (this->m_ogl)
-        this->m_ogl->mouseRelease(event);
-}
-
-void CubeElement::iVideo(QImage *frame)
-{
-    if (!this->m_ogl)
-        return;
-
-    this->m_ogl->resize(frame->size());
-    this->m_ogl->setImage(*frame);
-    this->m_image = this->m_ogl->renderPixmap(this->m_ogl->width(),this->m_ogl->height()).toImage();
-
-    emit(oVideo(&this->m_image));
-}
-
-void CubeElement::iAudio(QByteArray *frame)
-{
-    Q_UNUSED(frame)
-}
-
-bool CubeElement::start()
-{
-    this->m_ogl = new OGL();
-
-    if (!this->m_ogl)
-        return false;
-
-    QObject::connect(this->m_ogl, SIGNAL(xrotChanged(float)), this, SLOT(setXrot(float)));
-    QObject::connect(this->m_ogl, SIGNAL(yrotChanged(float)), this, SLOT(setYrot(float)));
-
-    return true;
-}
-
-bool CubeElement::stop()
-{
-    if (!this->m_ogl)
-        return true;
-
-    QObject::disconnect(this->m_ogl, SIGNAL(xrotChanged(float)), this, SLOT(setXrot(float)));
-    QObject::disconnect(this->m_ogl, SIGNAL(yrotChanged(float)), this, SLOT(setYrot(float)));
-    delete this->m_ogl;
-
-    return true;
-}
-
-void CubeElement::configure()
-{
-}
-
-void CubeElement::setManager(QObject *manager)
-{
-    Q_UNUSED(manager)
 }
 
 float CubeElement::xrot()
@@ -105,20 +35,55 @@ float CubeElement::yrot()
     return this->m_yrot;
 }
 
+bool CubeElement::start()
+{
+    QObject::connect(&this->m_ogl, SIGNAL(xrotChanged(float)), this, SLOT(setXrot(float)));
+    QObject::connect(&this->m_ogl, SIGNAL(yrotChanged(float)), this, SLOT(setYrot(float)));
+
+    return true;
+}
+
+bool CubeElement::stop()
+{
+    QObject::disconnect(&this->m_ogl, SIGNAL(xrotChanged(float)), this, SLOT(setXrot(float)));
+    QObject::disconnect(&this->m_ogl, SIGNAL(yrotChanged(float)), this, SLOT(setYrot(float)));
+
+    return true;
+}
+
+void CubeElement::iVideo(QImage *frame)
+{
+    this->m_ogl.resize(frame->size());
+    this->m_ogl.setImage(*frame);
+    this->m_image = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
+
+    emit(oVideo(&this->m_image));
+}
+
+void CubeElement::iAudio(QByteArray *frame)
+{
+    Q_UNUSED(frame)
+}
+
+void CubeElement::configure()
+{
+}
+
+void CubeElement::setManager(QObject *manager)
+{
+    Q_UNUSED(manager)
+}
+
 void CubeElement::setXrot(float xrot)
 {
     this->m_xrot = xrot;
-
-    if (this->m_ogl)
-        this->m_ogl->setXrot(xrot);
+    this->m_ogl.setXrot(xrot);
 }
 
 void CubeElement::setYrot(float yrot)
 {
     this->m_yrot = yrot;
-
-    if (this->m_ogl)
-        this->m_ogl->setYrot(yrot);
+    this->m_ogl.setYrot(yrot);
 }
 
 void CubeElement::resetXrot()
@@ -129,4 +94,19 @@ void CubeElement::resetXrot()
 void CubeElement::resetYrot()
 {
     this->setYrot(60.0f);
+}
+
+void CubeElement::mouseMove(QMouseEvent *event)
+{
+    this->m_ogl.mouseMove(event);
+}
+
+void CubeElement::mousePress(QMouseEvent *event)
+{
+    this->m_ogl.mousePress(event);
+}
+
+void CubeElement::mouseRelease(QMouseEvent *event)
+{
+    this->m_ogl.mouseRelease(event);
 }

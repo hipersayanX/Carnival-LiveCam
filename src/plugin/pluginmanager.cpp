@@ -58,12 +58,7 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
                 continue;
             }
 
-            QObject *pluginInstance = this->m_pluginLoader.instance();
-
-            if (!pluginInstance)
-                continue;
-
-            Plugin *plugin = qobject_cast<Plugin *>(pluginInstance);
+            Plugin *plugin = qobject_cast<Plugin *>(this->m_pluginLoader.instance());
 
             if (!plugin)
                 continue;
@@ -127,12 +122,7 @@ bool PluginManager::load(QString pluginId)
     if (!this->m_pluginLoader.load())
         return false;
 
-    QObject *pluginInstance = this->m_pluginLoader.instance();
-
-    if (!pluginInstance)
-        return false;
-
-    Plugin *plugin = qobject_cast<Plugin *>(pluginInstance);
+    Plugin *plugin = qobject_cast<Plugin *>(this->m_pluginLoader.instance());
 
     if (!plugin)
         return false;
@@ -182,7 +172,7 @@ bool PluginManager::addElement(QString elementId, QString pluginId)
         return false;
 
     this->m_elements[elementId] = element;
-    this->m_elements[elementId]->setManager(qobject_cast<QObject *>(this));
+    this->m_elements[elementId]->setManager(this);
 
     return true;
 }
@@ -193,11 +183,9 @@ bool PluginManager::removeElement(QString elementId)
         return true;
 
     QString pluginId = this->m_instances1[elementId].toList()[0].toString();
-    Element *element = this->m_elements[elementId];
 
-    delete element;
+    delete this->m_elements[elementId];
     this->m_elements.remove(elementId);
-
     bool unUsed = true;
 
     foreach (QVariant value, this->m_instances1)

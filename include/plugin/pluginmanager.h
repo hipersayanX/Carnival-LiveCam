@@ -83,9 +83,9 @@ class PluginManager: public QObject
         QVariant parseValue(QString value);
 
         void parsePipeline(QString pipeline,
-                           QMap<QString, QVariant> *instances = NULL,
-                           QList<QStringList> *connections = NULL,
-                           QList<QStringList> *ss = NULL);
+                           QMap<QString, QVariant> *instances,
+                           QList<QStringList> *connections,
+                           QList<QStringList> *ss);
 
     public slots:
         void setPipeline(QString pipeline2);
