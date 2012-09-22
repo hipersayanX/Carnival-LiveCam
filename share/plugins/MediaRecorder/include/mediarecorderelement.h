@@ -4,7 +4,7 @@
 // Carnival LiveCam is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+ // (at your option) any later version.
 //
 // Carnival LiveCam is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,61 +22,75 @@
 
 #include "element.h"
 
-#include "outputformat.h"
-
 class MediaRecorderElement: public Element
 {
     Q_OBJECT
+        Q_PROPERTY(QMap videoFormats READ videoFormats WRITE setVideoFormats RESET resetVideoFormats)
+        Q_PROPERTY(int fps READ fps WRITE setFps RESET resetFps)
+        Q_PROPERTY(QSize size READ size WRITE setSize RESET resetSize)
+        Q_PROPERTY(bool recordAudio READ recordAudio WRITE setRecordAudio RESET resetRecordAudio)
+        Q_PROPERTY(QString ffmpegPath READ ffmpegPath WRITE setFfmpegPath RESET resetFfmpegPath)
+        Q_PROPERTY(bool showOutput READ showOutput WRITE setShowOutput RESET resetShowOutput)
+        Q_PROPERTY(bool recording READ recording)
 
     public:
         explicit MediaRecorderElement();
 
+        QMap<QString, QVariant> videoFormats();
+        int fps();
+        QSize size();
+        bool recordAudio();
+        QString ffmpegPath();
+        bool showOutput();
+        bool recording();
+
         Q_INVOKABLE bool start();
         Q_INVOKABLE bool stop();
 
-        Q_INVOKABLE void setFPS(qint32 fps);
-        Q_INVOKABLE void addOutputFormat(const OutputFormat &outputformat);
-        Q_INVOKABLE QStringList supportedSuffix();
-        Q_INVOKABLE bool isRecording();
-
     private:
-        qint32 fps;
-        bool recording;
-        QTimer timerCapture;
-        QTimer timerRecord;
-        QImage currentFrame;
-        QFile videoPipe;
-        QDataStream outvideoStream;
-        QString videoPipeFilename;
-        QProcess ffmpeg;
-        QHash<QString, OutputFormat> outputFormats;
-        QHash<qint32, QString> qtToFFmpegPixFMT;
+        QMap<QString, QVariant> m_videoFormats;
+        int m_fps;
+        QSize m_size;
+        bool m_recordAudio;
+        QString m_ffmpegPath;
+        bool m_showOutput;
+        bool m_recording;
 
-        QString saveFile(QString filters);
-        QStringList outputParameters(QString filename);
-        QString videoFilters();
+        QImage m_currentFrame;
+        QFile m_videoPipe;
+        QDataStream m_outvideoStream;
+        QString m_videoPipeFilename;
+        QProcess m_ffmpeg;
 
     signals:
-        void captureFrame();
+        void fail();
 
     public slots:
         // Input Channels
         void iVideo(QImage *frame);
         void iAudio(QByteArray *frame);
-
         void configure();
         void setManager(QObject *manager);
 
-        void startRecord();
+        void setVideoFormats(QMap<QString, QVariant> videoFormats);
+        void setFps(int fps);
+        void setSize(QSize size);
+        void setRecordAudio(bool recordAudio);
+        void setFfmpegPath(QString ffmpegPath);
+        void setShowOutput(bool showOutput);
+        void resetVideoFormats();
+        void resetFps();
+        void resetSize();
+        void resetRecordAudio();
+        void resetFfmpegPath();
+        void resetShowOutput();
+
+        void startRecord(QString fileName);
         void stopRecord();
-        void startStopRecord();
-        void takePicture();
-        void setFrame(QImage frame);
+        void savePicture(QString fileName);
 
     private slots:
-        void saveVideoFrame();
-        void slotCaptureFrame();
-        void showOutput();
+        void ffmpegOutput();
 };
 
 #endif // MEDIARECORDERELEMENT_H

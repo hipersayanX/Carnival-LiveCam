@@ -27,7 +27,6 @@ HEADERS += \
     include/plugin.h \
     include/element.h \
     include/themask.h \
-    include/space.h \
     include/themaskelement.h
 
 unix {
@@ -54,7 +53,6 @@ RCC_DIR += $$PWD/build
 
 SOURCES += \
     src/themask.cpp \
-    src/space.cpp \
     src/themaskelement.cpp
 
 TEMPLATE = lib

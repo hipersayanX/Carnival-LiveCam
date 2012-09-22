@@ -17,40 +17,37 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef SPACE_H
-#define SPACE_H
+#include "include/fxbinelement.h"
 
-#include <QObject>
-#include <QImage>
-
-class Space: public QObject
+FxBinElement::FxBinElement()
 {
-    Q_OBJECT
+}
 
-    Q_PROPERTY(QImage maskImage READ maskImage WRITE setMaskImage RESET resetMaskImage)
-    Q_PROPERTY(QSize frameSize READ frameSize WRITE setFrameSize RESET resetFrameSize)
+void FxBinElement::iVideo(QImage *frame)
+{
+    Q_UNUSED(frame)
+}
 
-    public:
-        explicit Space(QObject *parent = 0);
-        Space(const Space &object);
+void FxBinElement::iAudio(QByteArray *frame)
+{
+    Q_UNUSED(frame)
+}
 
-        Space(QImage maskImage,
-              QSize frameSize);
+bool FxBinElement::start()
+{
+    return true;
+}
 
-        Space& operator =(const Space &other);
+bool FxBinElement::stop()
+{
+    return true;
+}
 
-        QImage maskImage();
-        QSize frameSize();
+void FxBinElement::configure()
+{
+}
 
-    private:
-        QImage m_maskImage;
-        QSize m_frameSize;
-
-    public slots:
-        void setMaskImage(QImage value);
-        void setFrameSize(QSize value);
-        void resetMaskImage();
-        void resetFrameSize();
-};
-
-#endif // SPACE_H
+void FxBinElement::setManager(QObject *manager)
+{
+    Q_UNUSED(manager)
+}

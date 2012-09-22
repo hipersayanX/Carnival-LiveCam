@@ -24,7 +24,6 @@ DESTDIR += $$PWD
 HEADERS += \
     include/element.h \
     include/plugin.h \
-    include/outputformat.h \
     include/mediarecorder.h \
     include/mediarecorderelement.h
 
@@ -37,7 +36,6 @@ QT += core gui
 RCC_DIR += $$PWD/build
 
 SOURCES += \
-    src/outputformat.cpp \
     src/mediarecorder.cpp \
     src/mediarecorderelement.cpp
 

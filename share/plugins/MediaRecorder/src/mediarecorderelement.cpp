@@ -17,167 +17,260 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include <math.h>
+//#include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #include "include/mediarecorderelement.h"
 
-MediaRecorderElement::MediaRecorderElement(): QObject()
+MediaRecorderElement::MediaRecorderElement(): Element()
 {
-    this->recording = false;
-    this->videoPipeFilename = QDir::tempPath() + QDir::separator() + "video_pipe.tmp";
-
-    setFPS(19);
-    this->currentFrame = QImage(640, 480, QImage::Format_RGB888);
-
-    this->qtToFFmpegPixFMT[QImage::Format_Mono] = "monow";
-    this->qtToFFmpegPixFMT[QImage::Format_RGB32] = "bgra";
-    this->qtToFFmpegPixFMT[QImage::Format_ARGB32] = "bgra";
-    this->qtToFFmpegPixFMT[QImage::Format_RGB16] = "rgb565le";
-    this->qtToFFmpegPixFMT[QImage::Format_RGB888] = "rgb24";
-
-    this->timerCapture.setInterval(1);
-    connect(&this->timerCapture, SIGNAL(timeout()), this, SLOT(slotCaptureFrame()));
-    timerCapture.start();
-
-    connect(&this->timerRecord, SIGNAL(timeout()), this, SLOT(saveVideoFrame()));
-
-    connect(&this->ffmpeg, SIGNAL(readyReadStandardError()), this, SLOT(showOutput()));
+    this->resetVideoFormats();
+    this->resetFps();
+    this->resetSize();
+    this->resetRecordAudio();
+    this->resetFfmpegPath();
+    this->resetShowOutput();
 }
 
-/*!
-  \fn void MediaStreaming::startRecord()
-
-  \brief Starts video recording.
- */
-void MediaRecorderElement::startRecord()
+QMap<QString, QVariant> MediaRecorderElement::videoFormats()
 {
-    if (this->recording)
-        return;
-
-    QString filename = this->saveFile(videoFilters());
-
-    if (filename == "")
-        return;
-
-    QFile::remove(this->videoPipeFilename);
-    mkfifo(this->videoPipeFilename.toUtf8().constData(), 0644);
-
-    this->ffmpeg.start("ffmpeg", this->outputParameters(filename));
-    this->videoPipe.setFileName(this->videoPipeFilename);
-    this->videoPipe.open(QIODevice::WriteOnly);
-    this->outvideoStream.setDevice(&this->videoPipe);
-    this->timerRecord.start();
-    this->recording = true;
+    return this->m_videoFormats;
 }
 
-/*!
-  \fn void MediaStreaming::stopRecord()
+int MediaRecorderElement::fps()
+{
+    return this->m_fps;
+}
 
-  \brief Stop video recording.
- */
+QSize MediaRecorderElement::size()
+{
+    return this->m_size;
+}
+
+bool MediaRecorderElement::recordAudio()
+{
+    return this->m_recordAudio;
+}
+
+QString MediaRecorderElement::ffmpegPath()
+{
+    return this->m_ffmpegPath;
+}
+
+bool MediaRecorderElement::showOutput()
+{
+    return this->m_showOutput;
+}
+
+bool MediaRecorderElement::recording()
+{
+    return this->m_recording;
+}
+
+bool MediaRecorderElement::start()
+{
+    this->m_recording = false;
+    this->m_videoPipeFilename = QString("%1%2%3").arg(QDir::tempPath()).arg(QDir::separator()).arg("video_pipe.tmp");
+
+    connect(&this->m_ffmpeg, SIGNAL(readyReadStandardError()), this, SLOT(ffmpegOutput()));
+
+    return true;
+}
+
+bool MediaRecorderElement::stop()
+{
+    disconnect(&this->m_ffmpeg, SIGNAL(readyReadStandardError()), this, SLOT(ffmpegOutput()));
+
+    return true;
+}
+
+void MediaRecorderElement::iVideo(QImage *frame)
+{
+    this->m_currentFrame = QImage(this->m_size, QImage::Format_RGB888);
+    this->m_currentFrame.fill(QColor(0, 0, 0));
+    QImage scaledFrame(frame->scaled(this->m_size, Qt::KeepAspectRatio));
+    QPoint point((this->m_size.width() - scaledFrame.width()) >> 1,
+                 (this->m_size.height() - scaledFrame.height()) >> 1);
+
+    QPainter painter;
+
+    painter.begin(&this->m_currentFrame);
+    painter.drawImage(point, scaledFrame);
+    painter.end();
+
+    this->m_outvideoStream.writeRawData((const char *)this->m_currentFrame.constBits(), this->m_currentFrame.byteCount());
+}
+
+void MediaRecorderElement::iAudio(QByteArray *frame)
+{
+    Q_UNUSED(frame)
+}
+
+void MediaRecorderElement::configure()
+{
+}
+
+void MediaRecorderElement::setManager(QObject *manager)
+{
+    Q_UNUSED(manager)
+}
+
+void MediaRecorderElement::setVideoFormats(QMap<QString, QVariant> videoFormats)
+{
+    this->m_videoFormats.clear();
+
+    foreach (QString key, videoFormats.keys())
+        this->m_videoFormats[key.toLower()] = videoFormats[key];
+}
+
+void MediaRecorderElement::setFps(int fps)
+{
+    this->m_fps = fps;
+}
+
+void MediaRecorderElement::setSize(QSize size)
+{
+    this->m_size = size;
+}
+
+void MediaRecorderElement::setRecordAudio(bool recordAudio)
+{
+    this->m_recordAudio = recordAudio;
+}
+
+void MediaRecorderElement::setFfmpegPath(QString ffmpegPath)
+{
+    this->m_ffmpegPath = ffmpegPath;
+}
+
+void MediaRecorderElement::setShowOutput(bool showOutput)
+{
+    this->m_showOutput = showOutput;
+}
+
+void MediaRecorderElement::resetVideoFormats()
+{
+    QMap<QString, QVariant> videoFormats;
+
+    videoFormats["webm"] = "-vcodec libvpx " \
+                           "-b:v 500000 " \
+                           "-r %fps " \
+                           "-s %size " \
+                           "-acodec libvorbis " \
+                           "-b:a 128000 " \
+                           "-f webm";
+
+    videoFormats["ogv"] = "-vcodec libtheora " \
+                          "-b:v 500000 " \
+                          "-r %fps " \
+                          "-s %size " \
+                          "-acodec libvorbis " \
+                          "-b:a 128000 " \
+                          "-f ogg";
+
+    videoFormats["ogg"] = videoFormats["ogv"];
+
+    this->setVideoFormats(videoFormats);
+}
+
+void MediaRecorderElement::resetFps()
+{
+    this->setFps(30);
+}
+
+void MediaRecorderElement::resetSize()
+{
+    this->setSize(QSize(640, 480));
+}
+
+void MediaRecorderElement::resetRecordAudio()
+{
+    this->setRecordAudio(true);
+}
+
+void MediaRecorderElement::resetFfmpegPath()
+{
+    this->setFfmpegPath("/usr/bin/ffmpeg");
+}
+
+void MediaRecorderElement::resetShowOutput()
+{
+    this->setShowOutput(false);
+}
+
+void MediaRecorderElement::startRecord(QString fileName)
+{
+    this->stopRecord();
+
+    if (fileName == "")
+        return;
+
+    QString ext = fileName.mid(fileName.lastIndexOf(".")).toLower();
+
+    if (!this->m_videoFormats.contains(ext))
+        return;
+
+    QStringList args;
+
+    args << "-y"
+         << "-f" << "rawvideo"
+         << "-pix_fmt" << "rgb24"
+         << "-r" << QString("%1").arg(this->m_fps)
+         << "-s" << QString("%1x%2").arg(this->m_size.width()).arg(this->m_size.height())
+         << "-i" << this->m_videoPipeFilename;
+
+    if (this->m_recordAudio)
+    {
+        // PulseAudio
+        if (QFile::exists("/usr/bin/pulseaudio"))
+            args << "-f" << "alsa"
+                 << "-ac" << "2"
+                 << "-i" << "pulse";
+        // Alsa
+        else if (QFile::exists("/proc/asound/version"))
+            args << "-f" << "alsa"
+                 << "-ac" << "2"
+                 << "-i" << "hw:0";
+        // OSS
+        else if (QFile::exists("/dev/dsp"))
+            args << "-f" << "oss"
+                 << "-ac" << "2"
+                 << "-i" << "/dev/dsp";
+    }
+
+    QString outArgs = this->m_videoFormats[ext].toString() \
+                                               .replace("%fps", QString("%1").arg(this->m_fps)) \
+                                               .replace("%size", QString("%1x%2").arg(this->m_size.width()) \
+                                                                                 .arg(this->m_size.height()));
+
+    args << outArgs.split(" ", QString::SkipEmptyParts)
+         << fileName;
+
+    QFile::remove(this->m_videoPipeFilename);
+    mkfifo(this->m_videoPipeFilename.toUtf8().constData(), 0644);
+    this->m_ffmpeg.start(this->m_ffmpegPath, args);
+    this->m_videoPipe.setFileName(this->m_videoPipeFilename);
+    this->m_videoPipe.open(QIODevice::WriteOnly);
+    this->m_outvideoStream.setDevice(&this->m_videoPipe);
+    this->m_recording = true;
+}
+
 void MediaRecorderElement::stopRecord()
 {
-    if (!this->recording)
+    if (!this->m_recording)
         return;
 
-    this->recording = false;
-    this->ffmpeg.terminate();
-    this->timerRecord.stop();
-    this->videoPipe.close();
-    QFile::remove(this->videoPipeFilename);
+    this->m_recording = false;
+    this->m_ffmpeg.terminate();
+    this->m_videoPipe.close();
+    QFile::remove(this->m_videoPipeFilename);
 }
 
-/*!
-  \fn void MediaStreaming::startStopRecord()
-
-  \brief Starts video recording, if already recording stop it.
- */
-void MediaRecorderElement::startStopRecord()
+void MediaRecorderElement::savePicture(QString fileName)
 {
-    if (this->recording)
-        stopRecord();
-    else
-        startRecord();
-}
-
-/*!
-  \fn void MediaStreaming::takePicture()
-
-  \brief Save the current frame to a image file.
- */
-void MediaRecorderElement::takePicture()
-{
-    QImage image(this->currentFrame);
-    QString filename = saveFile("PNG file (*.png)");
-
-    if (filename != "")
-        image.save(filename);
-}
-
-/*!
-  \fn void MediaStreaming::setFrame(QImage frame)
-
-  \param frame The video frame to be recorded.
-
-  \brief Set the video frame to be recorded.
- */
-void MediaRecorderElement::setFrame(QImage frame)
-{
-    this->currentFrame = frame;
-}
-
-/*!
-  \internal
-
-  \fn void MediaStreaming::saveVideoFrame()
-
-  \brief Save the current frame to a video file.
- */
-void MediaRecorderElement::saveVideoFrame()
-{
-    this->outvideoStream.writeRawData((const char *)this->currentFrame.constBits(), this->currentFrame.byteCount());
-}
-
-/*!
-  \internal
-
-  \fn QString MediaStreaming::saveFile(QString filters)
-
-  \return Selected output file name.
-
-  \param filters Output format filter
-
-  \brief Show a save file dialog for the output file.
- */
-QString MediaRecorderElement::saveFile(QString filters)
-{
-    QStringList selected_files;
-    QFileDialog save_file_dialog(dynamic_cast<QWidget *>(parent()), "", ".", filters);
-
-    save_file_dialog.setModal(true);
-    save_file_dialog.setFileMode(QFileDialog::AnyFile);
-    save_file_dialog.setAcceptMode(QFileDialog::AcceptSave);
-    save_file_dialog.exec();
-
-    selected_files = save_file_dialog.selectedFiles();
-
-    return (selected_files.isEmpty())? QString(): selected_files.first();
-}
-
-/*!
-  \internal
-
-  \fn void MediaStreaming::slotCaptureFrame()
-
-  \brief This slot is called when the internal timer reach the timeout state.
-
-  This slot emits the captureFrame() signal indicating that a new frame must be captured.
- */
-void MediaRecorderElement::slotCaptureFrame()
-{
-    emit captureFrame();
+    if (fileName != "")
+        this->m_currentFrame.save(fileName);
 }
 
 /*!
@@ -187,109 +280,8 @@ void MediaRecorderElement::slotCaptureFrame()
 
   \brief Show the output of FFmpeg.
  */
-void MediaRecorderElement::showOutput()
+void MediaRecorderElement::ffmpegOutput()
 {
-    qDebug() << this->ffmpeg.readAllStandardError();
-}
-
-/*!
-  \fn void MediaStreaming::addOutputFormat(const OutputFormat &outputformat)
-
-  \param outputformat The new output format.
-
-  \brief Add a new output format for video record.
- */
-void MediaRecorderElement::addOutputFormat(const OutputFormat &outputformat)
-{
-    OutputFormat ncOutputformat(outputformat);
-
-    this->outputFormats[ncOutputformat.suffix()] = outputformat;
-}
-
-/*!
-  \internal
-
-  \fn QStringList MediaStreaming::outputParameters(QString filename)
-
-  \return Output parameters for FFmpeg.
-
-  \param filename Output file name.
-
-  \brief Get the best output parameters for FFmpeg from file name.
- */
-QStringList MediaRecorderElement::outputParameters(QString filename)
-{
-    QStringList arguments;
-
-    arguments << "-y" << "-f" << "rawvideo" << "-pix_fmt" << this->qtToFFmpegPixFMT[currentFrame.format()] << "-r" << QString::number(this->fps) << "-s" << QString("%1x%2").arg(this->currentFrame.width()).arg(this->currentFrame.height()) << "-i" << this->videoPipeFilename
-                      << "-f" << "alsa" << "-ac" << "2" << "-i" << "hw:0"
-                      << this->outputFormats[QFileInfo(filename).completeSuffix()].toStringList(this->fps, this->currentFrame.width(), this->currentFrame.height()) << filename;
-
-    return arguments;
-}
-
-/*!
-  \fn void MediaStreaming::setFPS(qint32 fps)
-
-  \param fps Frames Per Second.
-
-  \brief Set the recording FPS.
- */
-void MediaRecorderElement::setFPS(qint32 fps)
-{
-    this->fps = fps;
-
-    this->timerRecord.setInterval((qint32)round(1000.0f / (qreal)fps));
-}
-
-/*!
-  \fn QStringList MediaStreaming::supportedSuffix()
-
-  \return Supported suffixes.
-
-  \brief Return the supported suffixes.
- */
-QStringList MediaRecorderElement::supportedSuffix()
-{
-    return this->outputFormats.keys();
-}
-
-/*!
-  \fn bool MediaStreaming::isRecording()
-
-  \retval true if recording video.
-  \retval false if not recording video.
-
-  \brief Indicates if currently is recording video.
- */
-bool MediaRecorderElement::isRecording()
-{
-    return this->recording;
-}
-
-/*!
-  \internal
-
-  \fn QString MediaStreaming::videoFilters()
-
-  \return File filters.
-
-  \brief Return the file filters for current output formats.
- */
-QString MediaRecorderElement::videoFilters()
-{
-    QString filters;
-    bool fst = true;
-
-    foreach (QString suffix, supportedSuffix())
-    {
-        if (fst)
-            fst = false;
-        else
-            filters += ";;";
-
-        filters += suffix.toUpper() + " file (*." + suffix + ")";
-    }
-
-    return filters;
+    if (this->m_showOutput)
+        qDebug() << this->m_ffmpeg.readAllStandardError();
 }

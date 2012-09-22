@@ -17,21 +17,28 @@
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-TEMPLATE = subdirs
+CONFIG += plugin
 
-CONFIG += ordered
+DESTDIR += $$PWD
 
-#SUBDIRS += \
-#           share/plugins/DefaultShell \
-#           share/plugins/Spaces
+HEADERS += \
+    include/plugin.h \
+    include/element.h \
+    include/fxbinelement.h \
+    include/fxbin.h
 
-SUBDIRS += share/plugins/Cube \
-           share/plugins/FxBin \
-           share/plugins/ImageSource \
-           share/plugins/MediaRecorder \
-           share/plugins/ParticleFall \
-           share/plugins/RenderModel \
-           share/plugins/TheMask \
-           share/plugins/VideoSource \
-           share/plugins/WebcamDetect \
-           share/plugins/WebcamSource
+MOC_DIR += $$PWD/build
+
+OBJECTS_DIR += $$PWD/build
+
+QT += core gui
+
+RCC_DIR += $$PWD/build
+
+SOURCES += \
+    src/fxbinelement.cpp \
+    src/fxbin.cpp
+
+TEMPLATE = lib
+
+UI_DIR += $$PWD/build
