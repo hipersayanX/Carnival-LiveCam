@@ -54,6 +54,8 @@ class PluginManager: public QObject
         QMap<QString, Plugin *> m_plugins;
         QMap<QString, Element *> m_elements;
         QMap<QString, PluginInfo> m_pluginsInfo;
+        QList<int> m_usedIds;
+        int m_curId;
 
         // Previous pipeline graph.
         QMap<QString, QVariant> m_instances1; // Nodes
@@ -70,7 +72,9 @@ class PluginManager: public QObject
         bool load(QString pluginId);
         bool unload(QString pluginId);
 
-        void initRegexpDict();
+        void resetRegexpDict();
+        int requestId();
+        void removeId(int id);
 
         bool startElement(QString elementId);
         bool stopElement(QString elementId);
@@ -88,7 +92,7 @@ class PluginManager: public QObject
 
         QVariant parseValue(QString value);
 
-        void parsePipeline(QString pipeline,
+        bool parsePipeline(QString pipeline,
                            QMap<QString, QVariant> *instances,
                            QList<QStringList> *connections,
                            QList<QStringList> *ss);
