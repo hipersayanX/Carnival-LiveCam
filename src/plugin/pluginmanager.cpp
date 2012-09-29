@@ -145,6 +145,164 @@ bool PluginManager::unload(QString pluginId)
     return true;
 }
 
+void PluginManager::initRegexpDict()
+{
+    this->m_regexpDict["bool"] = "true|false";
+    this->m_regexpDict["number"] = "[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+";
+    this->m_regexpDict["string"] = "'(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\"";
+
+    this->m_regexpDict["qColor"] = "qColor\\s*\\(\\s*(white|blackred|darkRed|" \
+                                   "green|darkGreen|blue|darkBlue|cyan|" \
+                                   "darkCyan|magenta|darkMagenta|yellow|" \
+                                   "darkYellow|gray|darkGray|lightGray|" \
+                                   "transparent|color0|color1)?\\s*\\)";
+
+    this->m_regexpDict["size"] = "(?:size|sizeF)\\s*\\(\\s*(?:(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")\\s*,\\s*(?:" +
+                                 this->m_regexpDict["number"] +
+                                 "))?\\s*\\)";
+
+    this->m_regexpDict["point"] = "(?:point|pointF)\\s*\\(\\s*(?:(?:" +
+                                  this->m_regexpDict["number"] +
+                                  ")\\s*,\\s*(?:" +
+                                  this->m_regexpDict["number"] +
+                                  "))?\\s*\\)";
+
+    this->m_regexpDict["rect"] = "(?:rect|rectF)\\s*\\(\\s*(?:(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")(?:\\s*,\\s*(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")){3})?\\s*\\)";
+
+    this->m_regexpDict["line"] = "(?:line|lineF)\\s*\\(\\s*(?:(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")(?:\\s*,\\s*(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")){3})?\\s*\\)";
+
+    this->m_regexpDict["date"] = "date\\s*\\(\\s*(?:(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")(?:\\s*,\\s*(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")){2})?\\s*\\)";
+
+    this->m_regexpDict["time"] = "time\\s*\\(\\s*(?:(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")(?:\\s*,\\s*(?:" +
+                                 this->m_regexpDict["number"] +
+                                 ")){3})?\\s*\\)";
+
+    this->m_regexpDict["bits"] = "bits\\s*\\(\\s*(?:0|1|\\s)*\\s*\\)";
+
+    this->m_regexpDict["bytes"] = "b(?:" + this->m_regexpDict["string"] + ")";
+
+    this->m_regexpDict["urlString"] = "(?:[a-zA-Z]+?://)*" \
+                                      "(?:[0-9a-zA-Z._]+(?::[0-9a-zA-Z%.]+)?@)?" \
+                                      "[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*" \
+                                      "(?:\\.[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*)*" \
+                                      "\\.[a-zA-Z]+(?: ?:\\d+)?(?:/[0-9a-zA-Z%.-]+)*" \
+                                      "(?:/*|\\?[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+" \
+                                      "(?:(?:&|;)[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+)*)?" \
+                                      "(?:#[0-9a-zA-Z%.]+)?";
+
+    this->m_regexpDict["url"] = "url\\s*\\(\\s*(?:" +
+                                this->m_regexpDict["urlString"] +
+                                ")?\\s*\\)";
+
+    this->m_regexpDict["commonValues"] = this->m_regexpDict["bool"] +
+                                         "|" +
+                                         this->m_regexpDict["number"] +
+                                         "|" +
+                                         this->m_regexpDict["string"] +
+                                         "|" +
+                                         this->m_regexpDict["qColor"] +
+                                         "|" +
+                                         this->m_regexpDict["size"] +
+                                         "|" +
+                                         this->m_regexpDict["point"] +
+                                         "|" +
+                                         this->m_regexpDict["rect"] +
+                                         "|" +
+                                         this->m_regexpDict["line"] +
+                                         "|" +
+                                         this->m_regexpDict["date"] +
+                                         "|" +
+                                         this->m_regexpDict["time"] +
+                                         "|" +
+                                         this->m_regexpDict["bits"] +
+                                         "|" +
+                                         this->m_regexpDict["bytes"] +
+                                         "|" +
+                                         this->m_regexpDict["urlString"] +
+                                         "|" +
+                                         this->m_regexpDict["url"];
+
+    this->m_regexpDict["list"] = "\\[\\s*(?:(?:" +
+                                 this->m_regexpDict["commonValues"] +
+                                 ")\\s*(?:,\\s*(?:" +
+                                 this->m_regexpDict["commonValues"] +
+                                 ")\\s*)*)?\\]";
+
+    this->m_regexpDict["dictKeyValue"] = this->m_regexpDict["string"] +
+                                         "\\s*:\\s*" +
+                                         this->m_regexpDict["commonVals"] +
+                                         "|" +
+                                         this->m_regexpDict["list"];
+
+    this->m_regexpDict["dict"] = "\\{\\s*(?:(?:" +
+                                 this->m_regexpDict["dictKeyValue"] +
+                                 ")\\s*(?:,\\s*(?:" +
+                                 this->m_regexpDict["dictKeyValue"] +
+                                 ")\\s*)*)?\\}";
+
+    this->m_regexpDict["extendedValues"] = this->m_regexpDict["commonValues"] +
+                                           "|" +
+                                           this->m_regexpDict["list"] +
+                                           "|" +
+                                           this->m_regexpDict["dict"];
+
+    this->m_regexpDict["var"] = "[a-zA-Z_]\\w*";
+
+    this->m_regexpDict["property"] = this->m_regexpDict["var"] +
+                                     "\\s*=\\s*(?:" +
+                                     this->m_regexpDict["extendedValues"] +
+                                     ")";
+
+    this->m_regexpDict["objectMethod"] = "(?:" +
+                                         this->m_regexpDict["var"] +
+                                         "\\.)?" +
+                                         this->m_regexpDict["var"] +
+                                         "\\s*\\(\\s*(?:" +
+                                         this->m_regexpDict["var"] +
+                                         "\\s*(?:,\\s*" +
+                                         this->m_regexpDict["var"] +
+                                         ")*)?\\s*\\)";
+
+    this->m_regexpDict["signalSlotLt"] = this->m_regexpDict["objectMethod"] +
+                                         "\\s*<\\s*" +
+                                         this->m_regexpDict["objectMethod"];
+
+    this->m_regexpDict["signalSlotGt"] = this->m_regexpDict["objectMethod"] +
+                                         "\\s*>\\s*" +
+                                         this->m_regexpDict["objectMethod"];
+
+    this->m_regexpDict["signalSlot"] = this->m_regexpDict["objectMethod"] +
+                                       "\\s*(?:<|>)\\s*" +
+                                       this->m_regexpDict["objectMethod"];
+
+    this->m_regexpDict["element"] = this->m_regexpDict["var"] +
+                                    "\\.?(?:\\s+(?:(?:" +
+                                    this->m_regexpDict["property"] +
+                                    ")|(?:" +
+                                    this->m_regexpDict["signalSlot"] +
+                                    ")))*";
+
+    this->m_regexpDict["pipeline"] = "(?:" +
+                                     this->m_regexpDict["element"] +
+                                     ")|!";
+}
+
 bool PluginManager::startElement(QString elementId)
 {
     if (!this->m_elements.contains(elementId))
@@ -300,21 +458,183 @@ bool PluginManager::disconnectElements(QString senderId, QString receiverId)
         return false;
 }
 
+QStringList PluginManager::regexpFindAll(QString regexp, QString text)
+{
+    QRegExp rx(regexp);
+    QString txt(text);
+    QStringList match;
+
+    while (true)
+    {
+        int pos = rx.indexIn(txt);
+        int matchedLength = rx.matchedLength();
+
+        if (matchedLength < 1)
+            break;
+
+        match << txt.mid(pos, matchedLength);
+        txt = txt.mid(pos + matchedLength);
+    }
+
+    return match;
+}
+
 /// Parse a string and returns the native value.
 QVariant PluginManager::parseValue(QString value)
 {
+    // QVariant(Qt::GlobalColor color)
+
+    // Bool
+    if (QRegExp("true|false").exactMatch(value))
+        return (value == "true")? true: false;
+    // Size
+    if (QRegExp("(?:size|sizeF)\\s*\\(\\s*(?:(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)\\s*,\\s*" \
+                "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+))?\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+", value);
+
+        if (value.startsWith("sizeF"))
+        {
+            if (r.length() == 2)
+                return QSizeF(r[0].toFloat(), r[1].toFloat());
+            else
+                return QSizeF();
+        }
+        else
+        {
+            if (r.length() == 2)
+                return QSize(r[0].toFloat(), r[1].toFloat());
+            else
+                return QSize();
+        }
+    }
+    // Point
+    if (QRegExp("(?:point|pointF)\\s*\\(\\s*(?:(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)\\s*,\\s*" \
+                "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+))?\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+", value);
+
+        if (value.startsWith("pointF"))
+        {
+            if (r.length() == 2)
+                return QPointF(r[0].toFloat(), r[1].toFloat());
+            else
+                return QPointF();
+        }
+        else
+        {
+            if (r.length() == 2)
+                return QPoint(r[0].toFloat(), r[1].toFloat());
+            else
+                return QPoint();
+        }
+    }
+    // Rect
+    if (QRegExp("(?:rect|rectF)\\s*\\(\\s*(?:(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)(?:\\s*,\\s*" \
+                "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)){3})?\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+", value);
+
+        if (value.startsWith("rectF"))
+        {
+            if (r.length() == 4)
+                return QRectF(r[0].toFloat(), r[1].toFloat(), r[2].toFloat(), r[3].toFloat());
+            else
+                return QRectF();
+        }
+        else
+        {
+            if (r.length() == 4)
+                return QRect(r[0].toFloat(), r[1].toFloat(), r[2].toFloat(), r[3].toFloat());
+            else
+                return QRect();
+        }
+    }
+    // Line
+    if (QRegExp("(?:line|lineF)\\s*\\(\\s*(?:(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)(?:\\s*,\\s*" \
+                "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)){3})?\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+", value);
+
+        if (value.startsWith("lineF"))
+        {
+            if (r.length() == 4)
+                return QLineF(r[0].toFloat(), r[1].toFloat(), r[2].toFloat(), r[3].toFloat());
+            else
+                return QLineF();
+        }
+        else
+        {
+            if (r.length() == 4)
+                return QLine(r[0].toFloat(), r[1].toFloat(), r[2].toFloat(), r[3].toFloat());
+            else
+                return QLine();
+        }
+    }
+    // Date
+    if (QRegExp("date\\s*\\(\\s*(?:(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)(?:\\s*,\\s*" \
+                "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)){2})?\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+", value);
+
+        if (r.length() == 3)
+            return QDate(r[0].toFloat(), r[1].toFloat(), r[2].toFloat());
+        else
+            return QDate();
+    }
+    // Time
+    if (QRegExp("time\\s*\\(\\s*(?:(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)(?:\\s*,\\s*" \
+                "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+)){3})?\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+", value);
+
+        if (r.length() == 4)
+            return QTime(r[0].toFloat(), r[1].toFloat(), r[2].toFloat(), r[3].toFloat());
+        else
+            return QTime();
+    }
+    // Bits
+    if (QRegExp("bits\\s*\\(\\s*(?:0|1|\\s)*\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("0|1", value);
+        QBitArray bits(r.length());
+
+        for (int i = 0; i < r.length(); i++)
+            if (r[i] == "0")
+                bits.setBit(i, false);
+            else
+                bits.setBit(i, true);
+
+        return bits;
+    }
+    // Url
+    if (QRegExp("url\\s*\\(\\s*(?:[a-zA-Z]+?://)*(?:[0-9a-zA-Z._]+(?::[0-9a-zA-Z%.]+)?@)?" \
+                "[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*(?:\\.[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*)*\\.[a-zA-Z]+" \
+                "(?: ?:\\d+)?(?:/[0-9a-zA-Z%.-]+)*(?:/*|\\?[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+" \
+                "(?:(?:&|;)[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+)*)?(?:#[0-9a-zA-Z%.]+)?\\s*\\)").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("(?:[a-zA-Z]+?://)*(?:[0-9a-zA-Z._]+(?::[0-9a-zA-Z%.]+)?@)?" \
+                                            "[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*(?:\\.[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*)*\\.[a-zA-Z]+" \
+                                            "(?: ?:\\d+)?(?:/[0-9a-zA-Z%.-]+)*(?:/*|\\?[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+" \
+                                            "(?:(?:&|;)[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+)*)?(?:#[0-9a-zA-Z%.]+)?", value);
+
+        return QUrl(r[0]);
+    }
+    // Bytes
+    if (QRegExp("b(?:'(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\")").exactMatch(value))
+        return QByteArray(value.mid(2, value.length() - 3).constData(), value.length() - 3);
     // String
-    if (QRegExp("'.*'|\".*\"").exactMatch(value))
+    if (QRegExp("'(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\"").exactMatch(value))
         return value.mid(1, value.length() - 2);
     // Dictionary
     else if (QRegExp("\\{.*\\}").exactMatch(value))
     {
-        QStringList r = value.mid(1, value.length() - 2).split(QRegExp("(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\".*\"|" \
-                                                                       "'.*'|\\{.*\\}|\\[.*\\])" \
-                                                                       " *: *" \
-                                                                       "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\".*\"|" \
-                                                                       "'.*'|\\{.*\\}|\\[.*\\])|" \
-                                                                       ","), QString::SkipEmptyParts);
+        QStringList r = this->regexpFindAll("(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\".*\"|" \
+                                            "'.*'|\\{.*\\}|\\[.*\\])" \
+                                            " *: *" \
+                                            "(?:[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.|[0-9]+|\".*\"|" \
+                                            "'.*'|\\{.*\\}|\\[.*\\])|" \
+                                            ",", value.mid(1, value.length() - 2));
 
         QMap<QString, QVariant> d;
 
@@ -330,18 +650,32 @@ QVariant PluginManager::parseValue(QString value)
 
         return d;
     }
-    // List
+    // String List
+    else if (QRegExp("\\[\\s*(?:'(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\")\\s*" \
+                     "(?:,\\s*(?:'(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\")\\s*)*\\]").exactMatch(value))
+    {
+        QStringList r = this->regexpFindAll("'(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\"",
+                                            value);
+
+        QStringList strList;
+
+        foreach (QString str, r)
+            strList << str.mid(1, str.length() - 2);
+
+        return strList;
+    }
+    // Variant List
     else if (QRegExp("\\[.*\\]").exactMatch(value))
     {
-        QStringList r = value.mid(1, value.length() - 2).split(QRegExp("[0-9]+\\.[0-9]+|" \
-                                                                       "\\.[0-9]+|" \
-                                                                       "[0-9]+\\.|" \
-                                                                       "[0-9]+|" \
-                                                                       "\".*\"|" \
-                                                                       "'.*'|" \
-                                                                       "\\{.*\\}|" \
-                                                                       "\\[.*\\]|" \
-                                                                       ","), QString::SkipEmptyParts);
+        QStringList r = this->regexpFindAll("[0-9]+\\.[0-9]+|" \
+                                            "\\.[0-9]+|" \
+                                            "[0-9]+\\.|" \
+                                            "[0-9]+|" \
+                                            "\".*\"|" \
+                                            "'.*'|" \
+                                            "\\{.*\\}|" \
+                                            "\\[.*\\]|" \
+                                            ",", value.mid(1, value.length() - 2));
 
         QList<QVariant> l;
 
@@ -384,20 +718,19 @@ void PluginManager::parsePipeline(QString pipeline,
     if (ss)
         ss->clear();
 
-    QStringList r = pipeline.split(QRegExp("[a-zA-Z_][0-9a-zA-Z_]* *= *(?:'.*'|\".*\"|" \
-                                           "\\[.*\\]|\\{.*\\}|[^\r^\n^ ^!]+)|" \
-                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
-                                           "[a-zA-Z_][0-9a-zA-Z_]* *" \
-                                           "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
-                                           "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)" \
-                                           " *(?:<|>) *" \
-                                           "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
-                                           "[a-zA-Z_][0-9a-zA-Z_]* *" \
-                                           "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
-                                           "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)|" \
-                                           "[a-zA-Z_][0-9a-zA-Z_]*\\.?|" \
-                                           "!"),
-                                           QString::SkipEmptyParts);
+    QStringList r = this->regexpFindAll("[a-zA-Z_][0-9a-zA-Z_]* *= *(?:'.*'|\".*\"|" \
+                                        "\\[.*\\]|\\{.*\\}|[^\r^\n^ ^!]+)|" \
+                                        "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                                        "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                        "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                        "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)" \
+                                        " *(?:<|>) *" \
+                                        "(?:[a-zA-Z_][0-9a-zA-Z_]*\\.)?" \
+                                        "[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                        "\\( *(?:[a-zA-Z_][0-9a-zA-Z_]* *" \
+                                        "(?:, *[a-zA-Z_][0-9a-zA-Z_]*)*)? *\\)|" \
+                                        "[a-zA-Z_][0-9a-zA-Z_]*\\.?|" \
+                                        "!", pipeline);
 
     QList<QVariant> pipes;
     QList<QVariant> pipe;

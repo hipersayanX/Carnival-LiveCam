@@ -63,10 +63,14 @@ class PluginManager: public QObject
         QStringList m_availableElementTypes;
         PipelineRoutingMode m_pipelineRoutingMode;
 
+        QMap<QString, QString> m_regexpDict;
+
         Plugin *plugin(QString pluginId);
         bool isLoaded(QString pluginId);
         bool load(QString pluginId);
         bool unload(QString pluginId);
+
+        void initRegexpDict();
 
         bool startElement(QString elementId);
         bool stopElement(QString elementId);
@@ -79,6 +83,8 @@ class PluginManager: public QObject
         bool disconnectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
         bool connectElements(QString senderId, QString receiverId);
         bool disconnectElements(QString senderId, QString receiverId);
+
+        QStringList regexpFindAll(QString regexp, QString text);
 
         QVariant parseValue(QString value);
 
