@@ -91,6 +91,9 @@ class PluginManager: public QObject
         QStringList regexpFindAll(QString regexp, QString text);
 
         QVariant parseValue(QString value);
+        QStringList parseSignalSlotLt(QString id, QString element);
+        QStringList parseSignalSlotGt(QString id, QString element);
+        QStringList parseSignalSlot(QString id, QString element);
 
         bool parsePipeline(QString pipeline,
                            QMap<QString, QVariant> *instances,

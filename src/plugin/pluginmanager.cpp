@@ -152,6 +152,7 @@ void PluginManager::resetRegexpDict()
     this->m_regexpDict["bool"] = "true|false";
     this->m_regexpDict["int"] = "[0-9]+";
     this->m_regexpDict["float"] = "[0-9]+\\.[0-9]+|\\.[0-9]+|[0-9]+\\.";
+    this->m_regexpDict["pipeSep"] = "!";
 
     this->m_regexpDict["number"] = this->m_regexpDict["float"] +
                                    "|" +
@@ -299,7 +300,9 @@ void PluginManager::resetRegexpDict()
                                  this->m_regexpDict["dictKeyValue"] +
                                  ")\\s*)*)?\\}";
 
-    this->m_regexpDict["anyString"] = "[^ \\t\\r\\n!]+";
+    this->m_regexpDict["anyString"] = "[^ \\t\\r\\n" +
+                                      this->m_regexpDict["pipeSep"] +
+                                      "]+";
 
     this->m_regexpDict["extendedValues"] = this->m_regexpDict["commonValues"] +
                                            "|(?:" +
@@ -317,27 +320,55 @@ void PluginManager::resetRegexpDict()
                                      this->m_regexpDict["extendedValues"] +
                                      ")";
 
+    this->m_regexpDict["methodArgs"] = "(?:" +
+                                       this->m_regexpDict["var"] +
+                                       ")(?:\\s+(?:" +
+                                       this->m_regexpDict["var"] +
+                                       "))*(?:\\s*<\\s*(?:" +
+                                       this->m_regexpDict["var"] +
+                                       ")\\s*(,\\s*(?:" +
+                                       this->m_regexpDict["var"] +
+                                       ")\\s*)*>)?(?:\\s*(?:\\*|&)(?:\\s*(?:" +
+                                       this->m_regexpDict["var"] +
+                                       "))?)?";
+
+    this->m_regexpDict["method"] = "(?:" +
+                                   this->m_regexpDict["var"] +
+                                   ")\s*\(\s*(?:" +
+                                   this->m_regexpDict["methodArgs"] +
+                                   ")?\s*\)";
+
     this->m_regexpDict["objectMethod"] = "(?:" +
                                          this->m_regexpDict["var"] +
-                                         "\\.)?" +
-                                         this->m_regexpDict["var"] +
-                                         "\\s*\\(\\s*(?:" +
-                                         this->m_regexpDict["var"] +
-                                         "\\s*(?:,\\s*" +
-                                         this->m_regexpDict["var"] +
-                                         ")*)?\\s*\\)";
+                                         ")\s*\.\s*(?:" +
+                                         this->m_regexpDict["method"] +
+                                         ")";
 
-    this->m_regexpDict["signalSlotLt"] = this->m_regexpDict["objectMethod"] +
+    this->m_regexpDict["signalSlotLt"] = "(?:" +
+                                         this->m_regexpDict["objectMethod"] +
                                          "\\s*<\\s*" +
-                                         this->m_regexpDict["objectMethod"];
+                                         this->m_regexpDict["method"] +
+                                         ")|(?:" +
+                                         this->m_regexpDict["method"] +
+                                         "\\s*<\\s*" +
+                                         this->m_regexpDict["objectMethod"] +
+                                         ")";
 
-    this->m_regexpDict["signalSlotGt"] = this->m_regexpDict["objectMethod"] +
+    this->m_regexpDict["signalSlotGt"] = "(?:" +
+                                         this->m_regexpDict["objectMethod"] +
                                          "\\s*>\\s*" +
-                                         this->m_regexpDict["objectMethod"];
+                                         this->m_regexpDict["method"] +
+                                         ")|(?:" +
+                                         this->m_regexpDict["method"] +
+                                         "\\s*>\\s*" +
+                                         this->m_regexpDict["objectMethod"] +
+                                         ")";
 
-    this->m_regexpDict["signalSlot"] = this->m_regexpDict["objectMethod"] +
-                                       "\\s*(?:<|>)\\s*" +
-                                       this->m_regexpDict["objectMethod"];
+    this->m_regexpDict["signalSlot"] = "(?:" +
+                                       this->m_regexpDict["signalSlotLt"] +
+                                       ")|(?:" +
+                                       this->m_regexpDict["signalSlotGt"] +
+                                       ")";
 
     this->m_regexpDict["elementRef"] = this->m_regexpDict["var"] + "\\.";
 
@@ -355,7 +386,9 @@ void PluginManager::resetRegexpDict()
                                      this->m_regexpDict["element"] +
                                      ")(?:\\s+(?:" +
                                      this->m_regexpDict["element"] +
-                                     "))*(?:\\s*!\\s*(?:" +
+                                     "))*(?:\\s*(?:" +
+                                     this->m_regexpDict["pipeSep"] +
+                                     ")\\s*(?:" +
                                      this->m_regexpDict["element"] +
                                      ")(?:\\s+(?:" +
                                      this->m_regexpDict["element"] +
@@ -369,7 +402,9 @@ void PluginManager::resetRegexpDict()
                                              this->m_regexpDict["elementRef"] +
                                              ")|(?:" +
                                              this->m_regexpDict["var"] +
-                                             ")|!";
+                                             ")|(?:" +
+                                             this->m_regexpDict["pipeSep"] +
+                                             ")";
 }
 
 int PluginManager::requestId()
@@ -818,6 +853,96 @@ QVariant PluginManager::parseValue(QString value)
         return value;
 }
 
+QStringList PluginManager::parseSignalSlotLt(QString id, QString element)
+{
+    int eq = element.indexOf("<");
+    QString s1 = element.left(eq).trimmed();
+    QString s2 = element.right(element.length() - eq - 1).trimmed();
+
+    QString sender;
+    QString signal;
+    QString receiver;
+    QString slot;
+
+    if (s1.contains("."))
+    {
+        QStringList receiverSlot = s1.split(".");
+        receiver = receiverSlot[0] + ".";
+        slot = receiverSlot[1];
+    }
+    else
+    {
+        receiver = id;
+        slot = s1;
+    }
+
+    if (s2.contains("."))
+    {
+        QStringList senderSignal = s2.split(".");
+        sender = senderSignal[0] + ".";
+        signal = senderSignal[1];
+    }
+    else
+    {
+        sender = id;
+        signal = s2;
+    }
+
+    signal = signal.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
+    slot = slot.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
+
+    return (QStringList() << sender << signal << receiver << slot);
+}
+
+QStringList PluginManager::parseSignalSlotGt(QString id, QString element)
+{
+    int eq = element.indexOf(">");
+    QString s1 = element.left(eq).trimmed();
+    QString s2 = element.right(element.length() - eq - 1).trimmed();
+
+    QString sender;
+    QString signal;
+    QString receiver;
+    QString slot;
+
+    if (s1.contains("."))
+    {
+        QStringList senderSignal = s1.split(".");
+        sender = senderSignal[0] + ".";
+        signal = senderSignal[1];
+    }
+    else
+    {
+        sender = id;
+        signal = s1;
+    }
+
+    if (s2.contains("."))
+    {
+        QStringList receiverSlot = s2.split(".");
+        receiver = receiverSlot[0] + ".";
+        slot = receiverSlot[1];
+    }
+    else
+    {
+        receiver = id;
+        slot = s2;
+    }
+
+    signal = signal.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
+    slot = slot.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
+
+    return (QStringList() << sender << signal << receiver << slot);
+}
+
+QStringList PluginManager::parseSignalSlot(QString id, QString element)
+{
+    if (QRegExp(this->m_regexpDict["signalSlotLt"]).exactMatch(element))
+        return this->parseSignalSlotLt(id, element);
+    else
+        return this->parseSignalSlotGt(id, element);
+}
+
 bool PluginManager::parsePipeline(QString pipeline,
                                   QMap<QString, QVariant> *instances,
                                   QList<QStringList> *connections,
@@ -838,14 +963,10 @@ bool PluginManager::parsePipeline(QString pipeline,
     QStringList r = this->regexpFindAll(this->m_regexpDict["pipelineElements"],
                                         pipeline);
 
-    QList<QVariant> pipes;
-    QList<QVariant> pipe;
-    QString elementName;
-    QMap<QString, QVariant> properties;
-
-    int i = 0; // Column
-    int j = 0; // Row
-    int k = 0;
+    QStringList pipe;
+    QList<QStringList> pipes;
+    QString curId;
+    QMap<QString, QString> references; // reference. -> id
 
     foreach (QString p, r)
     {
@@ -857,229 +978,91 @@ bool PluginManager::parsePipeline(QString pipeline,
             QString key = p.left(eq).trimmed();
             QString value = p.right(p.length() - eq - 1).trimmed();
 
-            properties[key] = this->parseValue(value);
+            QList<QVariant> list = (*instances)[curId].toList();
+            QMap<QString, QVariant> map = list[1].toMap();
+            map[key] = this->parseValue(value);
+            list[1] = map;
+            (*instances)[curId] = list;
+
+            if (key == "objectName")
+                references[QString("%1.").arg(value)] = curId;
         }
         // Parse Signals & Slots
-        //
-        // sender receiver.slot([type1, tipe2, ...])<signal([type1, tipe2, ...])
-        // receiver slot([type1, tipe2, ...])<sender.signal([type1, tipe2, ...])
-        else if (QRegExp(this->m_regexpDict["signalSlotLt"]).exactMatch(p))
+        else if (QRegExp(this->m_regexpDict["signalSlot"]).exactMatch(p))
         {
-            int eq = p.indexOf("<");
-            QString s1 = p.left(eq).trimmed();
-            QString s2 = p.right(p.length() - eq - 1).trimmed();
-
-            QString sender;
-            QString signal;
-            QString receiver;
-            QString slot;
-
-            if (s1.contains("."))
-            {
-                QStringList receiverSlot = s1.split(".");
-                receiver = receiverSlot[0] + ".";
-                slot = receiverSlot[1];
-            }
-            else
-            {
-                receiver = QString("%1,%2").arg(i).arg(j);
-                slot = s1;
-            }
-
-            if (s2.contains("."))
-            {
-                QStringList senderSignal = s2.split(".");
-                sender = senderSignal[0] + ".";
-                signal = senderSignal[1];
-            }
-            else
-            {
-                sender = QString("%1,%2").arg(i).arg(j);
-                signal = s2;
-            }
-
-            signal = signal.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
-            slot = slot.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
-
             if (ss)
-                *ss << (QStringList() << sender << signal << receiver << slot);
+                *ss << this->parseSignalSlot(curId, p);
         }
-        // Parse Signals & Slots
-        //
-        // sender signal([type1, tipe2, ...])>receiver.slot([type1, tipe2, ...])
-        // receiver sender.signal([type1, tipe2, ...])>slot([type1, tipe2, ...])
-        else if (QRegExp(this->m_regexpDict["signalSlotGt"]).exactMatch(p))
+        // Parse element reference.
+        else if (QRegExp(this->m_regexpDict["elementRef"]).exactMatch(p))
+            pipe << p;
+        // Parse element.
+        else if (QRegExp(this->m_regexpDict["var"]).exactMatch(p))
         {
-            int eq = p.indexOf(">");
-            QString s1 = p.left(eq).trimmed();
-            QString s2 = p.right(p.length() - eq - 1).trimmed();
-
-            QString sender;
-            QString signal;
-            QString receiver;
-            QString slot;
-
-            if (s1.contains("."))
+            if (this->m_pipelineRoutingMode == Fail &&
+                !this->m_availableElementTypes.contains(p))
             {
-                QStringList senderSignal = s1.split(".");
-                sender = senderSignal[0] + ".";
-                signal = senderSignal[1];
-            }
-            else
-            {
-                sender = QString("%1,%2").arg(i).arg(j);
-                signal = s1;
+                if (instances)
+                    *instances = QMap<QString, QVariant>();
+
+                if (connections)
+                    *connections = QList<QStringList>();
+
+                if (ss)
+                    *ss = QList<QStringList>();
+
+                return false;
             }
 
-            if (s2.contains("."))
-            {
-                QStringList receiverSlot = s2.split(".");
-                receiver = receiverSlot[0] + ".";
-                slot = receiverSlot[1];
-            }
-            else
-            {
-                receiver = QString("%1,%2").arg(i).arg(j);
-                slot = s2;
-            }
-
-            signal = signal.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
-            slot = slot.split(QRegExp("\\s+"), QString::SkipEmptyParts).join("");
-
-            if (ss)
-                *ss << (QStringList() << sender << signal << receiver << slot);
+            curId = QString("%1").arg(this->requestId());
+            (*instances)[curId] = QList<QVariant>() << p << QMap<QString, QVariant>();
+            pipe << curId;
         }
-        // Parse element
-        else
+        // Parse pipe.
+        else if (QRegExp(this->m_regexpDict["pipeSep"]).exactMatch(p))
         {
-            if (!elementName.isEmpty() && elementName != "!")
-            {
-                QList<QVariant> ep = QList<QVariant>() << elementName << properties;
-
-                if (!elementName.endsWith(".") && instances)
-                {
-                    if (this->m_pipelineRoutingMode == Fail &&
-                        !this->m_availableElementTypes.contains(elementName))
-                    {
-                        if (instances)
-                            *instances = QMap<QString, QVariant>();
-
-                        if (connections)
-                            *connections = QList<QStringList>();
-
-                        if (ss)
-                            *ss = QList<QStringList>();
-
-                        return false;
-                    }
-
-                    (*instances)[QString("%1,%2").arg(i).arg(j)] = ep;
-                }
-
-                pipe << ep;
-                i++;
-
-                if (p != "!")
-                {
-                    pipes << pipe;
-                    pipe.clear();
-                    i = 0;
-                    j++;
-                }
-            }
-
-            elementName = p;
-            properties.clear();
+            pipes << pipe;
+            pipe.clear();
         }
-
-        if (k == r.length() - 1)
-            if (!elementName.isEmpty() && elementName != "!")
-            {
-                QList<QVariant> ep = QList<QVariant>() << elementName << properties;
-
-                if (!elementName.endsWith(".") && instances)
-                    (*instances)[QString("%1,%2").arg(i).arg(j)] = ep;
-
-                pipe << ep;
-                i++;
-
-                if (p != "!")
-                {
-                    pipes << pipe;
-                    pipe.clear();
-                    i = 0;
-                    j++;
-                }
-            }
-
-        k++;
     }
 
-    // Solve references.
-    //
-    // i,j. -> x,y
-    QMap<QString, QString> references;
-
-    foreach (QVariant pipe, pipes)
-        foreach (QVariant element, pipe.toList())
-            if (element.toList()[0].toString().endsWith(".") && instances)
-                foreach (QString instance, (*instances).keys())
-                {
-                    QMap<QString, QVariant> props = (*instances)[instance].toList()[1].toMap();
-                    QString name = element.toList()[0].toString();
-
-                    if (props.contains("objectName") &&
-                        props["objectName"].toString() == name.left(name.length() - 1))
-                        references[name] = instance;
-                }
+    pipes << pipe;
+    pipe.clear();
 
     // Solve connections between elements.
-    j = 0;
-
-    foreach (QVariant pipe, pipes)
-    {
-        i = 0;
-
-        foreach (QVariant element, pipe.toList())
+    foreach (QStringList pipe, pipes)
+        for (int i = 0; i < pipe.length() - 1; i++)
         {
             QString cur;
 
-            if (element.toList()[0].toString().endsWith("."))
-                cur = references[element.toList()[0].toString()];
+            if (pipe.at(i).endsWith("."))
+                cur = references[pipe.at(i)];
             else
-                cur = QString("%1,%2").arg(i).arg(j);
+                cur = pipe.at(i);
 
-            if (i + 1 < pipe.toList().length())
-            {
-                QList<QVariant> nextElement = pipe.toList()[i + 1].toList();
-                QString nxt;
+            QString nxt;
 
-                if (nextElement[0].toString().endsWith("."))
-                    nxt = references[nextElement[0].toString()];
-                else
-                    nxt = QString("%1,%2").arg(i + 1).arg(j);
+            if (pipe.at(i + 1).endsWith("."))
+                nxt = references[pipe.at(i + 1)];
+            else
+                nxt = pipe.at(i + 1);
 
-                if (connections)
-                    *connections << (QStringList() << cur << nxt);
-            }
-
-            i++;
+            if (connections)
+                *connections << (QStringList() << cur << nxt);
         }
-
-        j++;
-    }
 
     // Solve signals & slots.
     if (ss)
-        foreach (QStringList s, *ss)
+        for (int i = 0; i < ss->length(); i++)
         {
-            if (s[0].endsWith("."))
-                s[0] = references[s[0]];
+            if (ss[i][0].endsWith("."))
+                ss[i][0] = references[ss[i][0]];
 
-            if (s[2].endsWith("."))
-                s[2] = references[s[2]];
+            if (ss[i][2].endsWith("."))
+                ss[i][2] = references[ss[i][2]];
         }
 
+    // Fix Pipeline
     if (this->m_pipelineRoutingMode == Remove ||
         this->m_pipelineRoutingMode == Force)
     {
@@ -1097,7 +1080,7 @@ bool PluginManager::parsePipeline(QString pipeline,
             QStringList iConns;
             QStringList oConns;
 
-            for (i = 0; i < connections->length(); i++)
+            for (int i = 0; i < connections->length(); i++)
                 if ((*connections)[i][0] == id || (*connections)[i][1] == id)
                 {
                     if ((*connections)[i][0] != id)
@@ -1121,7 +1104,7 @@ bool PluginManager::parsePipeline(QString pipeline,
                             *connections << c;
                     }
 
-            for (i = 0; i < ss->length(); i++)
+            for (int i = 0; i < ss->length(); i++)
                 if ((*ss)[i][0] == id || (*ss)[i][2] == id)
                 {
                     ss->removeAt(i);
