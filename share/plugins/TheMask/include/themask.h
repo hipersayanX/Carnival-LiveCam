@@ -43,8 +43,6 @@ class TheMask: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~TheMask();
 };
 
 #endif // THEMASK_H

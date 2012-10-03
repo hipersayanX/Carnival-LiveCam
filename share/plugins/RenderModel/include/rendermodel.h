@@ -43,8 +43,6 @@ class RenderModel: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~RenderModel();
 };
 
 #endif // RENDERMODEL_H

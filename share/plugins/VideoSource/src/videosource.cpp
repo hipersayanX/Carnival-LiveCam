@@ -84,8 +84,4 @@ Element *VideoSource::newElement()
     return new VideoSourceElement();
 }
 
-VideoSource::~VideoSource()
-{
-}
-
 Q_EXPORT_PLUGIN2(VideoSource, VideoSource)

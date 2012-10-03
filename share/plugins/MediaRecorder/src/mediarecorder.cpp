@@ -84,6 +84,4 @@ Element *MediaRecorder::newElement()
     return new MediaRecorderElement();
 }
 
-MediaRecorder::~MediaRecorder()
-{
-}
+Q_EXPORT_PLUGIN2(MediaRecorder, MediaRecorder)

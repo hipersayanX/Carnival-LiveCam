@@ -84,8 +84,4 @@ Element *WebcamDetect::newElement()
     return new WebcamDetectElement();
 }
 
-WebcamDetect::~WebcamDetect()
-{
-}
-
 Q_EXPORT_PLUGIN2(WebcamDetect, WebcamDetect)

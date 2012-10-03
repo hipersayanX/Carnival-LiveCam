@@ -19,7 +19,7 @@
 
 #include <QtGui>
 
-#include "../include/core/core.h"
+#include "core/core.h"
 /*!
   \mainpage About Carnival LiveCam
 

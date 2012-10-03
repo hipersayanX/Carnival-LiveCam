@@ -89,6 +89,18 @@ class PluginManager: public QObject
         bool disconnectElements(QString senderId, QString receiverId);
 
         QStringList regexpFindAll(QString regexp, QString text);
+        QString bestMatchId(QMap<QString, QVariant> instances1, QMap<QString, QVariant> instances2, QString id2);
+
+        QString changeId(QString srcId,
+                         QString dstId,
+                         QMap<QString, QVariant> *instances,
+                         QList<QStringList> *connections,
+                         QList<QStringList> *ss);
+
+        void alignPipelines(QMap<QString, QVariant> instances1,
+                            QMap<QString, QVariant> *instances2,
+                            QList<QStringList> *connections2,
+                            QList<QStringList> *ss2);
 
         QVariant parseValue(QString value);
         QStringList parseSignalSlotLt(QString id, QString element);

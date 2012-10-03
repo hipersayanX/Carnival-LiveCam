@@ -84,8 +84,4 @@ Element *Cube::newElement()
     return new CubeElement();
 }
 
-Cube::~Cube()
-{
-}
-
 Q_EXPORT_PLUGIN2(Cube, Cube)

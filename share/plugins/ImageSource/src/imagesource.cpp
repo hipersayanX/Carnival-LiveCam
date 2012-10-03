@@ -84,8 +84,4 @@ Element *ImageSource::newElement()
     return new ImageSourceElement();
 }
 
-ImageSource::~ImageSource()
-{
-}
-
 Q_EXPORT_PLUGIN2(ImageSource, ImageSource)

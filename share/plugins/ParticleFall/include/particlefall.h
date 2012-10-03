@@ -43,8 +43,6 @@ class ParticleFall: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~ParticleFall();
 };
 
 #endif // PARTICLEFALL_H

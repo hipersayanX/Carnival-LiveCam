@@ -84,8 +84,4 @@ Element *ParticleFall::newElement()
     return new ParticleFallElement();
 }
 
-ParticleFall::~ParticleFall()
-{
-}
-
 Q_EXPORT_PLUGIN2(ParticleFall, ParticleFall)

@@ -43,8 +43,6 @@ class VideoSource: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~VideoSource();
 };
 
 #endif // VIDEOSOURCE_H

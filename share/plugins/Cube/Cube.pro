@@ -19,9 +19,25 @@
 #
 # OpenGL test plugin
 
-CONFIG += plugin
+exists(commons.pri) {
+    include(commons.pri)
 
-DESTDIR += $$PWD
+    COMMONS_PRI_EXISTS = 1
+}
+
+isEmpty(COMMONS_PRI_EXISTS) {
+    exists(../../../commons.pri) {
+        include(../../../commons.pri)
+
+        COMMONS_PRI_EXISTS = 1
+    }
+}
+
+isEmpty(COMMONS_PRI_EXISTS) {
+    error("commons.pri file not found.")
+}
+
+CONFIG += plugin
 
 HEADERS += \
     include/element.h \
@@ -30,15 +46,14 @@ HEADERS += \
     include/cubeelement.h \
     include/cubegl.h
 
-MOC_DIR += $$PWD/build
+INCLUDEPATH += ../include
 
-OBJECTS_DIR += $$PWD/build
+OTHER_FILES += \
+    share/thumbnail-128x96.png
 
 QT += core gui opengl
 
 LIBS += -lGLU
-
-RCC_DIR += $$PWD/build
 
 SOURCES += \
     src/cube.cpp \
@@ -47,4 +62,13 @@ SOURCES += \
 
 TEMPLATE = lib
 
-UI_DIR += $$PWD/build
+# Install rules
+
+INSTALLS += target \
+            data
+
+target.files = $$TARGET
+target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
+
+data.files = share/*
+data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/share

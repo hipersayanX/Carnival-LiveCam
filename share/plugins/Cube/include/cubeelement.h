@@ -21,7 +21,7 @@
 #define CUBEELEMENT_H
 
 #include "element.h"
-#include "ogl.h"
+#include "cubegl.h"
 
 class CubeElement: public Element
 {
@@ -38,7 +38,7 @@ class CubeElement: public Element
         Q_INVOKABLE bool stop();
 
     private:
-        OGL m_ogl;
+        CubeGL m_ogl;
         QImage m_image;
         GLfloat m_xrot;
         GLfloat m_yrot;

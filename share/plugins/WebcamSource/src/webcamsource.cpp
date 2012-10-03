@@ -84,8 +84,4 @@ Element *WebcamSource::newElement()
     return new WebcamSourceElement();
 }
 
-WebcamSource::~WebcamSource()
-{
-}
-
 Q_EXPORT_PLUGIN2(WebcamSource, WebcamSource)

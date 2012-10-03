@@ -25,6 +25,7 @@
 
 WebcamDetectElement::WebcamDetectElement(): Element()
 {
+    this->m_fsWatcher = NULL;
     this->resetDevicesPath();
 }
 
@@ -154,7 +155,9 @@ void WebcamDetectElement::setDevicesPath(QString devicesPath)
 {
     if (this->m_fsWatcher)
     {
-        this->m_fsWatcher->removePath(this->m_devicesPath);
+        if (this->m_devicesPath != "")
+            this->m_fsWatcher->removePath(this->m_devicesPath);
+
         this->m_fsWatcher->addPath(devicesPath);
     }
 

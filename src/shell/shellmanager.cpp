@@ -20,8 +20,8 @@
 #include <QDir>
 #include <QDebug>
 
-#include "../../include/shell/shellmanager.h"
-#include "../../include/shell/shellfactory.h"
+#include "shell/shellmanager.h"
+#include "shell/shellfactory.h"
 
 /*!
   \class ShellManager

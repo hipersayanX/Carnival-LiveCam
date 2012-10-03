@@ -43,8 +43,6 @@ class ImageSource: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~ImageSource();
 };
 
 #endif // IMAGESOURCE_H

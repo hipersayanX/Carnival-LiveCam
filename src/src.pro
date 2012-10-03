@@ -24,53 +24,45 @@ exists(commons.pri) {
 }
 
 isEmpty(COMMONS_PRI_EXISTS) {
-    exists(../../../commons.pri) {
-        include(../../../commons.pri)
+    exists(../commons.pri) {
+        include(../commons.pri)
 
         COMMONS_PRI_EXISTS = 1
     }
 }
 
-isEmpty(COMMONS_PRI_EXISTS) {
-    error("commons.pri file not found.")
-}
-
-CONFIG += plugin
+CONFIG += qt
 
 HEADERS += \
-    include/plugin.h \
-    include/element.h \
-    include/rendermodel.h \
-    include/rendermodelelement.h \
-    include/rendermodelgl.h
+    ../include/core/core.h \
+    ../include/plugin/plugin.h \
+    ../include/plugin/element.h \
+    ../include/plugin/plugininfo.h \
+    ../include/plugin/pluginmanager.h \
+    ../include/shell/shell.h \
+    ../include/shell/shellfactory.h \
+    ../include/shell/shellmanager.h \
+    ../include/shell/shellinfo.h
 
 INCLUDEPATH += ../include
 
-unix {
-    CONFIG += link_pkgconfig
-    PKGCONFIG += openscenegraph openscenegraph-osgViewer
-}
-
-OTHER_FILES += \
-    share/thumbnail-128x96.png \
-    share/data/cow.osg
-
-QT += core gui opengl
+QT += core gui
 
 SOURCES += \
-    src/rendermodel.cpp \
-    src/rendermodelelement.cpp \
-    src/rendermodelgl.cpp
+    main.cpp \
+    core/core.cpp \
+    plugin/plugininfo.cpp \
+    plugin/pluginmanager.cpp \
+    shell/shellmanager.cpp \
+    shell/shellinfo.cpp
 
-TEMPLATE = lib
+TARGET = $${COMMONS_TARGET}
+
+TEMPLATE += app
 
 # Install rules
 
-INSTALLS += target \
-            data
+INSTALLS += target
 
 target.files = $$TARGET
-target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
-
-data.files = share/*
-data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share
+target.path = $${COMMONS_TARGET_INSTALL_PATH}

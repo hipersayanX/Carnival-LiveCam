@@ -96,7 +96,7 @@ class Plugin
 
         virtual Element *newElement() = 0;
 
-        virtual ~Plugin() = 0;
+        virtual ~Plugin() {}
 };
 
 Q_DECLARE_INTERFACE(Plugin, "CarnivalLiveCam.Plugin")

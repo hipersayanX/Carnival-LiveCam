@@ -84,8 +84,4 @@ Element *RenderModel::newElement()
     return new RenderModelElement();
 }
 
-RenderModel::~RenderModel()
-{
-}
-
 Q_EXPORT_PLUGIN2(RenderModel, RenderModel)

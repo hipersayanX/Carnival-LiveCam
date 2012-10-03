@@ -19,9 +19,25 @@
 #
 # OpenCV face recognition plugin
 
-CONFIG += plugin
+exists(commons.pri) {
+    include(commons.pri)
 
-DESTDIR += $$PWD
+    COMMONS_PRI_EXISTS = 1
+}
+
+isEmpty(COMMONS_PRI_EXISTS) {
+    exists(../../../commons.pri) {
+        include(../../../commons.pri)
+
+        COMMONS_PRI_EXISTS = 1
+    }
+}
+
+isEmpty(COMMONS_PRI_EXISTS) {
+    error("commons.pri file not found.")
+}
+
+CONFIG += plugin
 
 HEADERS += \
     include/plugin.h \
@@ -29,14 +45,12 @@ HEADERS += \
     include/themask.h \
     include/themaskelement.h
 
+INCLUDEPATH += ../include
+
 unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += opencv
 }
-
-MOC_DIR += $$PWD/build
-
-OBJECTS_DIR += $$PWD/build
 
 OTHER_FILES += \
     share/thumbnail-128x96.png \
@@ -49,12 +63,19 @@ OTHER_FILES += \
 
 QT += core gui
 
-RCC_DIR += $$PWD/build
-
 SOURCES += \
     src/themask.cpp \
     src/themaskelement.cpp
 
 TEMPLATE = lib
 
-UI_DIR += $$PWD/build
+# Install rules
+
+INSTALLS += target \
+            data
+
+target.files = $$TARGET
+target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
+
+data.files = share/*
+data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share

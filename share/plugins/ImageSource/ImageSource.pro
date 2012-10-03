@@ -19,9 +19,25 @@
 #
 # Image driver for linux
 
-CONFIG += plugin
+exists(commons.pri) {
+    include(commons.pri)
 
-DESTDIR += $$PWD
+    COMMONS_PRI_EXISTS = 1
+}
+
+isEmpty(COMMONS_PRI_EXISTS) {
+    exists(../../../commons.pri) {
+        include(../../../commons.pri)
+
+        COMMONS_PRI_EXISTS = 1
+    }
+}
+
+isEmpty(COMMONS_PRI_EXISTS) {
+    error("commons.pri file not found.")
+}
+
+CONFIG += plugin
 
 HEADERS += \
     include/plugin.h \
@@ -29,13 +45,9 @@ HEADERS += \
     include/imagesourceelement.h \
     include/imagesource.h
 
-MOC_DIR += $$PWD/build
-
-OBJECTS_DIR += $$PWD/build
+INCLUDEPATH += ../include
 
 QT += core gui
-
-RCC_DIR += $$PWD/build
 
 SOURCES += \
     src/imagesourceelement.cpp \
@@ -43,4 +55,9 @@ SOURCES += \
 
 TEMPLATE = lib
 
-UI_DIR += $$PWD/build
+# Install rules
+
+INSTALLS += target
+
+target.files = $$TARGET
+target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET

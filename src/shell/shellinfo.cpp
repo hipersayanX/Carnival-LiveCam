@@ -17,7 +17,7 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../../include/shell/shellinfo.h"
+#include "shell/shellinfo.h"
 
 /*!
   \class ShellInfo

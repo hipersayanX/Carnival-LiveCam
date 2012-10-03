@@ -17,7 +17,7 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/plugin/pluginmanager.h"
+#include "plugin/pluginmanager.h"
 
 /*!
   \class PluginManager
@@ -36,7 +36,7 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
     this->m_curId = 0;
     this->resetRegexpDict();
 
-    QDir pluginDir("share/plugins");
+    QDir pluginDir("../share/plugins");
 
     foreach (QString dirext, pluginDir.entryList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot, QDir::Name))
     {
@@ -229,12 +229,13 @@ void PluginManager::resetRegexpDict()
 
     this->m_regexpDict["bytes"] = "b(?:" + this->m_regexpDict["string"] + ")";
 
-    this->m_regexpDict["urlString"] = "(?:[a-zA-Z]+?://)*" \
-                                      "(?:[0-9a-zA-Z._]+(?::[0-9a-zA-Z%.]+)?@)?" \
+    // Bad repetition
+    this->m_regexpDict["urlString"] = "(?:[a-zA-Z]+\\://)*" \
+                                      "(?:[0-9a-zA-Z._]+(?:\\:[0-9a-zA-Z%.]+)?@)?" \
                                       "[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*" \
                                       "(?:\\.[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*)*" \
-                                      "\\.[a-zA-Z]+(?: ?:\\d+)?(?:/[0-9a-zA-Z%.-]+)*" \
-                                      "(?:/*|\\?[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+" \
+                                      "\\.[a-zA-Z]+(?:\\:\\d+)?(?:/[0-9a-zA-Z%.-]+)*" \
+                                      "(?:/|\\?[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+" \
                                       "(?:(?:&|;)[a-zA-Z_]\\w*=[0-9a-zA-Z_%.+-]+)*)?" \
                                       "(?:#[0-9a-zA-Z%.]+)?";
 
@@ -273,8 +274,6 @@ void PluginManager::resetRegexpDict()
                                          ")|(?:" +
                                          this->m_regexpDict["bytes"] +
                                          ")|(?:" +
-                                         this->m_regexpDict["urlString"] +
-                                         ")|(?:" +
                                          this->m_regexpDict["url"] +
                                          ")|(?:" +
                                          this->m_regexpDict["stringList"] +
@@ -304,8 +303,9 @@ void PluginManager::resetRegexpDict()
                                       this->m_regexpDict["pipeSep"] +
                                       "]+";
 
-    this->m_regexpDict["extendedValues"] = this->m_regexpDict["commonValues"] +
-                                           "|(?:" +
+    this->m_regexpDict["extendedValues"] = "(?:" +
+                                           this->m_regexpDict["commonValues"] +
+                                           ")|(?:" +
                                            this->m_regexpDict["list"] +
                                            ")|(?:" +
                                            this->m_regexpDict["dict"] +
@@ -315,8 +315,10 @@ void PluginManager::resetRegexpDict()
 
     this->m_regexpDict["var"] = "[a-zA-Z_]\\w*";
 
-    this->m_regexpDict["property"] = this->m_regexpDict["var"] +
-                                     "\\s*=\\s*(?:" +
+
+    this->m_regexpDict["property"] = "(?:" +
+                                     this->m_regexpDict["var"] +
+                                     ")\\s*=\\s*(?:" +
                                      this->m_regexpDict["extendedValues"] +
                                      ")";
 
@@ -334,35 +336,35 @@ void PluginManager::resetRegexpDict()
 
     this->m_regexpDict["method"] = "(?:" +
                                    this->m_regexpDict["var"] +
-                                   ")\s*\(\s*(?:" +
+                                   ")\\s*\\(\\s*(?:" +
                                    this->m_regexpDict["methodArgs"] +
-                                   ")?\s*\)";
+                                   ")?\\s*\\)";
 
     this->m_regexpDict["objectMethod"] = "(?:" +
                                          this->m_regexpDict["var"] +
-                                         ")\s*\.\s*(?:" +
+                                         ")\\s*\\.\\s*(?:" +
                                          this->m_regexpDict["method"] +
                                          ")";
 
-    this->m_regexpDict["signalSlotLt"] = "(?:" +
+    this->m_regexpDict["signalSlotLt"] = "(?:(?:" +
                                          this->m_regexpDict["objectMethod"] +
-                                         "\\s*<\\s*" +
+                                         ")\\s*<\\s*(?:" +
                                          this->m_regexpDict["method"] +
-                                         ")|(?:" +
+                                         "))|(?:(?:" +
                                          this->m_regexpDict["method"] +
-                                         "\\s*<\\s*" +
+                                         ")\\s*<\\s*(?:" +
                                          this->m_regexpDict["objectMethod"] +
-                                         ")";
+                                         "))";
 
-    this->m_regexpDict["signalSlotGt"] = "(?:" +
+    this->m_regexpDict["signalSlotGt"] = "(?:(?:" +
                                          this->m_regexpDict["objectMethod"] +
-                                         "\\s*>\\s*" +
+                                         ")\\s*>\\s*(?:" +
                                          this->m_regexpDict["method"] +
-                                         ")|(?:" +
+                                         "))|(?:(?:" +
                                          this->m_regexpDict["method"] +
-                                         "\\s*>\\s*" +
+                                         ")\\s*>\\s*(?:" +
                                          this->m_regexpDict["objectMethod"] +
-                                         ")";
+                                         "))";
 
     this->m_regexpDict["signalSlot"] = "(?:" +
                                        this->m_regexpDict["signalSlotLt"] +
@@ -792,7 +794,7 @@ QVariant PluginManager::parseValue(QString value)
     }
     // Bytes
     else if (QRegExp(this->m_regexpDict["bytes"]).exactMatch(value))
-        return QByteArray(value.mid(2, value.length() - 3).constData(), value.length() - 3);
+        return value.mid(2, value.length() - 3).toUtf8();
     // String
     else if (QRegExp(this->m_regexpDict["string"]).exactMatch(value))
         return value.mid(1, value.length() - 2);
@@ -957,8 +959,12 @@ bool PluginManager::parsePipeline(QString pipeline,
     if (ss)
         ss->clear();
 
-    if (!QRegExp(this->m_regexpDict["pipeline"]).exactMatch(value))
+    if (!QRegExp(this->m_regexpDict["pipeline"]).exactMatch(pipeline))
+    {
+        qDebug() << QRegExp(this->m_regexpDict["pipeline"]).errorString();
+
         return false;
+    }
 
     QStringList r = this->regexpFindAll(this->m_regexpDict["pipelineElements"],
                                         pipeline);
@@ -1056,10 +1062,10 @@ bool PluginManager::parsePipeline(QString pipeline,
         for (int i = 0; i < ss->length(); i++)
         {
             if (ss[i][0].endsWith("."))
-                ss[i][0] = references[ss[i][0]];
+                (*ss)[i][0] = references[(*ss)[i][0]];
 
             if (ss[i][2].endsWith("."))
-                ss[i][2] = references[ss[i][2]];
+                (*ss)[i][2] = references[(*ss)[i][2]];
         }
 
     // Fix Pipeline
@@ -1067,13 +1073,12 @@ bool PluginManager::parsePipeline(QString pipeline,
         this->m_pipelineRoutingMode == Force)
     {
         QStringList removeId;
-        QString id;
 
-        foreach (id, instances->keys())
+        foreach (QString id, instances->keys())
             if (!this->m_availableElementTypes.contains((*instances)[id].toList()[0].toString()))
                 removeId << id;
 
-        foreach (id, removeId)
+        foreach (QString id, removeId)
         {
             instances->remove(id);
 
@@ -1116,6 +1121,155 @@ bool PluginManager::parsePipeline(QString pipeline,
     return true;
 }
 
+QString PluginManager::bestMatchId(QMap<QString, QVariant> instances1, QMap<QString, QVariant> instances2, QString id2)
+{
+    QString type2 = instances2[id2].toList().at(0).toString();
+    QMap<QString, QVariant> properties2 = instances2[id2].toList().at(1).toMap();
+    QString bestId = "";
+    int bestScore = 0;
+
+    foreach (QString id1, instances1.keys())
+    {
+        QString type1 = instances1[id1].toList().at(0).toString();
+        QMap<QString, QVariant> properties1 = instances1[id1].toList().at(1).toMap();
+
+        if (type1 != type2)
+            continue;
+
+        if (properties1.contains("objectName") &&
+            properties2.contains("objectName") &&
+            properties1["objectName"].toString() == properties2["objectName"].toString())
+            return id1;
+
+        QSet<QString> propertiesSet1 = QSet<QString>::fromList(properties1.keys());
+        QSet<QString> propertiesSet2 = QSet<QString>::fromList(properties2.keys());
+
+        QSet<QString> commonProperties = propertiesSet1.intersect(propertiesSet2);
+        QSet<QString> diffProperties = propertiesSet1.subtract(propertiesSet2) +
+                                       propertiesSet2.subtract(propertiesSet1);
+
+        int score = commonProperties.count() - 2 * diffProperties.count();
+
+        foreach (QString property, commonProperties)
+            if (properties1[property].toString() == properties2[property].toString())
+                score++;
+            else
+                score--;
+
+        if (bestId == "" || score > bestScore)
+        {
+            bestId = id1;
+            bestScore = score;
+        }
+    }
+
+    return bestId;
+}
+
+QString PluginManager::changeId(QString srcId,
+                                QString dstId,
+                                QMap<QString, QVariant> *instances,
+                                QList<QStringList> *connections,
+                                QList<QStringList> *ss)
+{
+    QString ghostId = "";
+
+    if (instances && instances->contains(srcId))
+    {
+        if (instances->contains(dstId))
+        {
+            ghostId = QString(".%1").arg(dstId);
+            (*instances)[ghostId] = (*instances)[dstId];
+        }
+
+        (*instances)[dstId] = (*instances)[srcId];
+        instances->remove(srcId);
+    }
+
+    if (connections)
+        for (int i = 0; i < connections->length(); i++)
+        {
+            QStringList connection = connections->at(i);
+
+            if (connection[0] == dstId)
+            {
+                ghostId = QString(".%1").arg(dstId);
+                connection[0] = ghostId;
+            }
+            else if (connection[0] == srcId)
+                connection[0] = dstId;
+
+            if (connection[1] == dstId)
+            {
+                ghostId = QString(".%1").arg(dstId);
+                connection[1] = ghostId;
+            }
+            else if (connection[1] == srcId)
+                connection[1] = dstId;
+
+            (*connections)[i] = connection;
+        }
+
+    if (ss)
+        for (int i = 0; i < ss->length(); i++)
+        {
+            QStringList s = ss->at(i);
+
+            if (s[0] == dstId)
+            {
+                ghostId = QString(".%1").arg(dstId);
+                s[0] = ghostId;
+            }
+            else if (s[0] == srcId)
+                s[0] = dstId;
+
+            if (s[2] == dstId)
+            {
+                ghostId = QString(".%1").arg(dstId);
+                s[2] = ghostId;
+            }
+            else if (s[2] == srcId)
+                s[2] = dstId;
+
+            (*ss)[i] = s;
+        }
+
+    return ghostId;
+}
+
+void PluginManager::alignPipelines(QMap<QString, QVariant> instances1,
+                                   QMap<QString, QVariant> *instances2,
+                                   QList<QStringList> *connections2,
+                                   QList<QStringList> *ss2)
+{
+    while (true)
+    {
+        bool cont = false;
+
+        foreach (QString id2, instances2->keys())
+        {
+            QString id1 = this->bestMatchId(instances1, *instances2, id2);
+
+            if (id1 != "" && id1 != id2)
+            {
+                this->changeId(id2, id1, instances2, connections2, ss2);
+                cont = true;
+
+                break;
+            }
+        }
+
+        if (!cont)
+            break;
+    }
+}
+/*
+QStringList PluginManager::subtractId(QMap<QString, QVariant> instances1,
+                                      QMap<QString, QVariant> instances2)
+{
+    return QSet::fromList(instances1.keys()).subtract(QSet::fromList(instances2.keys())).toList();
+}
+*/
 void PluginManager::setPipeline(QString pipeline2)
 {
     QMap<QString, QVariant> instances2;
@@ -1431,10 +1585,10 @@ void PluginManager::setPipeline(QString pipeline2)
 
     foreach (QString elementId, removeElement)
         this->removeElement(elementId);
-
+/*                                               */
     foreach (QStringList change, changeId)
         this->changeElementId(change[0], change[1]);
-
+/*                                               */
     foreach (QString elementId, addElement.keys())
         this->addElement(elementId, addElement[elementId]);
 

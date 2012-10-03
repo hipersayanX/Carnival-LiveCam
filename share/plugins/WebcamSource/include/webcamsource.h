@@ -43,8 +43,6 @@ class WebcamSource: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~WebcamSource();
 };
 
 #endif // WEBCAMSOURCE_H

@@ -17,56 +17,44 @@
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-include(share/plugins/plugins.pro)
+exists(commons.pri) {
+    include(commons.pri)
 
-CONFIG += qt
+    COMMONS_PRI_EXISTS = 1
+}
 
-DESTDIR += $$PWD
+isEmpty(COMMONS_PRI_EXISTS) {
+    error("commons.pri file not found.")
+}
 
-HEADERS += \
-    include/core/core.h \
-    include/plugin/plugin.h \
-    include/plugin/element.h \
-    include/plugin/plugininfo.h \
-    include/plugin/pluginmanager.h \
-    include/shell/shell.h \
-    include/shell/shellfactory.h \
-    include/shell/shellmanager.h \
-    include/shell/shellinfo.h
+TEMPLATE = subdirs
 
-INSTALLS += target \
-            docs \
-            data
+CONFIG += ordered
 
-MOC_DIR += $$PWD/build
+#SUBDIRS += \
+#           share/plugins/DefaultShell \
+#           share/plugins/Spaces
 
-OBJECTS_DIR += $$PWD/build
-
-QT += core gui
-
-RCC_DIR += $$PWD/build
-
-SOURCES += src/main.cpp \
-    src/core/core.cpp \
-    src/plugin/plugininfo.cpp \
-    src/plugin/pluginmanager.cpp \
-    src/shell/shellmanager.cpp \
-    src/shell/shellinfo.cpp
-
-TEMPLATE += app
-
-UI_DIR += $$PWD/build
-
-# Build rules
-
-docs.commands = qdoc3 $$TARGET.qdocconf
-docs.files += share/docs/*
-docs.path += /usr/share/docs/$$TARGET
+SUBDIRS += src \
+           share/plugins/Cube \
+           share/plugins/FxBin \
+           share/plugins/ImageSource \
+           share/plugins/MediaRecorder \
+           share/plugins/ParticleFall \
+           share/plugins/RenderModel \
+           share/plugins/TheMask \
+           share/plugins/VideoSource \
+           share/plugins/WebcamDetect \
+           share/plugins/WebcamSource
 
 # Install rules
 
-target.files += $$TARGET
-target.path += /usr/bin/$$TARGET
+INSTALLS += docs \
+            license
 
-data.files = share/*
-data.path = /usr/share/$$TARGET
+docs.extra = qdoc3 Carnival-LiveCam.qdocconf
+docs.files = share/docs/html
+docs.path = $${COMMONS_DOCS_INSTALL_PATH}
+
+license.files = COPYING
+license.path = $${COMMONS_LICENSE_INSTALL_PATH}

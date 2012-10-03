@@ -84,8 +84,4 @@ Element *TheMask::newElement()
     return new TheMaskElement();
 }
 
-TheMask::~TheMask()
-{
-}
-
 Q_EXPORT_PLUGIN2(TheMask, TheMask)

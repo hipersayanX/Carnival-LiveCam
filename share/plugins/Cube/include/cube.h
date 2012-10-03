@@ -43,8 +43,6 @@ class Cube: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~Cube();
 };
 
 #endif // CUBE_H

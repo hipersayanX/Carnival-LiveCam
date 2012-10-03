@@ -43,8 +43,6 @@ class MediaRecorder: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~MediaRecorder();
 };
 
 #endif // MEDIARECORDER_H

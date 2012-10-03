@@ -43,8 +43,6 @@ class WebcamDetect: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~WebcamDetect();
 };
 
 #endif // WEBCAMDETECT_H

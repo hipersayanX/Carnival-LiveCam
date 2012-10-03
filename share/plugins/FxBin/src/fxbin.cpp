@@ -84,8 +84,4 @@ Element *FxBin::newElement()
     return new FxBinElement();
 }
 
-FxBin::~FxBin()
-{
-}
-
 Q_EXPORT_PLUGIN2(FxBin, FxBin)

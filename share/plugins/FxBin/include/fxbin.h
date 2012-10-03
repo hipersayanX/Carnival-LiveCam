@@ -43,8 +43,6 @@ class FxBin: public QObject, public Plugin
         bool isConfigurable();
 
         Element *newElement();
-
-        ~FxBin();
 };
 
 #endif // FXBIN_H

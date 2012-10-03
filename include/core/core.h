@@ -22,11 +22,7 @@
 
 #include <QObject>
 
-#include "../plugin/pluginmanager.h"
-/*#include "../driver/devicemanager.h"
-#include "../shell/shellmanager.h"
-#include "../space/spacemanager.h"
-#include "../streaming/mediastreaming.h"*/
+#include "plugin/pluginmanager.h"
 
 class Core: public QObject
 {
@@ -37,20 +33,6 @@ class Core: public QObject
 
     private:
         PluginManager pluginManager;
-/*        DeviceManager deviceManager;
-        ShellManager shellManager;
-        MediaStreaming mediaStreaming;
-        SpaceManager spaceManager;
-        QPushButton toggleMaximizedButton;
-        QPushButton scaleAndRotateButton;*/
-/*
-    private slots:
-        void setEffect(QString pluginId, QString spaceId);
-        void unsetEffect(QString pluginId, QString spaceId);
-        void devicesModified();
-        void deviceEnable(QString deviceId);
-        void deviceDisable(QString deviceId);
-        void captureFrame();*/
 };
 
 #endif // CORE_H
