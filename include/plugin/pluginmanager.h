@@ -78,9 +78,8 @@ class PluginManager: public QObject
 
         bool startElement(QString elementId);
         bool stopElement(QString elementId);
-        bool addElement(QString elementId, QString pluginId);
+        QString addElement(QString pluginId);
         bool removeElement(QString elementId);
-        bool changeElementId(QString oldElementId, QString newElementId);
         bool setElementProperty(QString elementId, QString property, QVariant value);
         bool resetElementProperty(QString elementId, QString property);
         bool connectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
@@ -101,6 +100,11 @@ class PluginManager: public QObject
                             QMap<QString, QVariant> *instances2,
                             QList<QStringList> *connections2,
                             QList<QStringList> *ss2);
+
+        template <typename T> QList<T> subtractLists(QList<T> list1, QList<T> list2);
+
+        QStringList subtractMapKeys(QMap<QString, QVariant> instances1,
+                               QMap<QString, QVariant> instances2);
 
         QVariant parseValue(QString value);
         QStringList parseSignalSlotLt(QString id, QString element);

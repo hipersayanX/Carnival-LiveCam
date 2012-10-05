@@ -47,5 +47,10 @@ isEmpty(COMMONS_PRI_INCLUDE) {
         UI_DIR = $${COMMONS_RELEASE_BUILD_PATH}
     }
 
+    unix {
+        # Enable support for C++11
+        QMAKE_CXXFLAGS += -std=c++0x
+    }
+
     COMMONS_PRI_INCLUDE = 1
 }

@@ -446,20 +446,22 @@ bool PluginManager::stopElement(QString elementId)
     return this->m_elements[elementId]->stop();
 }
 
-bool PluginManager::addElement(QString elementId, QString pluginId)
+QString PluginManager::addElement(QString pluginId)
 {
     if (!this->load(pluginId))
-        return false;
+        return "";
 
     Element *element = this->m_plugins[pluginId]->newElement();
 
     if (!element)
-        return false;
+        return "";
+
+    QString elementId = QString("%1").arg(this->requestId());
 
     this->m_elements[elementId] = element;
     this->m_elements[elementId]->setManager(this);
 
-    return true;
+    return elementId;
 }
 
 bool PluginManager::removeElement(QString elementId)
@@ -484,16 +486,7 @@ bool PluginManager::removeElement(QString elementId)
     if (unUsed)
         this->unload(pluginId);
 
-    return true;
-}
-
-bool PluginManager::changeElementId(QString oldElementId, QString newElementId)
-{
-    if (!this->m_elements.contains(oldElementId))
-        return false;
-
-    this->m_elements[newElementId] = this->m_elements[oldElementId];
-    this->m_elements.remove(oldElementId);
+    this->removeId(elementId.toInt());
 
     return true;
 }
@@ -972,6 +965,7 @@ bool PluginManager::parsePipeline(QString pipeline,
     QStringList pipe;
     QList<QStringList> pipes;
     QString curId;
+    int curIntId = 0;
     QMap<QString, QString> references; // reference. -> id
 
     foreach (QString p, r)
@@ -1020,7 +1014,7 @@ bool PluginManager::parsePipeline(QString pipeline,
                 return false;
             }
 
-            curId = QString("%1").arg(this->requestId());
+            curId = QString("%1").arg(curIntId++);
             (*instances)[curId] = QList<QVariant>() << p << QMap<QString, QVariant>();
             pipe << curId;
         }
@@ -1263,13 +1257,24 @@ void PluginManager::alignPipelines(QMap<QString, QVariant> instances1,
             break;
     }
 }
-/*
-QStringList PluginManager::subtractId(QMap<QString, QVariant> instances1,
+
+template <typename T> QList<T> PluginManager::subtractLists(QList<T> list1, QList<T> list2)
+{
+    QList<T> list;
+
+    foreach (T element, list1)
+        if (!list2.contains(element))
+            list << element;
+
+    return list;
+}
+
+QStringList PluginManager::subtractMapKeys(QMap<QString, QVariant> instances1,
                                       QMap<QString, QVariant> instances2)
 {
-    return QSet::fromList(instances1.keys()).subtract(QSet::fromList(instances2.keys())).toList();
+    return this->subtractLists(instances1.keys(), instances2.keys());
 }
-*/
+
 void PluginManager::setPipeline(QString pipeline2)
 {
     QMap<QString, QVariant> instances2;
@@ -1277,7 +1282,23 @@ void PluginManager::setPipeline(QString pipeline2)
     QList<QStringList> ss2;
 
     this->parsePipeline(pipeline2, &instances2, &connections2, &ss2);
+    this->alignPipelines(this->m_instances1, &instances2, &connections2, &ss2);
 
+    QStringList removeElements = this->subtractMapKeys(this->m_instances1, instances2);
+
+    QList<QStringList> disconnectElementsSS = this->subtractLists(this->m_ss1, ss2);
+    QList<QStringList> disconnectElements = this->subtractLists(this->m_connections1, connections2);
+
+    QStringList addElements = this->subtractMapKeys(instances2, this->m_instances1);
+
+    QList<QStringList> connectElements = this->subtractLists(connections2, this->m_connections1);
+    QList<QStringList> connectElementsSS = this->subtractLists(ss2, this->m_ss1);
+
+
+
+
+
+/*
     QMap<QString, QVariant> cInstances1(this->m_instances1);
     QMap<QString, QVariant> cInstances2(instances2);
 
@@ -1585,10 +1606,10 @@ void PluginManager::setPipeline(QString pipeline2)
 
     foreach (QString elementId, removeElement)
         this->removeElement(elementId);
-/*                                               */
-    foreach (QStringList change, changeId)
-        this->changeElementId(change[0], change[1]);
-/*                                               */
+
+//    foreach (QStringList change, changeId)
+//        this->changeElementId(change[0], change[1]);
+
     foreach (QString elementId, addElement.keys())
         this->addElement(elementId, addElement[elementId]);
 
@@ -1608,6 +1629,7 @@ void PluginManager::setPipeline(QString pipeline2)
 
     foreach (QString elementId, addElement.keys())
         this->startElement(elementId);
+        */
 }
 
 PluginManager::PipelineRoutingMode PluginManager::pipelineRoutingMode()
