@@ -27,97 +27,31 @@ class PluginInfo: public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString fileName READ fileName WRITE setFileName RESET resetFileName)
-    Q_PROPERTY(QString pluginId READ pluginId WRITE setPluginId RESET resetPluginId)
-    Q_PROPERTY(QString name READ name WRITE setName RESET resetName)
-    Q_PROPERTY(QString version READ version WRITE setVersion RESET resetVersion)
-    Q_PROPERTY(QString summary READ summary WRITE setSummary RESET resetSummary)
-    Q_PROPERTY(QString type READ type WRITE setType RESET resetType)
-    Q_PROPERTY(QString category READ category WRITE setCategory RESET resetCategory)
-    Q_PROPERTY(QString thumbnail READ thumbnail WRITE setThumbnail RESET resetThumbnail)
-    Q_PROPERTY(QString license READ license WRITE setLicense RESET resetLicense)
-    Q_PROPERTY(QString author READ author WRITE setAuthor RESET resetAuthor)
-    Q_PROPERTY(QString website READ website WRITE setWebsite RESET resetWebsite)
-    Q_PROPERTY(QString mail READ mail WRITE setMail RESET resetMail)
-    Q_PROPERTY(bool isConfigurable READ isConfigurable WRITE setIsConfigurable RESET resetIsConfigurable)
+    Q_PROPERTY(QMap metaData READ metaData WRITE setMetaData RESET resetMetaData)
 
     public:
         explicit PluginInfo(QObject *parent = 0);
         PluginInfo(const PluginInfo &object);
 
         PluginInfo(QString fileName,
-                   QString pluginId,
-                   QString name,
-                   QString version,
-                   QString summary,
-                   QString type,
-                   QString category,
-                   QString thumbnail,
-                   QString license,
-                   QString author,
-                   QString website,
-                   QString mail,
-                   bool isConfigurable);
+                   QMap<QString, QVariant> metaData);
 
         PluginInfo& operator =(const PluginInfo &other);
 
         Q_INVOKABLE QMap<QString, QVariant> toMap();
 
         QString fileName();
-        QString pluginId();
-        QString name();
-        QString version();
-        QString summary();
-        QString type();
-        QString category();
-        QString thumbnail();
-        QString license();
-        QString author();
-        QString website();
-        QString mail();
-        bool isConfigurable();
+        QMap<QString, QVariant> metaData();
 
     private:
         QString m_fileName;
-        QString m_pluginId;
-        QString m_name;
-        QString m_version;
-        QString m_summary;
-        QString m_type;
-        QString m_category;
-        QString m_thumbnail;
-        QString m_license;
-        QString m_author;
-        QString m_website;
-        QString m_mail;
-        bool m_isConfigurable;
+        QMap<QString, QVariant> m_metaData;
 
     public slots:
         void setFileName(QString fileName);
-        void setPluginId(QString pluginId);
-        void setName(QString name);
-        void setVersion(QString version);
-        void setSummary(QString summary);
-        void setType(QString type);
-        void setCategory(QString category);
-        void setThumbnail(QString thumbnail);
-        void setLicense(QString license);
-        void setAuthor(QString author);
-        void setWebsite(QString website);
-        void setMail(QString mail);
-        void setIsConfigurable(bool isConfigurable);
+        void setMetaData(QMap<QString, QVariant> metaData);
         void resetFileName();
-        void resetPluginId();
-        void resetName();
-        void resetVersion();
-        void resetSummary();
-        void resetType();
-        void resetCategory();
-        void resetThumbnail();
-        void resetLicense();
-        void resetAuthor();
-        void resetWebsite();
-        void resetMail();
-        void resetIsConfigurable();
+        void resetMetaData();
 };
 
 #endif // PLUGININFO_H

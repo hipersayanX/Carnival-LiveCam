@@ -49,6 +49,7 @@ HEADERS += \
 INCLUDEPATH += ../include
 
 OTHER_FILES += \
+    Cube.json \
     share/thumbnail-128x96.png
 
 QT += core gui opengl

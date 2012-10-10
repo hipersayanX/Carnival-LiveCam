@@ -45,6 +45,9 @@ HEADERS += \
 
 INCLUDEPATH += ../include
 
+OTHER_FILES += \
+    MediaRecorder.json
+
 QT += core gui
 
 SOURCES += \

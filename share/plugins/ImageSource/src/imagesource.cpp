@@ -19,69 +19,7 @@
 
 #include "include/imagesource.h"
 
-QString ImageSource::pluginId()
-{
-    return "ImageSource";
-}
-
-QString ImageSource::name()
-{
-    return "Image Source";
-}
-
-QString ImageSource::version()
-{
-    return "1.0.0";
-}
-
-QString ImageSource::summary()
-{
-    return "Create a source from a static image file.";
-}
-
-QString ImageSource::type()
-{
-    return "video";
-}
-
-QString ImageSource::category()
-{
-    return "image";
-}
-
-QString ImageSource::thumbnail()
-{
-    return "";
-}
-
-QString ImageSource::license()
-{
-    return "GPLv3";
-}
-
-QString ImageSource::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString ImageSource::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString ImageSource::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool ImageSource::isConfigurable()
-{
-    return false;
-}
-
 Element *ImageSource::newElement()
 {
     return new ImageSourceElement();
 }
-
-Q_EXPORT_PLUGIN2(ImageSource, ImageSource)

@@ -52,6 +52,7 @@ unix {
 }
 
 OTHER_FILES += \
+    RenderModel.json \
     share/thumbnail-128x96.png \
     share/data/cow.osg
 

@@ -19,69 +19,7 @@
 
 #include "include/videosource.h"
 
-QString VideoSource::pluginId()
-{
-    return "VideoSource";
-}
-
-QString VideoSource::name()
-{
-    return "Video Source";
-}
-
-QString VideoSource::version()
-{
-    return "1.0.0";
-}
-
-QString VideoSource::summary()
-{
-    return "Captures images from a video file.";
-}
-
-QString VideoSource::type()
-{
-    return "video";
-}
-
-QString VideoSource::category()
-{
-    return "video";
-}
-
-QString VideoSource::thumbnail()
-{
-    return "";
-}
-
-QString VideoSource::license()
-{
-    return "GPLv3";
-}
-
-QString VideoSource::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString VideoSource::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString VideoSource::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool VideoSource::isConfigurable()
-{
-    return false;
-}
-
 Element *VideoSource::newElement()
 {
     return new VideoSourceElement();
 }
-
-Q_EXPORT_PLUGIN2(VideoSource, VideoSource)

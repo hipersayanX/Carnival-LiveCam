@@ -19,69 +19,7 @@
 
 #include "include/cube.h"
 
-QString Cube::pluginId()
-{
-    return "Cube";
-}
-
-QString Cube::name()
-{
-    return "Cube";
-}
-
-QString Cube::version()
-{
-    return "1.0.0";
-}
-
-QString Cube::summary()
-{
-    return "Render the webcam image in a cube.";
-}
-
-QString Cube::type()
-{
-    return "video";
-}
-
-QString Cube::category()
-{
-    return "plugin";
-}
-
-QString Cube::thumbnail()
-{
-    return "../../../../../share/plugins/Cube/share/thumbnail-128x96.png";
-}
-
-QString Cube::license()
-{
-    return "GPLv3";
-}
-
-QString Cube::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString Cube::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString Cube::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool Cube::isConfigurable()
-{
-    return false;
-}
-
 Element *Cube::newElement()
 {
     return new CubeElement();
 }
-
-Q_EXPORT_PLUGIN2(Cube, Cube)

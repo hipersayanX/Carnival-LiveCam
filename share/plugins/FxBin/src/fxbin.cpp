@@ -19,69 +19,7 @@
 
 #include "include/fxbin.h"
 
-QString FxBin::pluginId()
-{
-    return "FxBin";
-}
-
-QString FxBin::name()
-{
-    return "Fx Bin";
-}
-
-QString FxBin::version()
-{
-    return "1.0.0";
-}
-
-QString FxBin::summary()
-{
-    return "Effects container and manager.";
-}
-
-QString FxBin::type()
-{
-    return "video";
-}
-
-QString FxBin::category()
-{
-    return "plugin";
-}
-
-QString FxBin::thumbnail()
-{
-    return "";
-}
-
-QString FxBin::license()
-{
-    return "GPLv3";
-}
-
-QString FxBin::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString FxBin::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString FxBin::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool FxBin::isConfigurable()
-{
-    return false;
-}
-
 Element *FxBin::newElement()
 {
     return new FxBinElement();
 }
-
-Q_EXPORT_PLUGIN2(FxBin, FxBin)

@@ -57,7 +57,7 @@ To compile and run [Carnival LiveCam](https://github.com/hipersayanX/Carnival-Li
 
 To compile and run [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) need the following software packages:
 
-* [Qt](http://qt.nokia.com/) >= 4.7.x
+* [Qt](http://qt.nokia.com/) >= 5.0
 * [OpenSceneGraph](http://www.openscenegraph.org/projects/osg) >= 3.0.x
 * [OpenCV](http://opencv.willowgarage.com/) >= 2.3.x
 * [FFmpeg](http://ffmpeg.org/)
@@ -66,7 +66,7 @@ To compile and run [Carnival LiveCam](https://github.com/hipersayanX/Carnival-Li
 
 May be you can compile and use [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) with an older versions of the recommended software, I don't know. The environment in which I am currently developing [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) is [Arch Linux](http://www.archlinux.org/) x86_64. The packages needed by Arch Linux are:
 
-    yaourt -S qt openscenegraph opencv ffmpeg ffmpegthumbnailer git
+    yaourt -S qt openscenegraph opencv ffmpeg ffmpegthumbnailer qxmpp git
 
 ## What we have and what we need ##
 

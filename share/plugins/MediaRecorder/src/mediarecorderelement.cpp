@@ -17,7 +17,6 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-//#include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 

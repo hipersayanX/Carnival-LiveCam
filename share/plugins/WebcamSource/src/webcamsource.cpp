@@ -19,69 +19,7 @@
 
 #include "include/webcamsource.h"
 
-QString WebcamSource::pluginId()
-{
-    return "WebcamSource";
-}
-
-QString WebcamSource::name()
-{
-    return "Webcam Source";
-}
-
-QString WebcamSource::version()
-{
-    return "1.0.0";
-}
-
-QString WebcamSource::summary()
-{
-    return "Capture video from a webcam";
-}
-
-QString WebcamSource::type()
-{
-    return "video";
-}
-
-QString WebcamSource::category()
-{
-    return "webcam";
-}
-
-QString WebcamSource::thumbnail()
-{
-    return "../../../../../share/drivers/WebcamLinux/share/icons/camera-web.png";
-}
-
-QString WebcamSource::license()
-{
-    return "GPLv3";
-}
-
-QString WebcamSource::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString WebcamSource::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString WebcamSource::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool WebcamSource::isConfigurable()
-{
-    return false;
-}
-
 Element *WebcamSource::newElement()
 {
     return new WebcamSourceElement();
 }
-
-Q_EXPORT_PLUGIN2(WebcamSource, WebcamSource)

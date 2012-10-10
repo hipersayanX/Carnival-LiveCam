@@ -46,6 +46,9 @@ HEADERS += \
 
 INCLUDEPATH += ../include
 
+OTHER_FILES += \
+    WebcamDetect.json
+
 QT += core gui
 
 SOURCES += \

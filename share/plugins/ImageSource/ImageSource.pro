@@ -47,6 +47,9 @@ HEADERS += \
 
 INCLUDEPATH += ../include
 
+OTHER_FILES += \
+    ImageSource.json
+
 QT += core gui
 
 SOURCES += \

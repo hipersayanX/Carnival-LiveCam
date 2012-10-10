@@ -19,69 +19,7 @@
 
 #include "include/webcamdetect.h"
 
-QString WebcamDetect::pluginId()
-{
-    return "WebcamDetect";
-}
-
-QString WebcamDetect::name()
-{
-    return "Webcam detect";
-}
-
-QString WebcamDetect::version()
-{
-    return "1.0.0";
-}
-
-QString WebcamDetect::summary()
-{
-    return "Detect all available webcam devices";
-}
-
-QString WebcamDetect::type()
-{
-    return "utils";
-}
-
-QString WebcamDetect::category()
-{
-    return "webcam";
-}
-
-QString WebcamDetect::thumbnail()
-{
-    return "../../../../../share/drivers/WebcamLinux/share/icons/camera-web.png";
-}
-
-QString WebcamDetect::license()
-{
-    return "GPLv3";
-}
-
-QString WebcamDetect::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString WebcamDetect::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString WebcamDetect::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool WebcamDetect::isConfigurable()
-{
-    return false;
-}
-
 Element *WebcamDetect::newElement()
 {
     return new WebcamDetectElement();
 }
-
-Q_EXPORT_PLUGIN2(WebcamDetect, WebcamDetect)

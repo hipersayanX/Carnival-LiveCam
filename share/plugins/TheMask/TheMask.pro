@@ -53,6 +53,7 @@ unix {
 }
 
 OTHER_FILES += \
+    TheMask.json \
     share/thumbnail-128x96.png \
     share/masks/cow.png \
     share/haars/aGest.xml \

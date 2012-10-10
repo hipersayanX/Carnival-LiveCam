@@ -19,69 +19,7 @@
 
 #include "include/particlefall.h"
 
-QString ParticleFall::pluginId()
-{
-    return "ParticleFall";
-}
-
-QString ParticleFall::name()
-{
-    return "Particle Fall";
-}
-
-QString ParticleFall::version()
-{
-    return "1.0.0";
-}
-
-QString ParticleFall::summary()
-{
-    return "Falling particles";
-}
-
-QString ParticleFall::type()
-{
-    return "video";
-}
-
-QString ParticleFall::category()
-{
-    return "plugin";
-}
-
-QString ParticleFall::thumbnail()
-{
-    return "../../../../../share/plugins/ParticleFall/share/thumbnail-128x96.png";
-}
-
-QString ParticleFall::license()
-{
-    return "GPLv3";
-}
-
-QString ParticleFall::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString ParticleFall::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString ParticleFall::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool ParticleFall::isConfigurable()
-{
-    return false;
-}
-
 Element *ParticleFall::newElement()
 {
     return new ParticleFallElement();
 }
-
-Q_EXPORT_PLUGIN2(ParticleFall, ParticleFall)

@@ -45,6 +45,9 @@ HEADERS += \
 
 INCLUDEPATH += ../include
 
+OTHER_FILES =  += \
+    FxBin.json
+
 QT += core gui
 
 SOURCES += \

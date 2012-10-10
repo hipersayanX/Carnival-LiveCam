@@ -1,0 +1,14 @@
+{
+    "pluginId": "ImageSource",
+    "name": "Image Source",
+    "version": "1.0.0",
+    "summary": "Create a source from a static image file.",
+    "type": "video",
+    "category": "image",
+    "thumbnail": "",
+    "license": "GPLv3",
+    "author": "Gonzalo Exequiel Pedone",
+    "website": "https://github.com/hipersayanX/Carnival-LiveCam",
+    "mail": "hipersayan DOT x AT gmail DOT com",
+    "publicProperties": {}
+}

@@ -52,6 +52,9 @@ unix {
     PKGCONFIG += opencv
 }
 
+OTHER_FILES += \
+    WebcamSource.json
+
 QT += core gui
 
 SOURCES += \

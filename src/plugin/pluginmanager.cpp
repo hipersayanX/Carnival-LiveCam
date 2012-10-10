@@ -65,21 +65,12 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
             if (!plugin)
                 continue;
 
-            this->m_pluginsInfo[plugin->pluginId()] = PluginInfo(fileName,
-                                                                 plugin->pluginId(),
-                                                                 plugin->name(),
-                                                                 plugin->version(),
-                                                                 plugin->summary(),
-                                                                 plugin->type(),
-                                                                 plugin->category(),
-                                                                 plugin->thumbnail(),
-                                                                 plugin->license(),
-                                                                 plugin->author(),
-                                                                 plugin->website(),
-                                                                 plugin->mail(),
-                                                                 plugin->isConfigurable());
+            QJsonObject metaData = this->m_pluginLoader.metaData();
 
-            this->m_availableElementTypes << plugin->pluginId();
+            this->m_pluginsInfo[metaData["pluginId"].toString()] = PluginInfo(fileName,
+                                                                              metaData.toVariantMap());
+
+            this->m_availableElementTypes << metaData["pluginId"].toString();
             this->m_pluginLoader.unload();
         }
 

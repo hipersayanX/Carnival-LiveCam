@@ -26,22 +26,10 @@
 class TheMask: public QObject, public Plugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "CarnivalLiveCam.Plugin" FILE "TheMask.json")
     Q_INTERFACES(Plugin)
 
     public:
-        QString pluginId();
-        QString name();
-        QString version();
-        QString summary();
-        QString type();
-        QString category();
-        QString thumbnail();
-        QString license();
-        QString author();
-        QString website();
-        QString mail();
-        bool isConfigurable();
-
         Element *newElement();
 };
 

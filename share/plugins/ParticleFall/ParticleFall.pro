@@ -49,6 +49,7 @@ HEADERS += \
 INCLUDEPATH += ../include
 
 OTHER_FILES += \
+    ParticleFall.json \
     share/thumbnail-128x96.png \
     share/sprites/flake0.png \
     share/sprites/flake1.png \

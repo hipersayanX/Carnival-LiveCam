@@ -1,0 +1,15 @@
+{
+    "pluginId": "WebcamSource",
+    "name": "Webcam Source",
+    "version": "1.0.0",
+    "summary": "Capture video from a webcam.",
+    "type": "video",
+    "category": "webcam",
+    "thumbnail": "../../../../../share/plugins/WebcamSource/share/thumbnail-128x96.png",
+    "license": "GPLv3",
+    "author": "Gonzalo Exequiel Pedone",
+    "website": "https://github.com/hipersayanX/Carnival-LiveCam",
+    "mail": "hipersayan DOT x AT gmail DOT com",
+    "publicProperties": {"size": "size",
+                         "fps": "fps"}
+}

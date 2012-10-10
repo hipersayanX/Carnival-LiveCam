@@ -19,69 +19,7 @@
 
 #include "include/mediarecorder.h"
 
-QString MediaRecorder::pluginId()
-{
-    return "MediaRecorder";
-}
-
-QString MediaRecorder::name()
-{
-    return "Media Recorder";
-}
-
-QString MediaRecorder::version()
-{
-    return "1.0.0";
-}
-
-QString MediaRecorder::summary()
-{
-    return "Record video using FFmpeg";
-}
-
-QString MediaRecorder::type()
-{
-    return "video";
-}
-
-QString MediaRecorder::category()
-{
-    return "utils";
-}
-
-QString MediaRecorder::thumbnail()
-{
-    return "";
-}
-
-QString MediaRecorder::license()
-{
-    return "GPLv3";
-}
-
-QString MediaRecorder::author()
-{
-    return "Gonzalo Exequiel Pedone";
-}
-
-QString MediaRecorder::website()
-{
-    return "https://github.com/hipersayanX/Carnival-LiveCam";
-}
-
-QString MediaRecorder::mail()
-{
-    return "hipersayan DOT x AT gmail DOT com";
-}
-
-bool MediaRecorder::isConfigurable()
-{
-    return false;
-}
-
 Element *MediaRecorder::newElement()
 {
     return new MediaRecorderElement();
 }
-
-Q_EXPORT_PLUGIN2(MediaRecorder, MediaRecorder)

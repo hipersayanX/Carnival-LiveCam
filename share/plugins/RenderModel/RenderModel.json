@@ -1,0 +1,14 @@
+{
+    "pluginId": "RenderModel",
+    "name": "Render Model",
+    "version": "1.0.0",
+    "summary": "This plugin shows a 3D model.",
+    "type": "video",
+    "category": "plugin",
+    "thumbnail": "../../../../../share/plugins/RenderModel/share/thumbnail-128x96.png",
+    "license": "GPLv3",
+    "author": "Gonzalo Exequiel Pedone",
+    "website": "https://github.com/hipersayanX/Carnival-LiveCam",
+    "mail": "hipersayan DOT x AT gmail DOT com",
+    "publicProperties": {"modelFileName": "modelFileName"}
+}

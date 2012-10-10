@@ -49,7 +49,7 @@ isEmpty(COMMONS_PRI_INCLUDE) {
 
     unix {
         # Enable support for C++11
-        QMAKE_CXXFLAGS += -std=c++0x
+        CONFIG += c++11
     }
 
     COMMONS_PRI_INCLUDE = 1
