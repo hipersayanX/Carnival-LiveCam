@@ -18,9 +18,31 @@
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
 isEmpty(COMMONS_PRI_INCLUDE) {
+    REQ_QT_MAJ = 5
+    REQ_QT_MIN = 0
+    REQ_QT_PAT = 0
+
+    isEqual(QT_MAJOR_VERSION, $$REQ_QT_MAJ) {
+        lessThan(QT_MINOR_VERSION, $$REQ_QT_MIN) {
+            REQ_QT_NOTEXISTS = 1
+        } else {
+            lessThan(QT_PATCH_VERSION, $$REQ_QT_PAT) {
+                REQ_QT_NOTEXISTS = 1
+            }
+        }
+    } else {
+        REQ_QT_NOTEXISTS = 1
+    }
+
+    !isEmpty(REQ_QT_NOTEXISTS): error("Your Qt version is $${QT_VERSION}. \
+                                       Please, install Qt $${REQ_QT_MAJ}.$${REQ_QT_MIN}.$${REQ_QT_PAT} or later.")
+
     COMMONS_APPNAME = "Carnival-LiveCam"
     COMMONS_TARGET = "Carnival-LiveCam"
-    COMMONS_VERSION = 1.0.0
+    VER_MAJ = 1
+    VER_MIN = 0
+    VER_PAT = 0
+    VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
     unix {
         COMMONS_TARGET_INSTALL_PATH = /usr/bin
@@ -36,15 +58,15 @@ isEmpty(COMMONS_PRI_INCLUDE) {
     COMMONS_RELEASE_BUILD_PATH = $${COMMONS_BUILD_PATH}/release
 
     CONFIG(debug, debug|release) {
-        MOC_DIR = $${COMMONS_DEBUG_BUILD_PATH}
-        OBJECTS_DIR = $${COMMONS_DEBUG_BUILD_PATH}
-        RCC_DIR = $${COMMONS_DEBUG_BUILD_PATH}
-        UI_DIR = $${COMMONS_DEBUG_BUILD_PATH}
+        MOC_DIR = $${COMMONS_DEBUG_BUILD_PATH}/moc
+        OBJECTS_DIR = $${COMMONS_DEBUG_BUILD_PATH}/obj
+        RCC_DIR = $${COMMONS_DEBUG_BUILD_PATH}/rcc
+        UI_DIR = $${COMMONS_DEBUG_BUILD_PATH}/ui
     } else {
-        MOC_DIR = $${COMMONS_RELEASE_BUILD_PATH}
-        OBJECTS_DIR = $${COMMONS_RELEASE_BUILD_PATH}
-        RCC_DIR = $${COMMONS_RELEASE_BUILD_PATH}
-        UI_DIR = $${COMMONS_RELEASE_BUILD_PATH}
+        MOC_DIR = $${COMMONS_RELEASE_BUILD_PATH}/moc
+        OBJECTS_DIR = $${COMMONS_RELEASE_BUILD_PATH}/obj
+        RCC_DIR = $${COMMONS_RELEASE_BUILD_PATH}/rcc
+        UI_DIR = $${COMMONS_RELEASE_BUILD_PATH}/ui
     }
 
     unix {

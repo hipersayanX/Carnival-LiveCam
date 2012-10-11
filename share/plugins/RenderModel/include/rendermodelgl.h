@@ -17,8 +17,8 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef OGL_H
-#define OGL_H
+#ifndef RENDERMODELGL_H
+#define RENDERMODELGL_H
 
 #include <QtOpenGL>
 
@@ -28,7 +28,7 @@
 #include <osgDB/ReadFile>
 #include <osgGA/TrackballManipulator>
 
-class OGL: public QGLWidget
+class RenderModelGL: public QGLWidget
 {
     Q_OBJECT
 
@@ -36,7 +36,7 @@ class OGL: public QGLWidget
     Q_PROPERTY(QImage image READ image WRITE setImage RESET resetImage)
 
     public:
-        explicit OGL();
+        explicit RenderModelGL();
         QString modelFileName();
         QImage image();
 
@@ -66,4 +66,4 @@ class OGL: public QGLWidget
         void resetImage();
 };
 
-#endif // OGL_H
+#endif // RENDERMODELGL_H

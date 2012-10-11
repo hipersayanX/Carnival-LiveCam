@@ -39,7 +39,7 @@ class RenderModelElement: public Element
 
     private:
         QString m_modelFileName;
-        OGL m_ogl;
+        RenderModelGL m_ogl;
         QImage m_image;
 
     public slots:

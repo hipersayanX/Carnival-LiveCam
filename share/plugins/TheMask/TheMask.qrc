@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>share/haars/aGest.xml</file>
+        <file>share/haars/haarcascade_eye_tree_eyeglasses.xml</file>
+        <file>share/haars/haarcascade_frontalface_alt_tree.xml</file>
+        <file>share/haars/haarcascade_frontalface_alt.xml</file>
+        <file>share/haars/haarcascade_mcs_eyepair_big.xml</file>
+        <file>share/haars/haars.txt</file>
+        <file>share/masks/cow.png</file>
+    </qresource>
+</RCC>

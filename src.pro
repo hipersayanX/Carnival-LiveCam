@@ -19,42 +19,28 @@
 
 exists(commons.pri) {
     include(commons.pri)
-
-    COMMONS_PRI_EXISTS = 1
-}
-
-isEmpty(COMMONS_PRI_EXISTS) {
-    exists(../commons.pri) {
-        include(../commons.pri)
-
-        COMMONS_PRI_EXISTS = 1
-    }
+} else {
+    error("commons.pri file not found.")
 }
 
 CONFIG += qt
 
 HEADERS += \
-    ../include/core/core.h \
-    ../include/plugin/plugin.h \
-    ../include/plugin/element.h \
-    ../include/plugin/plugininfo.h \
-    ../include/plugin/pluginmanager.h \
-    ../include/shell/shell.h \
-    ../include/shell/shellfactory.h \
-    ../include/shell/shellmanager.h \
-    ../include/shell/shellinfo.h
+    include/core/core.h \
+    include/plugin/plugin.h \
+    include/plugin/element.h \
+    include/plugin/plugininfo.h \
+    include/plugin/pluginmanager.h
 
-INCLUDEPATH += ../include
+INCLUDEPATH += include
 
 QT += core gui widgets
 
 SOURCES += \
-    main.cpp \
-    core/core.cpp \
-    plugin/plugininfo.cpp \
-    plugin/pluginmanager.cpp \
-    shell/shellmanager.cpp \
-    shell/shellinfo.cpp
+    src/main.cpp \
+    src/core/core.cpp \
+    src/plugin/plugininfo.cpp \
+    src/plugin/pluginmanager.cpp
 
 TARGET = $${COMMONS_TARGET}
 

@@ -17,7 +17,7 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/fxbinelement.h"
+#include "fxbinelement.h"
 
 FxBinElement::FxBinElement()
 {

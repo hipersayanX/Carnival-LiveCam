@@ -20,8 +20,8 @@
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 
-#include "include/sleep.h"
-#include "include/webcamdetectelement.h"
+#include "sleep.h"
+#include "webcamdetectelement.h"
 
 WebcamDetectElement::WebcamDetectElement(): Element()
 {

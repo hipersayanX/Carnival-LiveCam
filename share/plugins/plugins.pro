@@ -22,16 +22,17 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 #SUBDIRS += \
-#           share/plugins/DefaultShell \
-#           share/plugins/Spaces
+#           DefaultShell \
+#           Spaces
 
-SUBDIRS += share/plugins/Cube \
-           share/plugins/FxBin \
-           share/plugins/ImageSource \
-           share/plugins/MediaRecorder \
-           share/plugins/ParticleFall \
-           share/plugins/RenderModel \
-           share/plugins/TheMask \
-           share/plugins/VideoSource \
-           share/plugins/WebcamDetect \
-           share/plugins/WebcamSource
+SUBDIRS += \
+           Cube \
+           FxBin \
+           ImageSource \
+           MediaRecorder \
+           ParticleFall \
+           RenderModel \
+           TheMask \
+           VideoSource \
+           WebcamDetect \
+           WebcamSource

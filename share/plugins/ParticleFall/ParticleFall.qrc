@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>share/sprites/flake0.png</file>
+        <file>share/sprites/flake1.png</file>
+        <file>share/sprites/flake2.png</file>
+        <file>share/sprites/flake3.png</file>
+    </qresource>
+</RCC>

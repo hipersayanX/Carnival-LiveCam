@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "include/mediarecorderelement.h"
+#include "mediarecorderelement.h"
 
 MediaRecorderElement::MediaRecorderElement(): Element()
 {

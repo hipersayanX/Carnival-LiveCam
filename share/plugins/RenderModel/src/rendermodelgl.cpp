@@ -17,9 +17,9 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/rendermodelgl.h"
+#include "rendermodelgl.h"
 
-OGL::OGL(): QGLWidget()
+RenderModelGL::RenderModelGL(): QGLWidget()
 {
     this->m_viewer = new osgViewer::Viewer;
 
@@ -32,17 +32,17 @@ OGL::OGL(): QGLWidget()
     this->resetImage();
 }
 
-QString OGL::modelFileName()
+QString RenderModelGL::modelFileName()
 {
     return this->m_modelFileName;
 }
 
-QImage OGL::image()
+QImage RenderModelGL::image()
 {
     return this->m_image;
 }
 
-void OGL::initializeGL()
+void RenderModelGL::initializeGL()
 {
     if (this->m_window.valid())
         this->m_window->releaseContext();
@@ -50,7 +50,7 @@ void OGL::initializeGL()
     this->m_window = this->m_viewer->setUpViewerAsEmbeddedInWindow(0, 0, width(), height());
 }
 
-void OGL::resizeGL(qint32 width, qint32 height)
+void RenderModelGL::resizeGL(qint32 width, qint32 height)
 {
     if (this->m_window.valid())
     {
@@ -63,7 +63,7 @@ void OGL::resizeGL(qint32 width, qint32 height)
     }
 }
 
-void OGL::paintGL()
+void RenderModelGL::paintGL()
 {
     this->m_group  = new osg::Group;
 
@@ -85,7 +85,7 @@ void OGL::paintGL()
         this->m_viewer->frame();
 }
 
-osg::ref_ptr<osg::TextureRectangle> OGL::convertQImageToOsgTexture(const QImage &qimage)
+osg::ref_ptr<osg::TextureRectangle> RenderModelGL::convertQImageToOsgTexture(const QImage &qimage)
 {
     osg::ref_ptr<osg::Image> image = new osg::Image;
 
@@ -108,7 +108,7 @@ osg::ref_ptr<osg::TextureRectangle> OGL::convertQImageToOsgTexture(const QImage 
     return texture;
 }
 
-osg::ref_ptr<osg::Geode> OGL::createFrameGeode(const QImage &image)
+osg::ref_ptr<osg::Geode> RenderModelGL::createFrameGeode(const QImage &image)
 {
     osg::ref_ptr<osg::TextureRectangle> frameTexture = convertQImageToOsgTexture(image);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
@@ -126,7 +126,7 @@ osg::ref_ptr<osg::Geode> OGL::createFrameGeode(const QImage &image)
     return geode;
 }
 
-osg::ref_ptr<osg::Camera> OGL::createOrthoCamera()
+osg::ref_ptr<osg::Camera> RenderModelGL::createOrthoCamera()
 {
     osg::ref_ptr<osg::Camera> orthoCamera = new osg::Camera;
 
@@ -140,23 +140,23 @@ osg::ref_ptr<osg::Camera> OGL::createOrthoCamera()
     return orthoCamera;
 }
 
-void OGL::setModelFileName(QString modelFileName)
+void RenderModelGL::setModelFileName(QString modelFileName)
 {
     this->m_modelFileName = modelFileName;
     this->m_loadedModel = osgDB::readNodeFile(modelFileName.toUtf8().constData());
 }
 
-void OGL::setImage(const QImage &image)
+void RenderModelGL::setImage(const QImage &image)
 {
     this->m_image = image;
 }
 
-void OGL::resetModelFileName()
+void RenderModelGL::resetModelFileName()
 {
     this->setModelFileName("");
 }
 
-void OGL::resetImage()
+void RenderModelGL::resetImage()
 {
     this->setImage(QImage());
 }

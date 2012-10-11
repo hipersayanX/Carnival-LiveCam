@@ -19,7 +19,7 @@
 
 #include <cstdlib>
 
-#include "include/particlefallelement.h"
+#include "particlefallelement.h"
 
 ParticleFallElement::ParticleFallElement()
 {
@@ -245,7 +245,7 @@ void ParticleFallElement::resetSprites()
     QStringList sprites;
 
     for (int i = 0; i < 4; i++)
-        sprites << QString("share/plugins/ParticleFall/share/sprites/flake%1.png").arg(i);
+        sprites << QString(":/share/sprites/flake%1.png").arg(i);
 
     this->setSprites(sprites);
 }

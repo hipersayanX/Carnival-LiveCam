@@ -19,11 +19,7 @@
 
 exists(commons.pri) {
     include(commons.pri)
-
-    COMMONS_PRI_EXISTS = 1
-}
-
-isEmpty(COMMONS_PRI_EXISTS) {
+} else {
     error("commons.pri file not found.")
 }
 
@@ -31,21 +27,8 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-#SUBDIRS += \
-#           share/plugins/DefaultShell \
-#           share/plugins/Spaces
-
-SUBDIRS += src \
-           share/plugins/Cube \
-           share/plugins/FxBin \
-           share/plugins/ImageSource \
-           share/plugins/MediaRecorder \
-           share/plugins/ParticleFall \
-           share/plugins/RenderModel \
-           share/plugins/TheMask \
-           share/plugins/VideoSource \
-           share/plugins/WebcamDetect \
-           share/plugins/WebcamSource
+SUBDIRS += src.pro \
+           share/plugins
 
 # Install rules
 

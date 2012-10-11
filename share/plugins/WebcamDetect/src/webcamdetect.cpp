@@ -17,7 +17,7 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "include/webcamdetect.h"
+#include "webcamdetect.h"
 
 Element *WebcamDetect::newElement()
 {

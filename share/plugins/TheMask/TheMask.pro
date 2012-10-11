@@ -16,25 +16,15 @@
 #
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
-#
-# OpenCV face recognition plugin
 
 exists(commons.pri) {
     include(commons.pri)
-
-    COMMONS_PRI_EXISTS = 1
-}
-
-isEmpty(COMMONS_PRI_EXISTS) {
+} else {
     exists(../../../commons.pri) {
         include(../../../commons.pri)
-
-        COMMONS_PRI_EXISTS = 1
+    } else {
+        error("commons.pri file not found.")
     }
-}
-
-isEmpty(COMMONS_PRI_EXISTS) {
-    error("commons.pri file not found.")
 }
 
 CONFIG += plugin
@@ -45,7 +35,7 @@ HEADERS += \
     include/themask.h \
     include/themaskelement.h
 
-INCLUDEPATH += ../include
+INCLUDEPATH += include
 
 unix {
     CONFIG += link_pkgconfig
@@ -80,3 +70,6 @@ target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
 
 data.files = share/*
 data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share
+
+RESOURCES += \
+    TheMask.qrc

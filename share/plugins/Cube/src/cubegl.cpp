@@ -1,6 +1,6 @@
 #include <GL/glu.h>
 
-#include "include/cubegl.h"
+#include "cubegl.h"
 
 CubeGL::CubeGL(): QGLWidget()
 {

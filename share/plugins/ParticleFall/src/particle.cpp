@@ -20,7 +20,7 @@
 #include <cstdlib>
 #include <cmath>
 
-#include "include/particle.h"
+#include "particle.h"
 
 using namespace std;
 

@@ -49,6 +49,18 @@ class PluginManager: public QObject
         Q_INVOKABLE QList<QVariant> pluginList();
         PipelineRoutingMode pipelineRoutingMode();
 
+        Q_INVOKABLE bool startElement(QString elementId);
+        Q_INVOKABLE bool stopElement(QString elementId);
+        Q_INVOKABLE QString addElement(QString pluginId);
+        Q_INVOKABLE bool removeElement(QString elementId);
+        Q_INVOKABLE bool setElementProperty(QString elementId, QString property, QVariant value);
+        Q_INVOKABLE bool resetElementProperty(QString elementId, QString property);
+        Q_INVOKABLE bool connectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
+        Q_INVOKABLE bool disconnectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
+        Q_INVOKABLE bool connectElements(QString senderId, QString receiverId);
+        Q_INVOKABLE bool disconnectElements(QString senderId, QString receiverId);
+        Q_INVOKABLE bool setParentElements(QString elementId, QString parentId);
+
     private:
         QPluginLoader m_pluginLoader;
         QMap<QString, Plugin *> m_plugins;
@@ -76,17 +88,6 @@ class PluginManager: public QObject
         int requestId();
         void removeId(int id);
 
-        bool startElement(QString elementId);
-        bool stopElement(QString elementId);
-        QString addElement(QString pluginId);
-        bool removeElement(QString elementId);
-        bool setElementProperty(QString elementId, QString property, QVariant value);
-        bool resetElementProperty(QString elementId, QString property);
-        bool connectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
-        bool disconnectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
-        bool connectElements(QString senderId, QString receiverId);
-        bool disconnectElements(QString senderId, QString receiverId);
-
         QStringList regexpFindAll(QString regexp, QString text);
         QString bestMatchId(QMap<QString, QVariant> instances1, QMap<QString, QVariant> instances2, QString id2);
 
@@ -105,6 +106,9 @@ class PluginManager: public QObject
 
         QStringList subtractMapKeys(QMap<QString, QVariant> instances1,
                                QMap<QString, QVariant> instances2);
+
+        QList<QMap<QString, QStringList> > propertiesDiff(const QMap<QString, QVariant> &instances1,
+                                                          const QMap<QString, QVariant> &instances2);
 
         QVariant parseValue(QString value);
         QStringList parseSignalSlotLt(QString id, QString element);

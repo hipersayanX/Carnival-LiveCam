@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "include/themaskelement.h"
+#include "themaskelement.h"
 
 TheMaskElement::TheMaskElement()
 {
@@ -66,7 +66,7 @@ void TheMaskElement::resetHaarCascadeFile()
 
 void TheMaskElement::resetSprite()
 {
-    this->setSprite("share/plugins/TheMask/share/masks/cow.png");
+    this->setSprite(":/share/masks/cow.png");
 }
 
 void TheMaskElement::iVideo(QImage *frame)

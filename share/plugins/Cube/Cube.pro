@@ -21,20 +21,12 @@
 
 exists(commons.pri) {
     include(commons.pri)
-
-    COMMONS_PRI_EXISTS = 1
-}
-
-isEmpty(COMMONS_PRI_EXISTS) {
+} else {
     exists(../../../commons.pri) {
         include(../../../commons.pri)
-
-        COMMONS_PRI_EXISTS = 1
+    } else {
+        error("commons.pri file not found.")
     }
-}
-
-isEmpty(COMMONS_PRI_EXISTS) {
-    error("commons.pri file not found.")
 }
 
 CONFIG += plugin
@@ -46,7 +38,7 @@ HEADERS += \
     include/cubeelement.h \
     include/cubegl.h
 
-INCLUDEPATH += ../include
+INCLUDEPATH += include
 
 OTHER_FILES += \
     Cube.json \

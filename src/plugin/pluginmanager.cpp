@@ -36,7 +36,7 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
     this->m_curId = 0;
     this->resetRegexpDict();
 
-    QDir pluginDir("../share/plugins");
+    QDir pluginDir("share/plugins");
 
     foreach (QString dirext, pluginDir.entryList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot, QDir::Name))
     {
@@ -66,9 +66,10 @@ PluginManager::PluginManager(QObject *parent): QObject(parent)
                 continue;
 
             QJsonObject metaData = this->m_pluginLoader.metaData();
+            QString pluginId = metaData.toVariantMap()["MetaData"].toMap()["pluginId"].toString();
 
-            this->m_pluginsInfo[metaData["pluginId"].toString()] = PluginInfo(fileName,
-                                                                              metaData.toVariantMap());
+            this->m_pluginsInfo[pluginId] = PluginInfo(fileName,
+                                                       metaData.toVariantMap()["MetaData"].toMap());
 
             this->m_availableElementTypes << metaData["pluginId"].toString();
             this->m_pluginLoader.unload();
@@ -451,6 +452,7 @@ QString PluginManager::addElement(QString pluginId)
 
     this->m_elements[elementId] = element;
     this->m_elements[elementId]->setManager(this);
+//    this->m_instances1[elementId] = QList<QVariant>() << pluginId;
 
     return elementId;
 }
@@ -567,6 +569,11 @@ bool PluginManager::disconnectElements(QString senderId, QString receiverId)
         return true;
     else
         return false;
+}
+
+bool PluginManager::setParentElements(QString elementId, QString parentId)
+{
+    return false;
 }
 
 QStringList PluginManager::regexpFindAll(QString regexp, QString text)
@@ -1159,6 +1166,9 @@ QString PluginManager::changeId(QString srcId,
 {
     QString ghostId = "";
 
+    if (srcId == dstId)
+        return ghostId;
+
     if (instances && instances->contains(srcId))
     {
         if (instances->contains(dstId))
@@ -1261,9 +1271,36 @@ template <typename T> QList<T> PluginManager::subtractLists(QList<T> list1, QLis
 }
 
 QStringList PluginManager::subtractMapKeys(QMap<QString, QVariant> instances1,
-                                      QMap<QString, QVariant> instances2)
+                                           QMap<QString, QVariant> instances2)
 {
     return this->subtractLists(instances1.keys(), instances2.keys());
+}
+
+QList<QMap<QString, QStringList> > PluginManager::propertiesDiff(const QMap<QString, QVariant> &instances1,
+                                                                 const QMap<QString, QVariant> &instances2)
+{
+    QList<QMap<QString, QStringList> > propsDiff;
+    QMap<QString, QStringList> setPropertiers;
+
+    foreach (QString elementId, instances2.keys())
+        foreach (QString property, instances2[elementId].toList()[1].toMap().keys())
+            if (!instances1.contains(elementId) ||
+                !instances1[elementId].toList()[1].toMap().contains(property) ||
+                instances1[elementId].toList()[1].toMap()[property] !=
+                instances2[elementId].toList()[1].toMap()[property])
+                setPropertiers[elementId] << property;
+
+    QMap<QString, QStringList> resetPropertiers;
+
+    foreach (QString elementId, instances1.keys())
+        foreach (QString property, instances1[elementId].toList()[1].toMap().keys())
+            if (instances2.contains(elementId) &&
+                !instances2[elementId].toList()[1].toMap().contains(property))
+                resetPropertiers[elementId] << property;
+
+    propsDiff << setPropertiers << resetPropertiers;
+
+    return propsDiff;
 }
 
 void PluginManager::setPipeline(QString pipeline2)
@@ -1280,347 +1317,54 @@ void PluginManager::setPipeline(QString pipeline2)
     QList<QStringList> disconnectElementsSS = this->subtractLists(this->m_ss1, ss2);
     QList<QStringList> disconnectElements = this->subtractLists(this->m_connections1, connections2);
 
+    foreach (QString elementId, removeElements)
+        this->stopElement(elementId);
+
+    foreach (QStringList ss, disconnectElementsSS)
+        this->disconnectElementsSS(ss[0], ss[1], ss[2], ss[3]);
+
+    foreach (QStringList connection, disconnectElements)
+        this->disconnectElements(connection[0], connection[1]);
+
+    foreach (QString elementId, removeElements)
+        this->removeElement(elementId);
+
     QStringList addElements = this->subtractMapKeys(instances2, this->m_instances1);
+    QStringList addElementsTmp;
+
+    foreach (QString elementId, addElements)
+    {
+        QString elementIdNew = this->addElement(instances2[elementId].toList()[0].toString());
+        this->changeId(elementId, elementIdNew, &instances2, &connections2, &ss2);
+        addElementsTmp << elementIdNew;
+    }
+
+    addElements = addElementsTmp;
+
+    QList<QMap<QString, QStringList> > properties = this->propertiesDiff(this->m_instances1, instances2);
+
+    foreach (QString elementId, properties[0].keys())
+        foreach (QString property, properties[0][elementId])
+            this->setElementProperty(elementId,
+                                     property,
+                                     instances2[elementId].toList()[1].toMap()[property]);
+
+    foreach (QString elementId, properties[0].keys())
+        foreach (QString property, properties[0][elementId])
+            this->resetElementProperty(elementId,
+                                       property);
 
     QList<QStringList> connectElements = this->subtractLists(connections2, this->m_connections1);
     QList<QStringList> connectElementsSS = this->subtractLists(ss2, this->m_ss1);
 
-
-
-
-
-/*
-    QMap<QString, QVariant> cInstances1(this->m_instances1);
-    QMap<QString, QVariant> cInstances2(instances2);
-
-    QList<QStringList> cConnections1(this->m_connections1);
-    QList<QStringList> cConnections2(connections2);
-
-    QList<QStringList> cSs1(this->m_ss1);
-    QList<QStringList> cSs2(ss2);
-
-    QList<QStringList> disconnectSignalsAndSlots;
-    QList<QStringList> disconnectElement;
-    QStringList removeElement;
-    QList<QStringList> changeId;
-    QMap<QString, QMap<QString, QVariant> > setProperties;
-    QMap<QString, QStringList> resetProperties;
-    QList<QStringList> connectElement;
-    QList<QStringList> connectSignalsAndSlots;
-
-    int i;
-
-    while (!cInstances1.isEmpty())
-    {
-        // Get an item from cInstances1.
-        QString key = cInstances1.keys()[0];
-        QVariant value = cInstances1.take(key);
-        QString bestMatchId = "";
-
-        // Find a similar element.
-        foreach (QString instance2, cInstances2.keys())
-            if (value.toList()[0].toString() == cInstances2[instance2].toList()[0].toString())
-            {
-                if (bestMatchId == "")
-                    bestMatchId = instance2;
-                else if (value.toList()[1].toMap().contains("objectName") &&
-                         cInstances2[instance2].toList()[1].toMap().contains("objectName") &&
-                         value.toList()[1].toMap()["objectName"].toString() ==
-                         cInstances2[instance2].toList()[1].toMap()["objectName"].toString())
-                {
-                    bestMatchId = instance2;
-
-                    break;
-                }
-            }
-
-        // There are no similar elements.
-        if (bestMatchId == "")
-        {
-            // Remove it from the previous pipeline.
-            removeElement << key;
-
-            // Remove it's connections.
-            for (i = 0; i < cConnections1.length(); i++)
-                if (cConnections1[i][0] == key ||
-                    cConnections1[i][1] == key)
-                {
-                    disconnectElement << cConnections1[i];
-                    cConnections1.removeAt(i);
-                    i--;
-                }
-
-            // Remove it's signals & slots.
-            for (i = 0; i < cSs1.length(); i++)
-                if (cSs1[i][0] == key || cSs1[i][2] == key)
-                {
-                    disconnectSignalsAndSlots << cSs1[i];
-                    cSs1.removeAt(i);
-                    i--;
-                }
-        }
-        // There are at least one similar element.
-        else
-        {
-            // Change the Id of the element in pipeline1 by the Id of the
-            // element in pipeline2.
-            if (key != bestMatchId)
-            {
-                if (cInstances1.contains(bestMatchId))
-                    // The new Id is used by other element. Change the Id to
-                    // a ghost Id.
-                    changeId << (QStringList() << key << QString(".%1").arg(bestMatchId));
-                else
-                    changeId << (QStringList() << key << bestMatchId);
-            }
-
-            // Copy the properties from pipeline2 to the pipeline1.
-            QMap<QString, QVariant> setProps;
-
-            foreach (QString prop, cInstances2[bestMatchId].toList()[1].toMap().keys())
-                if (!value.toList()[1].toMap().contains(prop) ||
-                    (value.toList()[1].toMap().contains(prop) &&
-                     cInstances2[bestMatchId].toList()[1].toMap()[prop] != value.toList()[1].toMap()[prop]))
-                    setProps[prop] = cInstances2[bestMatchId].toList()[1].toMap()[prop];
-
-            if (!setProps.isEmpty())
-                setProperties[bestMatchId] = setProps;
-
-            QStringList resetProps;
-
-            foreach (QString prop, value.toList()[1].toMap().keys())
-                if (!cInstances2[bestMatchId].toList()[1].toMap().contains(prop))
-                    resetProps << prop;
-
-            if (!resetProps.isEmpty())
-                resetProperties[bestMatchId] = resetProps;
-
-            cInstances2.remove(bestMatchId);
-        }
-    }
-
-    // Converts ghost Id to the final Id.
-    for (i = 0; i < changeId.length(); i++)
-        if (changeId[i][1].startsWith("."))
-        {
-            if (removeElement.contains(changeId[i][1].mid(1)))
-                changeId[i][1] = changeId[i][1].mid(1);
-            else
-                changeId << (QStringList() << changeId[i][1] << changeId[i][1].mid(1));
-        }
-
-    bool fst;
-    bool snd;
-    QStringList dstConnection;
-
-    // Solve connections
-    for (i = 0; i < cConnections1.length(); i++)
-    {
-        dstConnection = QStringList(cConnections1[i]);
-        fst = false;
-        snd = false;
-
-        foreach (QStringList change, changeId)
-        {
-            QString dst = change[1].startsWith(".")? change[1].mid(1): change[1];
-
-            if (!fst && dstConnection[0] == change[0])
-            {
-                dstConnection[0] = dst;
-                fst = true;
-            }
-
-            if (!snd && dstConnection[1] == change[0])
-            {
-                dstConnection[1] = dst;
-                snd = true;
-            }
-
-            if (fst && snd)
-                break;
-        }
-
-        if (!cConnections2.contains(dstConnection))
-        {
-            disconnectElement << cConnections1[i];
-            cConnections1.removeAt(i);
-            i--;
-        }
-    }
-
-    for (i = 0; i < cConnections2.length(); i++)
-    {
-        dstConnection = QStringList(cConnections2[i]);
-        fst = false;
-        snd = false;
-
-        foreach (QStringList change, changeId)
-        {
-            QString src = change[1].startsWith(".")? change[1].mid(1): change[1];
-
-            if (!fst && dstConnection[0] == src)
-            {
-                dstConnection[0] = change[0];
-                fst = true;
-            }
-
-            if (!snd && dstConnection[1] == src)
-            {
-                dstConnection[1] = change[0];
-                snd = true;
-            }
-
-            if (fst && snd)
-                break;
-        }
-
-        if (!cConnections1.contains(dstConnection))
-        {
-            connectElement << cConnections2[i];
-            cConnections2.removeAt(i);
-            i--;
-        }
-    }
-
-    QStringList dstSs;
-
-    // Solve signals & slots.
-    for (i = 0; i < cSs1.length(); i++)
-    {
-        dstSs = QStringList(cSs1[i]);
-        fst = false;
-        snd = false;
-
-        foreach (QStringList change, changeId)
-        {
-            QString dst = change[1].startsWith(".")? change[1].mid(1): change[1];
-
-            if (!fst && dstSs[0] == change[0])
-            {
-                dstSs[0] = dst;
-                fst = true;
-            }
-
-            if (!snd && dstSs[2] == change[0])
-            {
-                dstSs[2] = dst;
-                snd = true;
-            }
-
-            if (fst && snd)
-                break;
-        }
-
-        if (!cSs2.contains(dstSs))
-        {
-            disconnectSignalsAndSlots << cSs1[i];
-            cSs1.removeAt(i);
-            i--;
-        }
-    }
-
-    for (i = 0; i < cSs2.length(); i++)
-    {
-        dstSs = QStringList(cSs2[i]);
-        fst = false;
-        snd = false;
-
-        foreach (QStringList change, changeId)
-        {
-            QString src = change[1].startsWith(".")? change[1].mid(1): change[1];
-
-            if (!fst && dstSs[0] == src)
-            {
-                dstSs[0] = change[0];
-                fst = true;
-            }
-
-            if (!snd && dstSs[2] == src)
-            {
-                dstSs[2] = change[0];
-                snd = true;
-            }
-
-            if (fst && snd)
-                break;
-        }
-
-        if (!cSs1.contains(dstSs))
-        {
-            connectSignalsAndSlots << cSs2[i];
-            cSs2.removeAt(i);
-            i--;
-        }
-    }
-
-    // Add elements in pipeline2 to pipeline1.
-    QMap<QString, QString> addElement;
-
-    foreach (QString instance, cInstances2.keys())
-    {
-        addElement[instance] = cInstances2[instance].toList()[0].toString();
-
-        if (!cInstances2[instance].toList()[1].toMap().isEmpty())
-            setProperties[instance] = cInstances2[instance].toList()[1].toMap();
-
-        for (i = 0; i < cConnections2.length(); i++)
-            if (cConnections2[i][0] == instance ||
-                cConnections2[i][1] == instance)
-            {
-                connectElement << cConnections2[i];
-                cConnections2.removeAt(i);
-                i--;
-            }
-
-        for (i = 0; i < cSs2.length(); i++)
-            if (cSs2[i][0] == instance || cSs2[i][2] == instance)
-            {
-                connectSignalsAndSlots << cSs2[i];
-                cSs2.removeAt(i);
-                i--;
-            }
-    }
-
-    // Set pipeline2 as the new pipeline.
-    this->m_instances1 = instances2;
-    this->m_connections1 = connections2;
-    this->m_ss1 = ss2;
-
-    foreach (QString elementId, removeElement)
-        this->stopElement(elementId);
-
-    foreach (QStringList ss, disconnectSignalsAndSlots)
-        this->disconnectElementsSS(ss[0], ss[1], ss[2], ss[3]);
-
-    foreach (QStringList connection, disconnectElement)
-        this->disconnectElements(connection[0], connection[1]);
-
-    foreach (QString elementId, removeElement)
-        this->removeElement(elementId);
-
-//    foreach (QStringList change, changeId)
-//        this->changeElementId(change[0], change[1]);
-
-    foreach (QString elementId, addElement.keys())
-        this->addElement(elementId, addElement[elementId]);
-
-    foreach (QString elementId, setProperties.keys())
-        foreach (QString prop, setProperties[elementId].keys())
-            this->setElementProperty(elementId, prop, setProperties[elementId][prop]);
-
-    foreach (QString elementId, resetProperties.keys())
-        foreach (QString prop, resetProperties[elementId])
-            this->resetElementProperty(elementId, prop);
-
-    foreach (QStringList connection, connectElement)
+    foreach (QStringList connection, connectElements)
         this->connectElements(connection[0], connection[1]);
 
-    foreach (QStringList ss, connectSignalsAndSlots)
+    foreach (QStringList ss, connectElementsSS)
        this->connectElementsSS(ss[0], ss[1], ss[2], ss[3]);
 
-    foreach (QString elementId, addElement.keys())
+    foreach (QString elementId, addElements)
         this->startElement(elementId);
-        */
 }
 
 PluginManager::PipelineRoutingMode PluginManager::pipelineRoutingMode()
