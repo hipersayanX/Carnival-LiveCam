@@ -32,6 +32,7 @@ CONFIG += plugin
 HEADERS += \
     include/plugin.h \
     include/element.h \
+    include/pipeline.h \
     include/webcamsource.h \
     include/webcamsourceelement.h
 

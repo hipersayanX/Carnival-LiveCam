@@ -32,6 +32,7 @@ CONFIG += plugin
 HEADERS += \
     include/plugin.h \
     include/element.h \
+    include/pipeline.h \
     include/fxbinelement.h \
     include/fxbin.h
 
@@ -54,3 +55,6 @@ INSTALLS += target
 
 target.files = $$TARGET
 target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
+
+HEADERS += \
+    include/pipeline.h

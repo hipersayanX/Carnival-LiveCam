@@ -101,8 +101,8 @@ void ParticleFallElement::setNParticles(int nParticles)
 
     QRect rect(-this->m_padding,
                -this->m_padding,
-               this->m_curFrame.width() + 2 * this->m_padding,
-               this->m_curFrame.height() + 2 * this->m_padding);
+               this->m_curFrameSize.width() + 2 * this->m_padding,
+               this->m_curFrameSize.height() + 2 * this->m_padding);
 
     while (this->m_particles.length() < this->m_nParticles)
         this->m_particles << Particle(rect,
@@ -125,8 +125,8 @@ void ParticleFallElement::setPadding(int padding)
 
     QRect rect(-this->m_padding,
                -this->m_padding,
-               this->m_curFrame.width() + 2 * this->m_padding,
-               this->m_curFrame.height() + 2 * this->m_padding);
+               this->m_curFrameSize.width() + 2 * this->m_padding,
+               this->m_curFrameSize.height() + 2 * this->m_padding);
 
     for (int i = 0; i < this->m_particles.length(); i++)
         this->m_particles[i].setRect(rect);
@@ -255,18 +255,57 @@ void ParticleFallElement::resetInc()
     this->setInc(0.01);
 }
 
-void ParticleFallElement::iVideo(QImage *frame)
+QImage ParticleFallElement::byteArrayToImage(QByteArray *ba)
 {
-    QSize oldFrameSize = this->m_curFrame.size();
+    if (!ba)
+        return QImage();
 
-    this->m_curFrame = QImage(*frame);
+    QDataStream iDataStream(ba, QIODevice::ReadOnly);
+    int type;
 
-    if (this->m_curFrame.size() != oldFrameSize)
+    iDataStream >> type;
+
+    if (type != ARGB32)
+        return QImage();
+
+    int width;
+    int height;
+
+    iDataStream >> width >> height;
+
+    QByteArray pixels(4 * width * height, 0);
+    iDataStream.readRawData(pixels.data(), pixels.size());
+
+    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
+}
+
+void ParticleFallElement::imageToByteArray(QImage *image, QByteArray *ba)
+{
+    if (!image || !ba)
+        return;
+
+    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+
+    oDataStream << ARGB32 << image->width() << image->height();
+    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
+}
+
+void ParticleFallElement::iStream(QByteArray *data)
+{
+    QImage iFrame = this->byteArrayToImage(data);
+
+    if (iFrame.isNull())
+        return;
+
+    QSize oldFrameSize = this->m_curFrameSize;
+    this->m_curFrameSize = iFrame.size();
+
+    if (this->m_curFrameSize != oldFrameSize)
         this->setPadding(this->padding());
 
     QPainter painter;
 
-    painter.begin(&this->m_curFrame);
+    painter.begin(&iFrame);
 
     for (int particle = 0; particle < this->m_particles.length(); particle++)
         painter.drawImage(this->m_particles[particle].pos(),
@@ -274,22 +313,15 @@ void ParticleFallElement::iVideo(QImage *frame)
 
     painter.end();
 
-    emit(oVideo(&this->m_curFrame));
+    this->imageToByteArray(&iFrame, &this->m_bCurFrame);
+
+    emit(oStream(&this->m_bCurFrame));
 
     for (int particle = 0; particle < this->m_particles.length(); particle++)
         this->m_particles[particle]++;
 }
 
-void ParticleFallElement::iAudio(QByteArray *frame)
+void ParticleFallElement::setPipeline(Pipeline *pipeline)
 {
-    Q_UNUSED(frame)
-}
-
-void ParticleFallElement::configure()
-{
-}
-
-void ParticleFallElement::setManager(QObject *manager)
-{
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }

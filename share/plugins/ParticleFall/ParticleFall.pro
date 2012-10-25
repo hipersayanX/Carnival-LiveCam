@@ -32,6 +32,7 @@ CONFIG += plugin
 HEADERS += \
     include/plugin.h \
     include/element.h \
+    include/pipeline.h \
     include/particle.h \
     include/particlefall.h \
     include/particlefallelement.h

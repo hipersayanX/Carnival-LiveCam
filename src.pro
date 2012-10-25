@@ -26,11 +26,10 @@ exists(commons.pri) {
 CONFIG += qt
 
 HEADERS += \
-    include/core/core.h \
     include/plugin/plugin.h \
     include/plugin/element.h \
-    include/plugin/plugininfo.h \
-    include/plugin/pluginmanager.h
+    include/plugin/pipeline.h \
+    include/plugin/mainpipeline.h
 
 INCLUDEPATH += include
 
@@ -38,9 +37,7 @@ QT += core gui widgets
 
 SOURCES += \
     src/main.cpp \
-    src/core/core.cpp \
-    src/plugin/plugininfo.cpp \
-    src/plugin/pluginmanager.cpp
+    src/plugin/mainpipeline.cpp
 
 TARGET = $${COMMONS_TARGET}
 

@@ -39,27 +39,61 @@ bool RenderModelElement::stop()
     return true;
 }
 
-void RenderModelElement::iVideo(QImage *frame)
+QImage RenderModelElement::byteArrayToImage(QByteArray *ba)
 {
-    this->m_ogl.resize(frame->size());
-    this->m_ogl.setImage(*frame);
-    this->m_image = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
+    if (!ba)
+        return QImage();
 
-    emit(oVideo(&this->m_image));
+    QDataStream iDataStream(ba, QIODevice::ReadOnly);
+    int type;
+
+    iDataStream >> type;
+
+    if (type != ARGB32)
+        return QImage();
+
+    int width;
+    int height;
+
+    iDataStream >> width >> height;
+
+    QByteArray pixels(4 * width * height, 0);
+    iDataStream.readRawData(pixels.data(), pixels.size());
+
+    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
 }
 
-void RenderModelElement::iAudio(QByteArray *frame)
+void RenderModelElement::imageToByteArray(QImage *image, QByteArray *ba)
 {
-    Q_UNUSED(frame)
+    if (!image || !ba)
+        return;
+
+    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+
+    oDataStream << ARGB32 << image->width() << image->height();
+    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
 }
 
-void RenderModelElement::configure()
+void RenderModelElement::iStream(QByteArray *data)
 {
+    QImage iFrame = this->byteArrayToImage(data);
+
+    if (iFrame.isNull())
+        return;
+
+    this->m_ogl.resize(iFrame.size());
+    this->m_ogl.setImage(iFrame);
+
+    QImage image = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
+
+    this->imageToByteArray(&image, &this->m_bImage);
+
+    emit(oStream(&this->m_bImage));
 }
 
-void RenderModelElement::setManager(QObject *manager)
+void RenderModelElement::setPipeline(Pipeline *pipeline)
 {
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }
 
 void RenderModelElement::setModelFileName(QString modelFileName)

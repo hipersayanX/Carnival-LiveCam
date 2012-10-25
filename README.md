@@ -52,8 +52,8 @@ To obtain a copy of [Carnival LiveCam](https://github.com/hipersayanX/Carnival-L
 To compile and run [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) run the following command:
 
     cd Carnival-LiveCam
-    ./build_all.sh
-    ./Carnival-LiveCam
+    qmake
+    make
 
 To compile and run [Carnival LiveCam](https://github.com/hipersayanX/Carnival-LiveCam) need the following software packages:
 

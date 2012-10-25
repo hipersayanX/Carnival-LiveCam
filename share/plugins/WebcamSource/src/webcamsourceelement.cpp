@@ -43,14 +43,20 @@ int WebcamSourceElement::fps()
     return this->m_fps;
 }
 
-void WebcamSourceElement::iVideo(QImage *frame)
+void WebcamSourceElement::imageToByteArray(QImage *image, QByteArray *ba)
 {
-    Q_UNUSED(frame)
+    if (!image || !ba)
+        return;
+
+    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+
+    oDataStream << ARGB32 << image->width() << image->height();
+    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
 }
 
-void WebcamSourceElement::iAudio(QByteArray *frame)
+void WebcamSourceElement::iStream(QByteArray *data)
 {
-    Q_UNUSED(frame)
+    Q_UNUSED(data)
 }
 
 bool WebcamSourceElement::start()
@@ -79,13 +85,9 @@ bool WebcamSourceElement::stop()
     return true;
 }
 
-void WebcamSourceElement::configure()
+void WebcamSourceElement::setPipeline(Pipeline *pipeline)
 {
-}
-
-void WebcamSourceElement::setManager(QObject *manager)
-{
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }
 
 void WebcamSourceElement::setDevice(QString device)
@@ -149,9 +151,12 @@ void WebcamSourceElement::timeout()
     this->m_webcam >> matFrame;
 
     // and convert it to QImage.
-    QImage qtFrame((const uchar *)matFrame.data, matFrame.cols, matFrame.rows, QImage::Format_RGB888);
+    QImage image = QImage((const uchar *) matFrame.data,
+                           matFrame.cols,
+                           matFrame.rows,
+                           QImage::Format_RGB888).rgbSwapped().convertToFormat(QImage::Format_ARGB32);
 
-    this->m_curFrame = qtFrame.rgbSwapped();
+    this->imageToByteArray(&image, &this->m_curFrame);
 
-    emit(oVideo(&this->m_curFrame));
+    emit(oStream(&this->m_curFrame));
 }

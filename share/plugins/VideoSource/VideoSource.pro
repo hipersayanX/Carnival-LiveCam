@@ -32,6 +32,7 @@ CONFIG += plugin
 HEADERS += \
     include/plugin.h \
     include/element.h \
+    include/pipeline.h \
     include/videosourceelement.h \
     include/videosource.h
 

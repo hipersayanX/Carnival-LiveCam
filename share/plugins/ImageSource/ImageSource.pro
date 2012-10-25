@@ -34,6 +34,7 @@ CONFIG += plugin
 HEADERS += \
     include/plugin.h \
     include/element.h \
+    include/pipeline.h \
     include/imagesourceelement.h \
     include/imagesource.h
 

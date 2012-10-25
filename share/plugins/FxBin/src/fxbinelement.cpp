@@ -23,14 +23,9 @@ FxBinElement::FxBinElement()
 {
 }
 
-void FxBinElement::iVideo(QImage *frame)
+void FxBinElement::iStream(QByteArray *data)
 {
-    Q_UNUSED(frame)
-}
-
-void FxBinElement::iAudio(QByteArray *frame)
-{
-    Q_UNUSED(frame)
+    Q_UNUSED(data)
 }
 
 bool FxBinElement::start()
@@ -43,11 +38,7 @@ bool FxBinElement::stop()
     return true;
 }
 
-void FxBinElement::configure()
+void FxBinElement::setPipeline(Pipeline *pipeline)
 {
-}
-
-void FxBinElement::setManager(QObject *manager)
-{
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }

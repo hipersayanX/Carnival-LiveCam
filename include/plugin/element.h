@@ -28,12 +28,21 @@
 
 #include <QtGui>
 
+#include "pipeline.h"
+
 /// Plugin template.
 class Element: public QObject
 {
     Q_OBJECT
+    Q_ENUMS(StreamFormats)
 
     public:
+        enum StreamFormats
+        {
+            ARGB32, // This is a image frame stored in 32-bit ARGB format (0xAARRGGBB).
+            S16LE   // This is a PCM audio frame stored in signed 16-bit little-endian format.
+        };
+
         /// This function is called after Plugin::setConfigs().
         /// This method executes the initialization code for the plugin.
         Q_INVOKABLE virtual bool start() = 0;
@@ -43,19 +52,14 @@ class Element: public QObject
         Q_INVOKABLE virtual bool stop() = 0;
 
     signals:
-        // Output Channels
-        void oVideo(QImage *frame);
-        void oAudio(QByteArray *frame);
+        // Output Channel
+        void oStream(QByteArray *data);
+        void requestPipeline();
 
     public slots:
-        // Input Channels
-        virtual void iVideo(QImage *frame) = 0;
-        virtual void iAudio(QByteArray *frame) = 0;
-
-        /// Calls the configuration dialog of the plugin.
-        virtual void configure() = 0;
-
-        virtual void setManager(QObject *manager) = 0;
+        // Input Channel
+        virtual void iStream(QByteArray *data) = 0;
+        virtual void setPipeline(Pipeline *pipeline) = 0;
 };
 
 #endif // ELEMENT_H

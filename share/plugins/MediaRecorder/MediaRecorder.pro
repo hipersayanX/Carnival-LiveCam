@@ -30,8 +30,9 @@ exists(commons.pri) {
 CONFIG += plugin
 
 HEADERS += \
-    include/element.h \
     include/plugin.h \
+    include/element.h \
+    include/pipeline.h \
     include/mediarecorder.h \
     include/mediarecorderelement.h
 

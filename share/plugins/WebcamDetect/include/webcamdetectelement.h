@@ -51,11 +51,8 @@ class WebcamDetectElement: public Element
 
     public slots:
         // Input Channels
-        void iVideo(QImage *frame);
-        void iAudio(QByteArray *frame);
-
-        void configure();
-        void setManager(QObject *manager);
+        void iStream(QByteArray *data);
+        void setPipeline(Pipeline *pipeline);
 
         void updateWebcams();
 

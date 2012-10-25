@@ -47,18 +47,17 @@ class WebcamSourceElement: public Element
         int m_fps;
         cv::VideoCapture m_webcam;
         QTimer m_timer;
-        QImage m_curFrame;
+        QByteArray m_curFrame;
+
+        void imageToByteArray(QImage *image, QByteArray *ba);
 
     signals:
         void fail();
 
     public slots:
         // Input Channels
-        void iVideo(QImage *frame);
-        void iAudio(QByteArray *frame);
-
-        void configure();
-        void setManager(QObject *manager);
+        void iStream(QByteArray *data);
+        void setPipeline(Pipeline *pipeline);
 
         void setDevice(QString device);
         void setSize(QSize size);

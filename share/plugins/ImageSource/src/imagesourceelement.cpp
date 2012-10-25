@@ -24,19 +24,25 @@ ImageSourceElement::ImageSourceElement()
     this->resetFileName();
 }
 
-void ImageSourceElement::iVideo(QImage *frame)
+void ImageSourceElement::imageToByteArray(QImage *image, QByteArray *ba)
 {
-    Q_UNUSED(frame)
+    if (!image || !ba)
+        return;
+
+    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+
+    oDataStream << ARGB32 << image->width() << image->height();
+    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
 }
 
-void ImageSourceElement::iAudio(QByteArray *frame)
+void ImageSourceElement::iStream(QByteArray *data)
 {
-    Q_UNUSED(frame)
+    Q_UNUSED(data)
 }
 
 bool ImageSourceElement::start()
 {
-    emit(oVideo(&this->m_image));
+    emit(oStream(&this->m_bImage));
 
     return true;
 }
@@ -46,13 +52,9 @@ bool ImageSourceElement::stop()
     return true;
 }
 
-void ImageSourceElement::configure()
+void ImageSourceElement::setPipeline(Pipeline *pipeline)
 {
-}
-
-void ImageSourceElement::setManager(QObject *manager)
-{
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }
 
 QString ImageSourceElement::fileName()
@@ -63,7 +65,14 @@ QString ImageSourceElement::fileName()
 void ImageSourceElement::setFileName(QString fileSource)
 {
     this->m_fileName = fileSource;
-    this->m_image = QImage(this->m_fileName);
+
+    if (this->m_fileName == "")
+        this->m_bImage.clear();
+    else
+    {
+        QImage image(this->m_fileName);
+        this->imageToByteArray(&image, &this->m_bImage);
+    }
 }
 
 void ImageSourceElement::resetFileName()

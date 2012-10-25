@@ -32,6 +32,7 @@ CONFIG += plugin
 HEADERS += \
     include/plugin.h \
     include/element.h \
+    include/pipeline.h \
     include/rendermodel.h \
     include/rendermodelelement.h \
     include/rendermodelgl.h

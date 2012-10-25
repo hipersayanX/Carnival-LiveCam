@@ -64,14 +64,9 @@ QList<QStringList> WebcamDetectElement::webcams(QString dir)
     return webcams;
 }
 
-void WebcamDetectElement::iVideo(QImage *frame)
+void WebcamDetectElement::iStream(QByteArray *data)
 {
-    Q_UNUSED(frame)
-}
-
-void WebcamDetectElement::iAudio(QByteArray *frame)
-{
-    Q_UNUSED(frame)
+    Q_UNUSED(data)
 }
 
 bool WebcamDetectElement::start()
@@ -98,13 +93,9 @@ bool WebcamDetectElement::stop()
     return true;
 }
 
-void WebcamDetectElement::configure()
+void WebcamDetectElement::setPipeline(Pipeline *pipeline)
 {
-}
-
-void WebcamDetectElement::setManager(QObject *manager)
-{
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }
 
 template <typename T>  QList<T> WebcamDetectElement::substractList(QList<T> a, QList<T> b)

@@ -84,11 +84,41 @@ bool MediaRecorderElement::stop()
     return true;
 }
 
-void MediaRecorderElement::iVideo(QImage *frame)
+QImage MediaRecorderElement::byteArrayToImage(QByteArray *ba)
 {
+    if (!ba)
+        return QImage();
+
+    QDataStream iDataStream(ba, QIODevice::ReadOnly);
+    int type;
+
+    iDataStream >> type;
+
+    if (type != ARGB32)
+        return QImage();
+
+    int width;
+    int height;
+
+    iDataStream >> width >> height;
+
+    QByteArray pixels(4 * width * height, 0);
+    iDataStream.readRawData(pixels.data(), pixels.size());
+
+    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
+}
+
+void MediaRecorderElement::iStream(QByteArray *data)
+{
+    QImage iFrame = this->byteArrayToImage(data);
+
+    if (iFrame.isNull())
+        return;
+
     this->m_currentFrame = QImage(this->m_size, QImage::Format_RGB888);
     this->m_currentFrame.fill(QColor(0, 0, 0));
-    QImage scaledFrame(frame->scaled(this->m_size, Qt::KeepAspectRatio));
+
+    QImage scaledFrame(iFrame.scaled(this->m_size, Qt::KeepAspectRatio));
     QPoint point((this->m_size.width() - scaledFrame.width()) >> 1,
                  (this->m_size.height() - scaledFrame.height()) >> 1);
 
@@ -101,18 +131,9 @@ void MediaRecorderElement::iVideo(QImage *frame)
     this->m_outvideoStream.writeRawData((const char *)this->m_currentFrame.constBits(), this->m_currentFrame.byteCount());
 }
 
-void MediaRecorderElement::iAudio(QByteArray *frame)
+void MediaRecorderElement::setPipeline(Pipeline *pipeline)
 {
-    Q_UNUSED(frame)
-}
-
-void MediaRecorderElement::configure()
-{
-}
-
-void MediaRecorderElement::setManager(QObject *manager)
-{
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }
 
 void MediaRecorderElement::setVideoFormats(QMap<QString, QVariant> videoFormats)

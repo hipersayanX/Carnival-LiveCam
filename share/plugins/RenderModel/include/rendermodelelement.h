@@ -40,15 +40,15 @@ class RenderModelElement: public Element
     private:
         QString m_modelFileName;
         RenderModelGL m_ogl;
-        QImage m_image;
+        QByteArray m_bImage;
+
+        QImage byteArrayToImage(QByteArray *ba);
+        void imageToByteArray(QImage *image, QByteArray *ba);
 
     public slots:
         // Input Channels
-        void iVideo(QImage *frame);
-        void iAudio(QByteArray *frame);
-
-        void configure();
-        void setManager(QObject *manager);
+        void iStream(QByteArray *data);
+        void setPipeline(Pipeline *pipeline);
 
         void setModelFileName(QString modelFileName);
         void resetModelFileName();

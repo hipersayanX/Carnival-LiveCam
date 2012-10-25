@@ -37,15 +37,15 @@ class ImageSourceElement: public Element
 
     private:
         QString m_fileName;
-        QImage m_image;
+        QByteArray m_bImage;
+
+        void imageToByteArray(QImage *image, QByteArray *ba);
 
     public slots:
         // Input Channels
-        void iVideo(QImage *frame);
-        void iAudio(QByteArray *frame);
+        void iStream(QByteArray *data);
 
-        void configure();
-        void setManager(QObject *manager);
+        void setPipeline(Pipeline *pipeline);
 
         void setFileName(QString fileName);
         void resetFileName();

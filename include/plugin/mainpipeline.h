@@ -17,37 +17,39 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef PLUGINMANAGER_H
-#define PLUGINMANAGER_H
+#ifndef MAINPIPELINE_H
+#define MAINPIPELINE_H
 
 #include "plugin.h"
-#include "plugininfo.h"
 
-class PluginManager: public QObject
+class MainPipeline: public Pipeline
 {
     Q_OBJECT
+    Q_ENUMS(PipelineRoutingMode)
 
-    Q_PROPERTY(PipelineRoutingMode pipelineRoutingMode
-               READ pipelineRoutingMode
-               WRITE setPipelineRoutingMode
-               RESET resetPipelineRoutingMode)
+        Q_PROPERTY(QStringList pluginsPaths
+                   READ pluginsPaths
+                   WRITE setPluginsPaths
+                   RESET resetPluginsPaths)
+
+        Q_PROPERTY(QVariantMap pluginList
+                   READ pluginList)
+
+        Q_PROPERTY(PipelineRoutingMode pipelineRoutingMode
+                   READ pipelineRoutingMode
+                   WRITE setPipelineRoutingMode
+                   RESET resetPipelineRoutingMode)
 
     /// Enumerator for pipeline diff operations
     public:
-        /// Actions to do if some element doesn't exist
-        typedef enum _PipelineRoutingMode
-        {
-            NoCheck, // Build the pipeline as is.
-            Fail,    // If an element doesn't exist return a void graph.
-            Remove,  // If an element doesn't exist return a graph without the
-                     // element and it's connections.
-            Force    // If an element doesn't exist try to connect all elements
-                     // connected to the lost element.
-        } PipelineRoutingMode;
+        explicit MainPipeline(QObject *parent = 0);
+        MainPipeline(const MainPipeline &object);
+        MainPipeline& operator =(const MainPipeline &other);
 
-        explicit PluginManager(QObject *parent = 0);
-        Q_INVOKABLE QList<QVariant> pluginList();
-        PipelineRoutingMode pipelineRoutingMode();
+        Q_INVOKABLE void loadPlugins();
+        Q_INVOKABLE QStringList pluginsPaths();
+        Q_INVOKABLE QVariantMap pluginList();
+        Q_INVOKABLE PipelineRoutingMode pipelineRoutingMode();
 
         Q_INVOKABLE bool startElement(QString elementId);
         Q_INVOKABLE bool stopElement(QString elementId);
@@ -55,27 +57,36 @@ class PluginManager: public QObject
         Q_INVOKABLE bool removeElement(QString elementId);
         Q_INVOKABLE bool setElementProperty(QString elementId, QString property, QVariant value);
         Q_INVOKABLE bool resetElementProperty(QString elementId, QString property);
+
         Q_INVOKABLE bool connectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
+        Q_INVOKABLE bool connectElementsSS(QString senderId, QString signal, const QObject *receiver, const char *slot);
+        Q_INVOKABLE bool connectElementsSS(const QObject *sender, const char *signal, QString receiverId, QString slot);
         Q_INVOKABLE bool disconnectElementsSS(QString senderId, QString signal, QString receiverId, QString slot);
+        Q_INVOKABLE bool disconnectElementsSS(QString senderId, QString signal, const QObject *receiver, const char *slot);
+        Q_INVOKABLE bool disconnectElementsSS(const QObject *sender, const char *signal, QString receiverId, QString slot);
+
         Q_INVOKABLE bool connectElements(QString senderId, QString receiverId);
+        Q_INVOKABLE bool connectElements(QString senderId, const QObject *receiver, const char *slot);
+        Q_INVOKABLE bool connectElements(const QObject *sender, const char *signal, QString receiverId);
         Q_INVOKABLE bool disconnectElements(QString senderId, QString receiverId);
-        Q_INVOKABLE bool setParentElements(QString elementId, QString parentId);
+        Q_INVOKABLE bool disconnectElements(QString senderId, const QObject *receiver, const char *slot);
+        Q_INVOKABLE bool disconnectElements(const QObject *sender, const char *signal, QString receiverId);
 
     private:
+        QStringList m_pluginsPaths;
+        QVariantMap m_pluginList;
+        PipelineRoutingMode m_pipelineRoutingMode;
+
         QPluginLoader m_pluginLoader;
         QMap<QString, Plugin *> m_plugins;
         QMap<QString, Element *> m_elements;
-        QMap<QString, PluginInfo> m_pluginsInfo;
         QList<int> m_usedIds;
         int m_curId;
 
         // Previous pipeline graph.
-        QMap<QString, QVariant> m_instances1; // Nodes
-        QList<QStringList> m_connections1;    // Edges
-        QList<QStringList> m_ss1;             // Signals & Slots
-
-        QStringList m_availableElementTypes;
-        PipelineRoutingMode m_pipelineRoutingMode;
+        QMap<QString, QVariantList> m_instances1; // Nodes
+        QList<QStringList> m_connections1;        // Edges
+        QList<QStringList> m_ss1;                 // Signals & Slots
 
         QMap<QString, QString> m_regexpDict;
 
@@ -89,26 +100,26 @@ class PluginManager: public QObject
         void removeId(int id);
 
         QStringList regexpFindAll(QString regexp, QString text);
-        QString bestMatchId(QMap<QString, QVariant> instances1, QMap<QString, QVariant> instances2, QString id2);
+        QString bestMatchId(QMap<QString, QVariantList> instances1, QMap<QString, QVariantList> instances2, QString id2);
 
         QString changeId(QString srcId,
                          QString dstId,
-                         QMap<QString, QVariant> *instances,
+                         QMap<QString, QVariantList> *instances,
                          QList<QStringList> *connections,
                          QList<QStringList> *ss);
 
-        void alignPipelines(QMap<QString, QVariant> instances1,
-                            QMap<QString, QVariant> *instances2,
+        void alignPipelines(QMap<QString, QVariantList> instances1,
+                            QMap<QString, QVariantList> *instances2,
                             QList<QStringList> *connections2,
                             QList<QStringList> *ss2);
 
         template <typename T> QList<T> subtractLists(QList<T> list1, QList<T> list2);
 
-        QStringList subtractMapKeys(QMap<QString, QVariant> instances1,
-                               QMap<QString, QVariant> instances2);
+        QStringList subtractMapKeys(QMap<QString, QVariantList> instances1,
+                                    QMap<QString, QVariantList> instances2);
 
-        QList<QMap<QString, QStringList> > propertiesDiff(const QMap<QString, QVariant> &instances1,
-                                                          const QMap<QString, QVariant> &instances2);
+        QList<QMap<QString, QStringList> > propertiesDiff(const QMap<QString, QVariantList> &instances1,
+                                                          const QMap<QString, QVariantList> &instances2);
 
         QVariant parseValue(QString value);
         QStringList parseSignalSlotLt(QString id, QString element);
@@ -116,15 +127,19 @@ class PluginManager: public QObject
         QStringList parseSignalSlot(QString id, QString element);
 
         bool parsePipeline(QString pipeline,
-                           QMap<QString, QVariant> *instances,
+                           QMap<QString, QVariantList> *instances,
                            QList<QStringList> *connections,
                            QList<QStringList> *ss);
 
     public slots:
-        void setPipeline(QString pipeline2);
-        void setPipelineRoutingMode(QString mode);
+        void setPipeline(QString pipeline);
+        void setPluginsPaths(QStringList pluginsPaths);
         void setPipelineRoutingMode(PipelineRoutingMode mode);
+        void resetPluginsPaths();
         void resetPipelineRoutingMode();
+
+    private slots:
+        void assignPipeline();
 };
 
-#endif // PLUGINMANAGER_H
+#endif // MAINPIPELINE_H

@@ -19,7 +19,8 @@
 
 #include <QtWidgets>
 
-#include "core/core.h"
+#include "plugin/mainpipeline.h"
+
 /*!
   \mainpage About Carnival LiveCam
 
@@ -85,7 +86,14 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    Core core;
+    MainPipeline mainPipeline;
+
+    mainPipeline.setPluginsPaths(QStringList() << "share/plugins");
+    mainPipeline.loadPlugins();
+
+    mainPipeline.setPipeline("WebcamDetect ! " \
+                             "WebcamSource device=/dev/video0 size=size(640, 480) fps=30 ! " \
+                             "MediaRecorder");
 
     return app.exec();
 }

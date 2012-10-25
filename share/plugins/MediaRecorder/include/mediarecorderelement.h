@@ -55,22 +55,21 @@ class MediaRecorderElement: public Element
         QString m_ffmpegPath;
         bool m_showOutput;
         bool m_recording;
-
         QImage m_currentFrame;
         QFile m_videoPipe;
         QDataStream m_outvideoStream;
         QString m_videoPipeFilename;
         QProcess m_ffmpeg;
 
+        QImage byteArrayToImage(QByteArray *ba);
+
     signals:
         void fail();
 
     public slots:
         // Input Channels
-        void iVideo(QImage *frame);
-        void iAudio(QByteArray *frame);
-        void configure();
-        void setManager(QObject *manager);
+        void iStream(QByteArray *data);
+        void setPipeline(Pipeline *pipeline);
 
         void setVideoFormats(QMap<QString, QVariant> videoFormats);
         void setFps(int fps);

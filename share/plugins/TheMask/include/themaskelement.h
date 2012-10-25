@@ -43,9 +43,12 @@ class TheMaskElement: public Element
     private:
         QString m_haarCascadeFile;
         QString m_sprite;
-        QImage m_curFrame;
+        QByteArray m_curFrame;
         QImage m_maskImage;
         cv::CascadeClassifier m_cascadeClassifier;
+
+        QImage byteArrayToImage(QByteArray *ba);
+        void imageToByteArray(QImage *image, QByteArray *ba);
 
     public slots:
         void setHaarCascadeFile(QString haarCascadeFile);
@@ -53,10 +56,8 @@ class TheMaskElement: public Element
         void resetHaarCascadeFile();
         void resetSprite();
 
-        void iVideo(QImage *frame);
-        void iAudio(QByteArray *frame);
-        void configure();
-        void setManager(QObject *manager);
+        void iStream(QByteArray *data);
+        void setPipeline(Pipeline *pipeline);
 };
 
 #endif // THEMASKELEMENT_H

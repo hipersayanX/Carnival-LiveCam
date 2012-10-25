@@ -68,7 +68,11 @@ class ParticleFallElement: public Element
         float m_inc;
         QList<QImage> m_pixmaps;
         QList<Particle> m_particles;
-        QImage m_curFrame;
+        QByteArray m_bCurFrame;
+        QSize m_curFrameSize;
+
+        QImage byteArrayToImage(QByteArray *ba);
+        void imageToByteArray(QImage *image, QByteArray *ba);
 
     public slots:
         void setNParticles(int nParticles);
@@ -92,10 +96,8 @@ class ParticleFallElement: public Element
         void resetSprites();
         void resetInc();
 
-        void iVideo(QImage *frame);
-        void iAudio(QByteArray *frame);
-        void configure();
-        void setManager(QObject *manager);
+        void iStream(QByteArray *data);
+        void setPipeline(Pipeline *pipeline);
 };
 
 #endif // PARTICLEFALLELEMENT_H

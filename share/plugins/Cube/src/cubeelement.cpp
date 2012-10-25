@@ -51,27 +51,61 @@ bool CubeElement::stop()
     return true;
 }
 
-void CubeElement::iVideo(QImage *frame)
+QImage CubeElement::byteArrayToImage(QByteArray *ba)
 {
-    this->m_ogl.resize(frame->size());
-    this->m_ogl.setImage(*frame);
-    this->m_image = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
+    if (!ba)
+        return QImage();
 
-    emit(oVideo(&this->m_image));
+    QDataStream iDataStream(ba, QIODevice::ReadOnly);
+    int type;
+
+    iDataStream >> type;
+
+    if (type != ARGB32)
+        return QImage();
+
+    int width;
+    int height;
+
+    iDataStream >> width >> height;
+
+    QByteArray pixels(4 * width * height, 0);
+    iDataStream.readRawData(pixels.data(), pixels.size());
+
+    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
 }
 
-void CubeElement::iAudio(QByteArray *frame)
+void CubeElement::imageToByteArray(QImage *image, QByteArray *ba)
 {
-    Q_UNUSED(frame)
+    if (!image || !ba)
+        return;
+
+    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+
+    oDataStream << ARGB32 << image->width() << image->height();
+    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
 }
 
-void CubeElement::configure()
+void CubeElement::iStream(QByteArray *data)
 {
+    QImage iFrame = this->byteArrayToImage(data);
+
+    if (iFrame.isNull())
+        return;
+
+    this->m_ogl.resize(iFrame.size());
+    this->m_ogl.setImage(iFrame);
+
+    QImage image = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
+
+    this->imageToByteArray(&image, &this->m_bImage);
+
+    emit(oStream(&this->m_bImage));
 }
 
-void CubeElement::setManager(QObject *manager)
+void CubeElement::setPipeline(Pipeline *pipeline)
 {
-    Q_UNUSED(manager)
+    Q_UNUSED(pipeline)
 }
 
 void CubeElement::setXrot(float xrot)
