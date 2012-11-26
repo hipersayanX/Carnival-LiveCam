@@ -19,37 +19,52 @@
 #
 # Image driver for linux
 
-CONFIG += plugin
+exists(commons.pri) {
+    include(commons.pri)
+} else {
+    exists(../../../commons.pri) {
+        include(../../../commons.pri)
+    } else {
+        error("commons.pri file not found.")
+    }
+}
 
-DESTDIR += $$PWD
+CONFIG += plugin
 
 HEADERS += \
     include/element.h \
+    include/pipeline.h \
     include/plugin.h \
     include/space.h \
-    include/spacecontrols.h \
-    include/spacemanager.h \
-    include/spacemodel.h \
-    include/spacewidget.h
+    include/spaceselement.h \
+    include/spaceswidget.h \
+    include/spaces.h
 
-MOC_DIR += $$PWD/build
+INCLUDEPATH += include
 
-OBJECTS_DIR += $$PWD/build
+OTHER_FILES += \
+    Spaces.json
 
-QT += core gui
-
-RCC_DIR += $$PWD/build
+QT += core gui widgets
 
 SOURCES += \
     src/space.cpp \
-    src/spacecontrols.cpp \
-    src/spacemanager.cpp \
-    src/spacemodel.cpp \
-    src/spacewidget.cpp
+    src/spaceselement.cpp \
+    src/spaceswidget.cpp \
+    src/spaces.cpp
 
 TEMPLATE = lib
 
-UI_DIR += $$PWD/build
-
 FORMS += \
-    ui/spacecontrols.ui
+    share/ui/space.ui
+
+# Install rules
+
+INSTALLS += target \
+            data
+
+target.files = $$TARGET
+target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
+
+data.files = share/*
+data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share

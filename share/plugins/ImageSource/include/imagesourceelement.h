@@ -44,8 +44,9 @@ class ImageSourceElement: public Element
     public slots:
         // Input Channels
         void iStream(QByteArray *data);
-
+        void iEvent(QEvent *event);
         void setPipeline(Pipeline *pipeline);
+        void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 
         void setFileName(QString fileName);
         void resetFileName();

@@ -46,6 +46,8 @@ class TheMaskElement: public Element
         QByteArray m_curFrame;
         QImage m_maskImage;
         cv::CascadeClassifier m_cascadeClassifier;
+        QList<Element *> m_srcs;
+        QList<Element *> m_sinks;
 
         QImage byteArrayToImage(QByteArray *ba);
         void imageToByteArray(QImage *image, QByteArray *ba);
@@ -57,7 +59,9 @@ class TheMaskElement: public Element
         void resetSprite();
 
         void iStream(QByteArray *data);
+        void iEvent(QEvent *event);
         void setPipeline(Pipeline *pipeline);
+        void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 };
 
 #endif // THEMASKELEMENT_H

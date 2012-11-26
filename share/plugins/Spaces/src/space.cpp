@@ -18,436 +18,40 @@
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
 #include <cmath>
-#include <QtDebug>
-#include <QtAlgorithms>
 
-#include "../../include/space/space.h"
+#include "space.h"
 
-Space::Space(QObject *parent): QObject(parent)
+class SpacesWidget;
+
+Space::Space(QWidget *parent): QWidget(parent)
 {
-    this->m_spaceId = "";
-    this->m_nParts = 1;
-    this->m_center = QPointF(0, 0);
-    this->m_CenterRef = QPointF(0, 0);
-    this->m_size = QSizeF(0, 0);
-    this->m_sizeRef = QSizeF(0, 0);
-    this->m_scale = 1;
-    this->m_scaleRef = 1;
-    this->m_rotation = 0;
-    this->m_rotationRef = 0;
-    this->m_maximized = false;
+    this->setupUi(this);
+    this->setLayout(this->gridLayout);
 
-    this->setSnapping(false, 1, 0, 0);
+    this->btnScaleAndRotate->installEventFilter(this);
+    this->btnScaleAndRotate->hide();
+    this->lblFrame->installEventFilter(this);
+
+    this->m_proxy = nullptr;
+
+    this->m_move = false;
+    this->m_rotateScale = false;
+    this->m_editMode = false;
+    this->m_fstFrame = true;
+
+    this->resetEditMode();
+    this->resetSnapping();
+    this->resetNParts();
+    this->resetSnappingPT();
+    this->resetSnappingRT();
+    this->resetButtonText();
+    this->resetButtonIcon();
+    this->resetButtonStyleSheet();
 }
 
-Space::Space(const Space &object):
-    QObject(object.parent()),
-    m_snapAngles(object.m_snapAngles),
-    m_spaceId(object.m_spaceId),
-    m_nParts(object.m_nParts),
-    m_center(object.m_center),
-    m_CenterRef(object.m_CenterRef),
-    m_size(object.m_size),
-    m_sizeRef(object.m_sizeRef),
-    m_snapping(object.m_snapping),
-    m_snappingPT(object.m_snappingPT),
-    m_snappingRT(object.m_snappingRT),
-    m_scale(object.m_scale),
-    m_scaleRef(object.m_scaleRef),
-    m_rotation(object.m_rotation),
-    m_rotationRef(object.m_rotationRef),
-    m_maximized(object.m_maximized)
+bool Space::editMode()
 {
-}
-
-Space::Space(QString spaceId,
-             QPointF center,
-             QSizeF size,
-             qreal scale,
-             qreal rotation):
-                m_spaceId(spaceId),
-                m_center(center),
-                m_CenterRef(center),
-                m_size(size),
-                m_sizeRef(size),
-                m_scale(scale),
-                m_scaleRef(scale),
-                m_rotation(rotation),
-                m_rotationRef(rotation),
-                m_maximized(false)
-{
-    this->setSnapping(false, 1, 0, 0);
-}
-
-Space& Space::operator =(const Space &other)
-{
-    if (this != &other)
-    {
-        this->m_snapAngles = other.m_snapAngles;
-        this->m_spaceId = other.m_spaceId;
-        this->m_nParts = other.m_nParts;
-        this->m_center = other.m_center;
-        this->m_CenterRef = other.m_CenterRef;
-        this->m_size = other.m_size;
-        this->m_sizeRef = other.m_sizeRef;
-        this->m_snapping = other.m_snapping;
-        this->m_snappingPT = other.m_snappingPT;
-        this->m_snappingRT = other.m_snappingRT;
-        this->m_scale = other.m_scale,
-        this->m_scaleRef = other.m_scaleRef,
-        this->m_rotation = other.m_rotation;
-        this->m_rotationRef = other.m_rotationRef;
-        this->m_maximized = other.m_maximized;
-    }
-
-    return *this;
-}
-
-bool Space::operator ==(const Space &other) const
-{
-    return (this->m_snapAngles == other.m_snapAngles &&
-            this->m_spaceId == other.m_spaceId &&
-            this->m_nParts == other.m_nParts &&
-            this->m_center == other.m_center &&
-            this->m_CenterRef == other.m_CenterRef &&
-            this->m_size == other.m_size &&
-            this->m_sizeRef == other.m_sizeRef &&
-            this->m_snapping == other.m_snapping &&
-            this->m_snappingPT == other.m_snappingPT &&
-            this->m_snappingRT == other.m_snappingRT &&
-            this->m_scale == other.m_scale &&
-            this->m_scaleRef == other.m_scaleRef &&
-            this->m_rotation == other.m_rotation &&
-            this->m_rotationRef == other.m_rotationRef &&
-            this->m_maximized == other.m_maximized)? true: false;
-}
-
-bool Space::isMaximized()
-{
-    return this->m_maximized;
-}
-
-template <typename T> T Space::min(const QList<T> &list)
-{
-    QList<T> l = list;
-
-    qSort(l.begin(), l.end(), qLess<T>());
-
-    return l[0];
-}
-
-template <typename T> T Space::max(const QList<T> &list)
-{
-    QList<T> l = list;
-
-    qSort(l.begin(), l.end(), qGreater<T>());
-
-    return l[0];
-}
-
-void Space::toggleMaximized(const QList<qreal> &hLines, const QList<qreal> &vLines)
-{
-    this->m_maximized = !this->m_maximized;
-
-    if (this->m_maximized)
-    {
-        this->m_rotation = 0;
-
-        qreal left = (vLines.isEmpty())? -this->m_size.width() / 2: this->min(vLines);
-        qreal right = (vLines.isEmpty())? this->m_size.width() / 2: this->max(vLines);
-        qreal top = (vLines.isEmpty())? -this->m_size.height() / 2: this->min(hLines);
-        qreal bottom = (vLines.isEmpty())? this->m_size.height() / 2: this->max(hLines);
-
-        qreal width = right - left;
-        qreal height = bottom - top;
-
-        QSizeF size = this->m_size;
-        size.scale(width, height, Qt::KeepAspectRatio);
-
-        this->m_scale = size.width() / this->m_size.width();
-        this->m_center = QPointF(left + right, top + bottom) / 2;
-    }
-    else
-        this->resetStatus();
-}
-
-void Space::setSnapping(bool snapping, qint32 nParts, qreal snappingPT, qreal snappingRT)
-{
-    this->m_snapping = snapping;
-    this->m_nParts = nParts;
-    this->m_snappingPT = snappingPT;
-    this->m_snappingRT = snappingRT;
-
-    this->m_snapAngles.clear();
-
-    for (qreal angle = 0; angle < 2 * M_PI; angle += 2 * M_PI / nParts)
-        this->m_snapAngles << angle;
-}
-
-void Space::setRef()
-{
-    this->m_CenterRef = this->m_center;
-    this->m_sizeRef = this->m_size;
-    this->m_rotationRef = this->m_rotation;
-    this->m_scaleRef = this->m_scale;
-}
-
-void Space::resetStatus()
-{
-    this->m_center = this->m_CenterRef;
-    this->m_size = this->m_sizeRef;
-    this->m_rotation = this->m_rotationRef;
-    this->m_scale = this->m_scaleRef;
-}
-
-QList<qreal> Space::hLines()
-{
-    QRectF rect = this->boundingRect();
-    QList<qreal> lines;
-
-    lines << rect.top() << rect.bottom();
-
-    return lines;
-}
-
-QList<qreal> Space::vLines()
-{
-    QRectF rect = this->boundingRect();
-    QList<qreal> lines;
-
-    lines << rect.left() << rect.right();
-
-    return lines;
-}
-
-void Space::scaleAndRotate(qreal factor, qreal rotation, const QList<qreal> &hLines, const QList<qreal> &vLines)
-{
-    this->m_scale = factor;
-
-    while (true)
-    {
-        if (rotation > 2 * M_PI)
-            rotation -= 2 * M_PI;
-        else if (rotation < -2 * M_PI)
-            rotation += 2 * M_PI;
-        else
-            break;
-    }
-
-    this->m_rotation = (rotation < 0)? 2 * M_PI + rotation: rotation;
-
-    if (!this->m_snapping)
-        return;
-
-    if (!this->m_snapAngles.contains(this->m_rotation))
-        foreach (qreal angle, this->m_snapAngles)
-            if (fabs(this->m_rotation - angle) <= this->m_snappingRT)
-            {
-                this->m_rotation = angle;
-
-                break;
-            }
-
-    QRectF boundingBox = this->boundingRect();
-    QSizeF internalRect;
-
-    bool snapped = false;
-
-    foreach (qreal hLine, hLines)
-    {
-        foreach (qreal line, this->hLines())
-            if (fabs(line - hLine) <= this->m_snappingPT)
-            {
-                internalRect = this->internalRectSize(QSizeF(boundingBox.width(), boundingBox.height() + hLine - line));
-                this->m_scale = internalRect.width() / this->m_size.width();
-                snapped = true;
-
-                break;
-            }
-
-        if (snapped)
-            break;
-    }
-
-    snapped = false;
-
-    foreach (qreal vLine, vLines)
-    {
-        foreach (qreal line, this->vLines())
-            if (fabs(line - vLine) <= this->m_snappingPT)
-            {
-                internalRect = this->internalRectSize(QSizeF(boundingBox.width() + vLine - line, boundingBox.height()));
-                this->m_scale = internalRect.width() / this->m_size.width();
-                snapped = true;
-
-                break;
-            }
-
-        if (snapped)
-            break;
-    }
-}
-
-void Space::setScale(qreal factor, const QList<qreal> &hLines, const QList<qreal> &vLines)
-{
-    this->m_scale = factor;
-
-    if (!this->m_snapping)
-        return;
-
-    QRectF boundingBox = this->boundingRect();
-    QSizeF internalRect;
-
-    bool snapped = false;
-
-    foreach (qreal hLine, hLines)
-    {
-        foreach (qreal line, this->hLines())
-            if (fabs(line - hLine) <= this->m_snappingPT)
-            {
-                internalRect = this->internalRectSize(QSizeF(boundingBox.width(), boundingBox.height() + hLine - line));
-                this->m_scale = internalRect.width() / this->m_size.width();
-                snapped = true;
-
-                break;
-            }
-
-        if (snapped)
-            break;
-    }
-
-    snapped = false;
-
-    foreach (qreal vLine, vLines)
-    {
-        foreach (qreal line, this->vLines())
-            if (fabs(line - vLine) <= this->m_snappingPT)
-            {
-                internalRect = this->internalRectSize(QSizeF(boundingBox.width() + vLine - line, boundingBox.height()));
-                this->m_scale = internalRect.width() / this->m_size.width();
-                snapped = true;
-
-                break;
-            }
-
-        if (snapped)
-            break;
-    }
-}
-
-void Space::move(QPointF pos, const QList<qreal> &hLines, const QList<qreal> &vLines)
-{
-    this->m_center = pos;
-
-    if (!this->m_snapping)
-        return;
-
-    bool snapped = false;
-
-    foreach (qreal hLine, hLines)
-    {
-        foreach (qreal line, this->hLines())
-            if (fabs(line - hLine) <= this->m_snappingPT)
-            {
-                this->m_center += QPointF(0, hLine - line);
-                snapped = true;
-
-                break;
-            }
-
-        if (snapped)
-            break;
-    }
-
-    snapped = false;
-
-    foreach (qreal vLine, vLines)
-    {
-        foreach (qreal line, this->vLines())
-            if (fabs(line - vLine) <= this->m_snappingPT)
-            {
-                this->m_center += QPointF(vLine - line, 0);
-                snapped = true;
-
-                break;
-            }
-
-        if (snapped)
-            break;
-    }
-}
-
-QPointF Space::mapToLocal(QPointF point)
-{
-    QPointF p = point - this->m_center;
-
-    qreal x = p.x() *  cos(this->m_rotation) + p.y() * sin(this->m_rotation);
-    qreal y = p.x() * -sin(this->m_rotation) + p.y() * cos(this->m_rotation);
-
-    return QPointF(x, y);
-}
-
-bool Space::contains(QPointF point)
-{
-    QPointF p = this->mapToLocal(point);
-
-    QRectF rect(QPointF(0, 0), this->m_scale * this->m_size);
-    rect.moveCenter(QPointF(0, 0));
-
-    return rect.contains(p);
-}
-
-QSizeF Space::internalRectSize(QSizeF size)
-{
-    qreal rot = this->m_rotation;
-    qreal d = cos(2 * rot);
-
-    if (d == 0)
-    {
-        rot += 0.01 * M_PI / 180;
-        d = cos(2 * rot);
-    }
-
-    qreal width = size.width() * fabs(cos(rot)) - size.height() * fabs(sin(rot));
-    qreal height = size.height() * fabs(cos(rot)) - size.width() * fabs(sin(rot));
-
-    return QSizeF(width, height) / d;
-}
-
-QRectF Space::boundingRect()
-{
-    qreal width = this->m_size.width() * fabs(cos(this->m_rotation)) + this->m_size.height() * fabs(sin(this->m_rotation));
-    qreal height = this->m_size.width() * fabs(sin(this->m_rotation)) + this->m_size.height() * fabs(cos(this->m_rotation));
-
-    QSizeF boundSize = this->m_scale * QSizeF(width, height);
-    QPointF topLeft = this->m_center - QPointF(boundSize.width(), boundSize.height()) / 2;
-
-    return QRectF(topLeft, boundSize);
-}
-
-QPointF Space::pos()
-{
-    return this->m_center - QPointF(this->m_size.width(), this->m_size.height()) / 2;
-}
-
-QString Space::spaceId()
-{
-    return this->m_spaceId;
-}
-
-qint32 Space::nParts()
-{
-    return this->m_nParts;
-}
-
-QPointF Space::center()
-{
-    return this->m_center;
-}
-
-QSizeF Space::size()
-{
-    return this->m_size;
+    return this->m_editMode;
 }
 
 bool Space::snapping()
@@ -455,146 +59,562 @@ bool Space::snapping()
     return this->m_snapping;
 }
 
-qreal Space::snappingPT()
+int Space::nParts()
+{
+    return this->m_snapAngles.length();
+}
+
+float Space::snappingPT()
 {
     return this->m_snappingPT;
 }
 
-qreal Space::snappingRT()
+float Space::snappingRT()
 {
     return this->m_snappingRT;
 }
 
-qreal Space::scale()
+QString Space::buttonText()
 {
-    return this->m_scale;
+    return this->btnScaleAndRotate->text();
 }
 
-qreal Space::rotation()
+QString Space::buttonIcon()
 {
-    return this->m_rotation;
+    return this->m_buttonIconFileName;
 }
 
-bool Space::maximized()
+QString Space::buttonStyleSheet()
 {
-    return this->m_maximized;
+    return this->btnScaleAndRotate->styleSheet();
 }
 
-void Space::setSpaceId(QString value)
+void Space::setSpaceId(QString spaceId)
 {
-    this->m_spaceId = value;
+    this->setProperty("spaceId", spaceId);
+    this->setStyleSheet(QString("QWidget[spaceId=\"%1\"]{background-color: rgba(0, 0, 0, 0);}").arg(spaceId));
 }
 
-void Space::setNParts(qint32 value)
+void Space::setProxy(QGraphicsProxyWidget *proxy)
 {
-    this->m_nParts = value;
+    this->m_proxy = proxy;
+
+    this->m_proxy->setFlags(QGraphicsItem::ItemIsMovable |
+                            QGraphicsItem::ItemIsSelectable |
+                            QGraphicsItem::ItemIsFocusable);
 }
 
-void Space::setCenter(QPointF value)
+void Space::setFrame(const QImage &frame)
 {
-    this->m_center = value;
-}
-
-void Space::setSize(QSizeF value)
-{
-    this->m_size = value;
-}
-
-void Space::setSnapping(bool value)
-{
-    this->m_snapping = value;
-}
-
-void Space::setSnappingPT(qreal value)
-{
-    this->m_snappingPT = value;
-}
-
-void Space::setSnappingRT(qreal value)
-{
-    this->m_snappingRT = value;
-}
-
-void Space::setScale(qreal value)
-{
-    this->m_scale = value;
-}
-
-void Space::setRotation(qreal rotation)
-{
-    while (true)
+    if (this->m_fstFrame)
     {
-        if (rotation > 2 * M_PI)
-            rotation -= 2 * M_PI;
-        else if (rotation < -2 * M_PI)
-            rotation += 2 * M_PI;
-        else
-            break;
+        this->resize(frame.size());
+        this->lblFrame->resize(frame.size());
+
+        this->m_fstFrame = false;
+    }
+    else if (this->lblFrame->pixmap()->size() != frame.size())
+    {
+        QSize size = frame.size();
+
+        size.scale(this->size(), Qt::KeepAspectRatio);
+
+        QPointF widgetSceneCenter = this->m_proxy->mapToScene(this->m_proxy->rect().center());
+        QPointF pos = widgetSceneCenter - 0.5 * QPointF(size.width(), size.height());
+
+        this->m_proxy->setPos(pos);
+        this->m_proxy->resize(QSizeF(size));
+        this->lblFrame->resize(size);
     }
 
-    this->m_rotation = (rotation < 0)? 2 * M_PI + rotation: rotation;
+    this->lblFrame->setPixmap(QPixmap::fromImage(frame));
+}
 
-    if (this->m_snapping && !this->m_snapAngles.contains(this->m_rotation))
-        foreach (qreal angle, this->m_snapAngles)
-            if (fabs(this->m_rotation - angle) <= this->m_snappingRT)
+void Space::snapLines(QList<float> *hLines, QList<float> *vLines)
+{
+    if (hLines)
+        hLines->clear();
+
+    if (hLines)
+        vLines->clear();
+
+    foreach (QGraphicsItem *space, this->m_proxy->scene()->items())
+    {
+        QRectF boundingRect = space->mapRectToParent(space->boundingRect());
+
+        if (hLines)
+        {
+            float top = boundingRect.top();
+
+            if (!hLines->contains(top))
+                hLines->append(top);
+
+            float bottom = boundingRect.bottom();
+
+            if (!hLines->contains(bottom))
+                hLines->append(bottom);
+        }
+
+        if (vLines)
+        {
+            float left = boundingRect.left();
+
+            if (!vLines->contains(left))
+                vLines->append(left);
+
+            float right = boundingRect.right();
+
+            if (!vLines->contains(right))
+                vLines->append(right);
+        }
+    }
+
+    if (hLines)
+        qSort(hLines->begin(), hLines->end());
+
+    if (vLines)
+        qSort(vLines->begin(), vLines->end());
+}
+
+float Space::calculateAngle(QPoint point)
+{
+    float angle;
+
+    if (point.x() >= 0 && point.y() <= 0)
+        angle = atan2(-point.y(), point.x());
+    else if (point.x() <= 0 && point.y() <= 0)
+        angle = atan2(-point.x(), -point.y()) + M_PI / 2.0;
+    else if (point.x() <= 0 && point.y() >= 0)
+        angle = atan2(point.y(), -point.x()) + M_PI;
+    else
+        angle = atan2(point.x(), point.y()) + 3.0 * M_PI / 2.0;
+
+    return 180.0 * angle / M_PI;
+}
+
+void Space::bringToFront()
+{
+    QList<QGraphicsItem *> spaces = this->m_proxy->scene()->items();
+
+    foreach (QGraphicsItem *space, spaces)
+        if (space != this->m_proxy && space->zValue() > this->m_proxy->zValue())
+            space->setZValue(space->zValue() - 1);
+
+    this->m_proxy->setZValue(spaces.length() - 1);
+}
+
+bool Space::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == this->btnScaleAndRotate ||
+        watched == this->lblFrame)
+    {
+        if (event->type() == QEvent::MouseButtonDblClick ||
+            event->type() == QEvent::MouseButtonPress ||
+            event->type() == QEvent::MouseButtonRelease ||
+            event->type() == QEvent::MouseMove)
+        {
+            if (watched == this->btnScaleAndRotate &&
+                event->type() == QEvent::MouseButtonDblClick)
+                return QWidget::eventFilter(watched, event);
+
+            if (watched == this->btnScaleAndRotate &&
+                event->type() == QEvent::MouseButtonPress)
+                this->btnScaleAndRotate->setDown(true);
+
+            if (watched == this->btnScaleAndRotate &&
+                event->type() == QEvent::MouseButtonRelease)
+                this->btnScaleAndRotate->setDown(false);
+
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            QWidget *widget = static_cast<QWidget *>(watched);
+            QPoint pos = widget->mapToParent(mouseEvent->pos());
+            QMouseEvent mEvent(event->type(), pos, mouseEvent->button(), mouseEvent->button(), mouseEvent->modifiers());
+
+            if (event->type() == QEvent::MouseButtonDblClick)
+                this->mouseDoubleClickEvent(&mEvent);
+            else if (event->type() == QEvent::MouseButtonPress)
+                this->mousePressEvent(&mEvent);
+            else if (event->type() == QEvent::MouseButtonRelease)
+                this->mouseReleaseEvent(&mEvent);
+            else if (event->type() == QEvent::MouseMove)
+                this->mouseMoveEvent(&mEvent);
+        }
+
+        return false;
+    }
+
+    return QWidget::eventFilter(watched, event);
+}
+
+bool Space::resendMouseEvent(QMouseEvent *event)
+{
+    QCoreApplication *coreApplication = QCoreApplication::instance();
+
+    if (!coreApplication)
+        return false;
+
+    QObject *element = coreApplication->findChild<QObject *>(this->property("spaceId").toString());
+
+    if (!element)
+        return false;
+
+    int x = event->x() * (this->lblFrame->pixmap()->width() - 1) / (float) (this->width() - 1);
+    int y = event->y() * (this->lblFrame->pixmap()->height() - 1) / (float) (this->height() - 1);
+
+    QMouseEvent mEvent(event->type(), QPoint(x, y), event->button(), event->button(), event->modifiers());
+
+    return QCoreApplication::sendEvent(element, &mEvent);
+}
+
+void Space::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    if (this->m_editMode)
+    {
+        QPointF center = this->m_proxy->mapToScene(this->m_proxy->rect().center());
+
+        this->m_proxy->setTransformOriginPoint(this->m_proxy->rect().center());
+
+        QSize size = this->lblFrame->pixmap()->size();
+        QSize minimumSize = this->minimumSize();
+
+        if (size.width() < minimumSize.width() || size.height() < minimumSize.height())
+            size.scale(minimumSize, Qt::KeepAspectRatioByExpanding);
+
+        QPointF pos = QPointF(center) - 0.5 * QPointF(size.width(), size.height());
+
+        this->m_proxy->setPos(pos);
+        this->m_proxy->setRotation(0);
+        this->m_proxy->resize(QSizeF(size));
+        this->lblFrame->resize(size);
+    }
+    else
+        this->resendMouseEvent(event);
+}
+
+void Space::mousePressEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    if (this->m_editMode)
+    {
+        this->bringToFront();
+
+        if (this->btnScaleAndRotate->isDown())
+        {
+            this->m_mousePos0 = QCursor::pos();
+            this->m_widgetGlobalCenter = this->m_proxy->scene()->views()[0]->mapToGlobal(this->m_proxy->scene()->views()[0]->mapFromScene(this->m_proxy->mapToScene(this->m_proxy->rect().center())));
+            this->m_widgetSceneCenter = this->m_proxy->mapToScene(this->m_proxy->rect().center());
+            this->snapLines(&this->m_hLines0, &this->m_vLines0);
+
+            this->m_rotateScale = true;
+        }
+        else
+        {
+            this->m_mousePos0 = QCursor::pos();
+            this->m_pos0 = this->m_proxy->pos();
+            this->snapLines(&this->m_hLines0, &this->m_vLines0);
+
+            this->m_move = true;
+        }
+    }
+    else
+        this->resendMouseEvent(event);
+}
+
+void Space::mouseReleaseEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    if (this->m_editMode)
+    {
+        this->m_move = false;
+        this->m_rotateScale = false;
+        this->m_mousePos0 = QPoint();
+        this->m_widgetGlobalCenter = QPoint();
+        this->m_widgetSceneCenter = QPointF();
+    }
+    else
+        this->resendMouseEvent(event);
+}
+
+void Space::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    if (this->m_editMode)
+    {
+        if (this->m_rotateScale)
+        {
+            QPoint mousePos1 = QCursor::pos();
+
+            QPoint pi = this->m_mousePos0 - this->m_widgetGlobalCenter;
+            QPoint pf = mousePos1 - this->m_widgetGlobalCenter;
+
+            float factor = sqrt(pow(pf.x(), 2) + pow(pf.y(), 2));
+
+            if (pi.x() == 0 && pi.y() == 0)
+                factor /= 0.5;
+            else
+                factor /= sqrt(pow(pi.x(), 2) + pow(pi.y(), 2));
+
+            this->m_proxy->setTransformOriginPoint(this->m_proxy->rect().center());
+            QSizeF size = factor * this->m_proxy->size();
+            QSize minimumSize = this->minimumSize();
+
+            if (size.width() < minimumSize.width() || size.height() < minimumSize.height())
+                size.scale(QSizeF(minimumSize), Qt::KeepAspectRatioByExpanding);
+
+            QPointF pos = this->m_widgetSceneCenter - 0.5 * QPointF(size.width(), size.height());
+            float rotation = this->m_proxy->rotation() - this->calculateAngle(pf) + this->calculateAngle(pi);
+
+            if (this->m_snapping)
             {
-                this->m_rotation = angle;
+                while (rotation >= 360)
+                    rotation -= 360;
 
-                break;
+                while (rotation < 0)
+                    rotation += 360;
+
+                foreach (float angle, this->m_snapAngles)
+                    if (fabs(rotation - angle) <= this->m_snappingRT)
+                    {
+                        rotation = angle;
+
+                        break;
+                    }
             }
+
+            this->m_proxy->setRotation(rotation);
+            this->m_proxy->setPos(pos);
+            this->m_proxy->resize(size);
+            this->lblFrame->resize(size.toSize());
+
+            if (this->m_snapping)
+            {
+                QRectF boundingRect = this->m_proxy->mapRectToParent(this->m_proxy->boundingRect());
+                QList<float> lines;
+                bool snapped = false;
+
+                foreach (float hLine, this->m_hLines0)
+                {
+                    lines << boundingRect.top() << boundingRect.bottom();
+
+                    foreach (float line, lines)
+                        if (fabs(line - hLine) <= this->m_snappingPT)
+                        {
+                            float factor = 1 + 2 * (line - hLine) / this->m_proxy->boundingRect().size().height();
+                            QSizeF size = factor * this->m_proxy->size();
+                            QSize minimumSize = this->minimumSize();
+
+                            if (size.width() < minimumSize.width() || size.height() < minimumSize.height())
+                                size.scale(QSizeF(minimumSize), Qt::KeepAspectRatioByExpanding);
+
+                            QPointF pos = this->m_widgetSceneCenter - 0.5 * QPointF(size.width(), size.height());
+
+                            this->m_proxy->setPos(pos);
+                            this->m_proxy->resize(size);
+                            this->lblFrame->resize(size.toSize());
+
+                            snapped = true;
+
+                            break;
+                        }
+
+                    if (snapped)
+                        break;
+                }
+
+                lines.clear();
+                snapped = false;
+
+                foreach (float vLine, this->m_vLines0)
+                {
+                    lines << boundingRect.left() << boundingRect.right();
+
+                    foreach (float line, lines)
+                        if (fabs(line - vLine) <= this->m_snappingPT)
+                        {
+                            float factor = 1 + 2 * (line - vLine) / this->m_proxy->boundingRect().size().width();
+                            QSizeF size = factor * this->m_proxy->size();
+                            QSize minimumSize = this->minimumSize();
+
+                            if (size.width() < minimumSize.width() || size.height() < minimumSize.height())
+                                size.scale(QSizeF(minimumSize), Qt::KeepAspectRatioByExpanding);
+
+                            QPointF pos = this->m_widgetSceneCenter - 0.5 * QPointF(size.width(), size.height());
+
+                            this->m_proxy->setPos(pos);
+                            this->m_proxy->resize(size);
+                            this->lblFrame->resize(size.toSize());
+
+                            snapped = true;
+
+                            break;
+                        }
+
+                    if (snapped)
+                        break;
+                }
+            }
+
+            this->m_mousePos0 = mousePos1;
+        }
+        else if (this->m_move)
+        {
+            QPoint mousePos1 = QCursor::pos();
+
+            this->m_proxy->setPos(this->m_proxy->pos() +
+                                this->m_proxy->scene()->views()[0]->mapToScene(this->m_proxy->scene()->views()[0]->mapFromGlobal(mousePos1)) -
+                                this->m_proxy->scene()->views()[0]->mapToScene(this->m_proxy->scene()->views()[0]->mapFromGlobal(this->m_mousePos0)));
+
+            if (this->m_snapping)
+            {
+                QPointF snapDiff(0, 0);
+
+                QRectF boundingRect = this->m_proxy->mapRectToParent(this->m_proxy->boundingRect());
+                QList<float> lines;
+                bool snapped = false;
+
+                foreach (float hLine, this->m_hLines0)
+                {
+                    lines << boundingRect.top() << boundingRect.bottom();
+
+                    foreach (float line, lines)
+                        if (fabs(line - hLine) <= this->m_snappingPT)
+                        {
+                            snapDiff += QPointF(0, hLine - line);
+                            snapped = true;
+
+                            break;
+                        }
+
+                    if (snapped)
+                        break;
+                }
+
+                lines.clear();
+                snapped = false;
+
+                foreach (float vLine, this->m_vLines0)
+                {
+                    lines << boundingRect.left() << boundingRect.right();
+
+                    foreach (float line, lines)
+                        if (fabs(line - vLine) <= this->m_snappingPT)
+                        {
+                            snapDiff += QPointF(vLine - line, 0);
+                            snapped = true;
+
+                            break;
+                        }
+
+                    if (snapped)
+                        break;
+                }
+
+                this->m_proxy->setPos(this->m_proxy->pos() + snapDiff);
+            }
+
+            this->m_mousePos0 = mousePos1;
+        }
+    }
+    else
+        this->resendMouseEvent(event);
 }
 
-void Space::setMaximized(bool value)
+void Space::setEditMode(bool editable)
 {
-    this->m_maximized = value;
+    this->m_editMode = editable;
+    this->btnScaleAndRotate->setVisible(editable);
 }
 
-void Space::resetSpaceId()
+void Space::setSnapping(bool enable)
 {
-    this->m_spaceId = "";
+    this->m_snapping = enable;
 }
 
-void Space::resetNParts()
+void Space::setNParts(int nParts)
 {
-    this->m_nParts = 1;
+    this->m_snapAngles.clear();
+
+    if (nParts <= 0)
+        return;
+
+    float angle = 0;
+    float inc = 360.0 / (float) nParts;
+
+    while (angle < 360)
+    {
+        this->m_snapAngles << angle;
+        angle += inc;
+    }
 }
 
-void Space::resetCenter()
+void Space::setSnappingPT(float snappingPT)
 {
-    this->m_center = QPointF(0, 0);
+    this->m_snappingPT = snappingPT;
 }
 
-void Space::resetSize()
+void Space::setSnappingRT(float snappingRT)
 {
-    this->m_size = QSizeF(0, 0);
+    this->m_snappingRT = snappingRT;
+}
+
+void Space::setButtonText(QString text)
+{
+    this->btnScaleAndRotate->setText(text);
+}
+
+void Space::setButtonIcon(QString icon)
+{
+    this->m_buttonIconFileName = icon;
+
+    this->btnScaleAndRotate->setIcon(QIcon(icon));
+}
+
+void Space::setButtonStyleSheet(QString styleSheet)
+{
+    this->btnScaleAndRotate->setStyleSheet(styleSheet);
+}
+
+void Space::resetEditMode()
+{
+    this->setEditMode(false);
 }
 
 void Space::resetSnapping()
 {
-    this->m_snapping = false;
+    this->setSnapping(false);
+}
+
+void Space::resetNParts()
+{
+    this->setNParts(0);
 }
 
 void Space::resetSnappingPT()
 {
-    this->m_snappingPT = 0;
+    this->setSnappingPT(0);
 }
 
 void Space::resetSnappingRT()
 {
-    this->m_snappingRT = 0;
+    this->setSnappingRT(0);
 }
 
-void Space::resetScale()
+void Space::resetButtonText()
 {
-    this->m_scale = 1;
+    this->setButtonText("");
 }
 
-void Space::resetRotation()
+void Space::resetButtonIcon()
 {
-    this->m_rotation = 0;
+    this->setButtonIcon("");
 }
 
-void Space::resetMaximized()
+void Space::resetButtonStyleSheet()
 {
-    this->m_maximized = false;
+    this->setButtonStyleSheet("");
 }

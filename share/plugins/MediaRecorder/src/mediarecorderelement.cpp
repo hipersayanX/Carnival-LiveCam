@@ -131,9 +131,20 @@ void MediaRecorderElement::iStream(QByteArray *data)
     this->m_outvideoStream.writeRawData((const char *)this->m_currentFrame.constBits(), this->m_currentFrame.byteCount());
 }
 
+void MediaRecorderElement::iEvent(QEvent *event)
+{
+    Q_UNUSED(event)
+}
+
 void MediaRecorderElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void MediaRecorderElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    Q_UNUSED(srcs)
+    Q_UNUSED(sinks)
 }
 
 void MediaRecorderElement::setVideoFormats(QMap<QString, QVariant> videoFormats)

@@ -53,6 +53,11 @@ void VideoSourceElement::iStream(QByteArray *data)
     Q_UNUSED(data)
 }
 
+void VideoSourceElement::iEvent(QEvent *event)
+{
+    Q_UNUSED(event)
+}
+
 bool VideoSourceElement::start()
 {
     if (!this->m_video.open(this->m_fileName.toUtf8().constData()))
@@ -81,6 +86,12 @@ bool VideoSourceElement::stop()
 void VideoSourceElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void VideoSourceElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    Q_UNUSED(srcs)
+    Q_UNUSED(sinks)
 }
 
 void VideoSourceElement::setFileName(QString fileName)

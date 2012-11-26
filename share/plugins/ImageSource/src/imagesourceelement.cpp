@@ -40,6 +40,11 @@ void ImageSourceElement::iStream(QByteArray *data)
     Q_UNUSED(data)
 }
 
+void ImageSourceElement::iEvent(QEvent *event)
+{
+    Q_UNUSED(event)
+}
+
 bool ImageSourceElement::start()
 {
     emit(oStream(&this->m_bImage));
@@ -55,6 +60,12 @@ bool ImageSourceElement::stop()
 void ImageSourceElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void ImageSourceElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    Q_UNUSED(srcs)
+    Q_UNUSED(sinks)
 }
 
 QString ImageSourceElement::fileName()

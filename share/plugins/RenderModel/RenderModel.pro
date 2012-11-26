@@ -51,6 +51,9 @@ OTHER_FILES += \
 
 QT += core gui opengl
 
+RESOURCES += \
+    RenderModel.qrc
+
 SOURCES += \
     src/rendermodel.cpp \
     src/rendermodelelement.cpp \
@@ -68,6 +71,3 @@ target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
 
 data.files = share/*
 data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share
-
-RESOURCES += \
-    RenderModel.qrc

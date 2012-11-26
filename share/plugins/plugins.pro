@@ -22,16 +22,15 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 #SUBDIRS += \
-#           DefaultShell \
-#           Spaces
+#           DefaultShell
 
 SUBDIRS += \
            Cube \
-           FxBin \
            ImageSource \
            MediaRecorder \
            ParticleFall \
            RenderModel \
+           Spaces \
            TheMask \
            VideoSource \
            WebcamDetect \

@@ -41,6 +41,8 @@ class RenderModelElement: public Element
         QString m_modelFileName;
         RenderModelGL m_ogl;
         QByteArray m_bImage;
+        QList<Element *> m_srcs;
+        QList<Element *> m_sinks;
 
         QImage byteArrayToImage(QByteArray *ba);
         void imageToByteArray(QImage *image, QByteArray *ba);
@@ -48,7 +50,9 @@ class RenderModelElement: public Element
     public slots:
         // Input Channels
         void iStream(QByteArray *data);
+        void iEvent(QEvent *event);
         void setPipeline(Pipeline *pipeline);
+        void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 
         void setModelFileName(QString modelFileName);
         void resetModelFileName();

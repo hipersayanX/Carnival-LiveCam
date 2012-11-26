@@ -103,9 +103,36 @@ void CubeElement::iStream(QByteArray *data)
     emit(oStream(&this->m_bImage));
 }
 
+void CubeElement::iEvent(QEvent *event)
+{
+    switch (event->type())
+    {
+        case QEvent::MouseMove:
+            this->m_ogl.mouseMove(static_cast<QMouseEvent *>(event));
+        break;
+
+        case QEvent::MouseButtonPress:
+            this->m_ogl.mousePress(static_cast<QMouseEvent *>(event));
+        break;
+
+        case QEvent::MouseButtonRelease:
+            this->m_ogl.mouseRelease(static_cast<QMouseEvent *>(event));
+        break;
+
+        default:
+        break;
+    }
+}
+
 void CubeElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void CubeElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    Q_UNUSED(srcs)
+    Q_UNUSED(sinks)
 }
 
 void CubeElement::setXrot(float xrot)
@@ -128,19 +155,4 @@ void CubeElement::resetXrot()
 void CubeElement::resetYrot()
 {
     this->setYrot(60.0f);
-}
-
-void CubeElement::mouseMove(QMouseEvent *event)
-{
-    this->m_ogl.mouseMove(event);
-}
-
-void CubeElement::mousePress(QMouseEvent *event)
-{
-    this->m_ogl.mousePress(event);
-}
-
-void CubeElement::mouseRelease(QMouseEvent *event)
-{
-    this->m_ogl.mouseRelease(event);
 }

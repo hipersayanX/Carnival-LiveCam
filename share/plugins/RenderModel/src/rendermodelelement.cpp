@@ -91,9 +91,21 @@ void RenderModelElement::iStream(QByteArray *data)
     emit(oStream(&this->m_bImage));
 }
 
+void RenderModelElement::iEvent(QEvent *event)
+{
+    foreach (Element *element, this->m_srcs)
+        element->iEvent(event);
+}
+
 void RenderModelElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void RenderModelElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    this->m_srcs = srcs;
+    this->m_sinks = sinks;
 }
 
 void RenderModelElement::setModelFileName(QString modelFileName)

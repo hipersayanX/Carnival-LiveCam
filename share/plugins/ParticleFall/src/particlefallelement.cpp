@@ -321,7 +321,19 @@ void ParticleFallElement::iStream(QByteArray *data)
         this->m_particles[particle]++;
 }
 
+void ParticleFallElement::iEvent(QEvent *event)
+{
+    foreach (Element *element, this->m_srcs)
+        element->iEvent(event);
+}
+
 void ParticleFallElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void ParticleFallElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    this->m_srcs = srcs;
+    this->m_sinks = sinks;
 }

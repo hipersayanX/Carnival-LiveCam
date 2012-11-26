@@ -70,6 +70,8 @@ class ParticleFallElement: public Element
         QList<Particle> m_particles;
         QByteArray m_bCurFrame;
         QSize m_curFrameSize;
+        QList<Element *> m_srcs;
+        QList<Element *> m_sinks;
 
         QImage byteArrayToImage(QByteArray *ba);
         void imageToByteArray(QImage *image, QByteArray *ba);
@@ -97,7 +99,9 @@ class ParticleFallElement: public Element
         void resetInc();
 
         void iStream(QByteArray *data);
+        void iEvent(QEvent *event);
         void setPipeline(Pipeline *pipeline);
+        void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 };
 
 #endif // PARTICLEFALLELEMENT_H

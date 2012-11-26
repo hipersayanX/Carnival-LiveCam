@@ -69,6 +69,11 @@ void WebcamDetectElement::iStream(QByteArray *data)
     Q_UNUSED(data)
 }
 
+void WebcamDetectElement::iEvent(QEvent *event)
+{
+    Q_UNUSED(event)
+}
+
 bool WebcamDetectElement::start()
 {
     this->m_fsWatcher = new QFileSystemWatcher(QStringList(this->m_devicesPath), this);
@@ -96,6 +101,12 @@ bool WebcamDetectElement::stop()
 void WebcamDetectElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void WebcamDetectElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    Q_UNUSED(srcs)
+    Q_UNUSED(sinks)
 }
 
 template <typename T>  QList<T> WebcamDetectElement::substractList(QList<T> a, QList<T> b)

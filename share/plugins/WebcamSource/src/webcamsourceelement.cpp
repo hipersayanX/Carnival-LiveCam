@@ -59,6 +59,11 @@ void WebcamSourceElement::iStream(QByteArray *data)
     Q_UNUSED(data)
 }
 
+void WebcamSourceElement::iEvent(QEvent *event)
+{
+    Q_UNUSED(event)
+}
+
 bool WebcamSourceElement::start()
 {
     // Try to open webcam device,
@@ -88,6 +93,12 @@ bool WebcamSourceElement::stop()
 void WebcamSourceElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void WebcamSourceElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    Q_UNUSED(srcs)
+    Q_UNUSED(sinks)
 }
 
 void WebcamSourceElement::setDevice(QString device)

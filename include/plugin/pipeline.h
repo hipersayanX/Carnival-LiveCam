@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+class Element;
+
 class Pipeline: public QObject
 {
     Q_OBJECT
@@ -64,6 +66,8 @@ class Pipeline: public QObject
         Q_INVOKABLE virtual QVariantMap pluginList() = 0;
         Q_INVOKABLE virtual PipelineRoutingMode pipelineRoutingMode() = 0;
 
+        Q_INVOKABLE virtual Element *elementById(QString elementId) = 0;
+        Q_INVOKABLE virtual Element *elementByName(QString elementName) = 0;
         Q_INVOKABLE virtual bool startElement(QString elementId) = 0;
         Q_INVOKABLE virtual bool stopElement(QString elementId) = 0;
         Q_INVOKABLE virtual QString addElement(QString pluginId) = 0;

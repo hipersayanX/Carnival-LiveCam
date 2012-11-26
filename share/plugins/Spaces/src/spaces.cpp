@@ -17,27 +17,9 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef FXBINELEMENT_H
-#define FXBINELEMENT_H
+#include "spaces.h"
 
-#include "element.h"
-
-class FxBinElement: public Element
+Element *Spaces::newElement()
 {
-    Q_OBJECT
-
-    public:
-        FxBinElement();
-
-        Q_INVOKABLE bool start();
-        Q_INVOKABLE bool stop();
-
-    private:
-
-    public slots:
-        // Input Channels
-        void iStream(QByteArray *data);
-        void setPipeline(Pipeline *pipeline);
-};
-
-#endif // FXBINELEMENT_H
+    return new SpacesElement();
+}

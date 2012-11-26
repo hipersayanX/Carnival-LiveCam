@@ -159,7 +159,19 @@ void TheMaskElement::iStream(QByteArray *data)
     emit(oStream(&this->m_curFrame));
 }
 
+void TheMaskElement::iEvent(QEvent *event)
+{
+    foreach (Element *element, this->m_srcs)
+        element->iEvent(event);
+}
+
 void TheMaskElement::setPipeline(Pipeline *pipeline)
 {
     Q_UNUSED(pipeline)
+}
+
+void TheMaskElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
+{
+    this->m_srcs = srcs;
+    this->m_sinks = sinks;
 }

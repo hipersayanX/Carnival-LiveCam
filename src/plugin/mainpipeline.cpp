@@ -131,6 +131,23 @@ MainPipeline::PipelineRoutingMode MainPipeline::pipelineRoutingMode()
     return this->m_pipelineRoutingMode;
 }
 
+Element *MainPipeline::elementById(QString elementId)
+{
+    if (!this->m_elements.contains(elementId))
+        return NULL;
+
+    return this->m_elements[elementId];
+}
+
+Element *MainPipeline::elementByName(QString elementName)
+{
+    foreach (Element *element, this->m_elements)
+        if (element->objectName() == elementName)
+            return element;
+
+    return NULL;
+}
+
 bool MainPipeline::startElement(QString elementId)
 {
     if (!this->m_elements.contains(elementId))
@@ -475,6 +492,7 @@ void MainPipeline::setPipeline(QString pipeline)
         QString elementIdNew = this->addElement(instances2[elementId][0].toString());
         this->changeId(elementId, elementIdNew, &instances2, &connections2, &ss2);
         addElementsTmp << elementIdNew;
+//        this->elementById(elementIdNew)->setPeers();
     }
 
     addElements = addElementsTmp;
@@ -500,6 +518,15 @@ void MainPipeline::setPipeline(QString pipeline)
 
     foreach (QStringList ss, connectElementsSS)
        this->connectElementsSS(ss[0], ss[1], ss[2], ss[3]);
+
+    foreach (QString elementId, this->m_instances1.keys())
+    {
+        QList<Element *> srcs;
+        QList<Element *> sinks;
+
+        this->peers(elementId, srcs, sinks);
+        this->elementById(elementId)->setPeers(srcs, sinks);
+    }
 
     foreach (QString elementId, addElements)
         this->startElement(elementId);
@@ -557,7 +584,7 @@ QVariant MainPipeline::parseValue(QString value)
     {
         QStringList r = this->regexpFindAll(this->m_regexpDict["colorConst"],
                                             value);
-
+/*
         if (r[0] == "white")
             return Qt::white;
         else if (r[0] == "black")
@@ -599,7 +626,7 @@ QVariant MainPipeline::parseValue(QString value)
         else if (r[0] == "color1")
             return Qt::color1;
         else
-            return Qt::color0;
+            return Qt::color0;*/
     }
     // Size
     else if (QRegExp(this->m_regexpDict["size"]).exactMatch(value))
@@ -1273,6 +1300,18 @@ QList<QMap<QString, QStringList> > MainPipeline::propertiesDiff(const QMap<QStri
     return propsDiff;
 }
 
+void MainPipeline::peers(QString elementId, QList<Element *> &srcs, QList<Element *> &sinks)
+{
+    srcs.clear();
+    sinks.clear();
+
+    foreach (QStringList connection, this->m_connections1)
+        if (connection[0] == elementId)
+            sinks << this->elementById(connection[1]);
+        else if (connection[1] == elementId)
+            srcs << this->elementById(connection[0]);
+}
+
 Plugin *MainPipeline::plugin(QString pluginId)
 {
     return this->isLoaded(pluginId)? this->m_plugins[pluginId]: NULL;
@@ -1398,7 +1437,6 @@ void MainPipeline::resetRegexpDict()
 
     this->m_regexpDict["bytes"] = "b(?:" + this->m_regexpDict["string"] + ")";
 
-    // Bad repetition
     this->m_regexpDict["urlString"] = "(?:[a-zA-Z]+\\://)*" \
                                       "(?:[0-9a-zA-Z._]+(?:\\:[0-9a-zA-Z%.]+)?@)?" \
                                       "[0-9a-zA-Z]+(?:-[0-9a-zA-Z]+)*" \

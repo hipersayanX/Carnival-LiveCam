@@ -43,6 +43,14 @@ class Element: public QObject
             S16LE   // This is a PCM audio frame stored in signed 16-bit little-endian format.
         };
 
+        enum ElementState
+        {
+            Null,
+            Ready,
+            Paused,
+            Playing
+        };
+
         /// This function is called after Plugin::setConfigs().
         /// This method executes the initialization code for the plugin.
         Q_INVOKABLE virtual bool start() = 0;
@@ -50,7 +58,10 @@ class Element: public QObject
         /// This function is called after Plugin::configs(), and before unload the plugin.
         /// This method executes the finalization code for the plugin.
         Q_INVOKABLE virtual bool stop() = 0;
-
+/*
+        Q_INVOKABLE virtual bool state(ElementState state) = 0;
+        Q_INVOKABLE virtual ElementState setState() = 0;
+*/
     signals:
         // Output Channel
         void oStream(QByteArray *data);
@@ -59,7 +70,9 @@ class Element: public QObject
     public slots:
         // Input Channel
         virtual void iStream(QByteArray *data) = 0;
+        virtual void iEvent(QEvent *event) = 0;
         virtual void setPipeline(Pipeline *pipeline) = 0;
+        virtual void setPeers(QList<Element *> srcs, QList<Element *> sinks) = 0;
 };
 
 #endif // ELEMENT_H

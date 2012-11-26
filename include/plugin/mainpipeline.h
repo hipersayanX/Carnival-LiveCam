@@ -27,18 +27,18 @@ class MainPipeline: public Pipeline
     Q_OBJECT
     Q_ENUMS(PipelineRoutingMode)
 
-        Q_PROPERTY(QStringList pluginsPaths
-                   READ pluginsPaths
-                   WRITE setPluginsPaths
-                   RESET resetPluginsPaths)
+    Q_PROPERTY(QStringList pluginsPaths
+               READ pluginsPaths
+               WRITE setPluginsPaths
+               RESET resetPluginsPaths)
 
-        Q_PROPERTY(QVariantMap pluginList
-                   READ pluginList)
+    Q_PROPERTY(QVariantMap pluginList
+               READ pluginList)
 
-        Q_PROPERTY(PipelineRoutingMode pipelineRoutingMode
-                   READ pipelineRoutingMode
-                   WRITE setPipelineRoutingMode
-                   RESET resetPipelineRoutingMode)
+    Q_PROPERTY(PipelineRoutingMode pipelineRoutingMode
+               READ pipelineRoutingMode
+               WRITE setPipelineRoutingMode
+               RESET resetPipelineRoutingMode)
 
     /// Enumerator for pipeline diff operations
     public:
@@ -51,6 +51,8 @@ class MainPipeline: public Pipeline
         Q_INVOKABLE QVariantMap pluginList();
         Q_INVOKABLE PipelineRoutingMode pipelineRoutingMode();
 
+        Q_INVOKABLE Element *elementById(QString elementId);
+        Q_INVOKABLE Element *elementByName(QString elementName);
         Q_INVOKABLE bool startElement(QString elementId);
         Q_INVOKABLE bool stopElement(QString elementId);
         Q_INVOKABLE QString addElement(QString pluginId);
@@ -120,6 +122,8 @@ class MainPipeline: public Pipeline
 
         QList<QMap<QString, QStringList> > propertiesDiff(const QMap<QString, QVariantList> &instances1,
                                                           const QMap<QString, QVariantList> &instances2);
+
+        void peers(QString elementId, QList<Element *> &srcs, QList<Element *> &sinks);
 
         QVariant parseValue(QString value);
         QStringList parseSignalSlotLt(QString id, QString element);

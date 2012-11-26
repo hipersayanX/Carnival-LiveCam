@@ -17,22 +17,20 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef SPACECONTROLS_H
-#define SPACECONTROLS_H
+#ifndef SPACES_H
+#define SPACES_H
 
-#include <QWidget>
+#include "plugin.h"
+#include "spaceselement.h"
 
-#include "ui_spacecontrols.h"
-
-class SpaceControls: public QWidget, public Ui::SpaceControls
+class Spaces: public QObject, public Plugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "CarnivalLiveCam.Plugin" FILE "Spaces.json")
+    Q_INTERFACES(Plugin)
 
     public:
-        explicit SpaceControls(QWidget *parent = 0);
-
-    protected:
-        void changeEvent(QEvent *e);
+        Element *newElement();
 };
 
-#endif // SPACECONTROLS_H
+#endif // SPACES_H

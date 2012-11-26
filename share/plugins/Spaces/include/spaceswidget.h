@@ -17,73 +17,56 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef SPACE_H
-#define SPACE_H
+#ifndef SPACESWIDGET_H
+#define SPACESWIDGET_H
 
 #include <QtWidgets>
 
-#include "ui_space.h"
-
-class Space: public QWidget, public Ui::Space
+class SpacesWidget: public QGraphicsView
 {
     Q_OBJECT
 
     Q_PROPERTY(bool editMode READ editMode WRITE setEditMode RESET resetEditMode)
     Q_PROPERTY(bool snapping READ snapping WRITE setSnapping RESET resetSnapping)
     Q_PROPERTY(int nParts READ nParts WRITE setNParts RESET resetNParts)
-    Q_PROPERTY(float snappingPT READ snappingPT WRITE setSnappingPT RESET resetSnappingPT)
-    Q_PROPERTY(float snappingRT READ snappingRT WRITE setSnappingRT RESET resetSnappingRT)
+    Q_PROPERTY(int snappingPT READ snappingPT WRITE setSnappingPT RESET resetSnappingPT)
+    Q_PROPERTY(int snappingRT READ snappingRT WRITE setSnappingRT RESET resetSnappingRT)
     Q_PROPERTY(QString buttonText READ buttonText WRITE setButtonText RESET resetButtonText)
     Q_PROPERTY(QString buttonIcon READ buttonIcon WRITE setButtonIcon RESET resetButtonIcon)
     Q_PROPERTY(QString buttonStyleSheet READ buttonStyleSheet WRITE setButtonStyleSheet RESET resetButtonStyleSheet)
 
     public:
-        explicit Space(QWidget *parent = 0);
+        explicit SpacesWidget(QWidget *parent = 0);
 
         bool editMode();
         bool snapping();
         int nParts();
-        float snappingPT();
-        float snappingRT();
+        int snappingPT();
+        int snappingRT();
         QString buttonText();
         QString buttonIcon();
         QString buttonStyleSheet();
 
-        Q_INVOKABLE void setSpaceId(QString spaceId);
-        Q_INVOKABLE void setProxy(QGraphicsProxyWidget *proxy);
-        Q_INVOKABLE void setFrame(const QImage &frame);
+        Q_INVOKABLE void setFrame(QString spaceId, const QImage &frame);
 
     private:
         bool m_editMode;
         bool m_snapping;
-        float m_snappingPT;
-        float m_snappingRT;
-        QGraphicsProxyWidget *m_proxy;
-        QString m_buttonIconFileName;
-        bool m_move;
-        bool m_rotateScale;
-        bool m_fstFrame;
-        QList<float> m_snapAngles;
-        QPointF m_pos0;
-        QPoint m_mousePos0;
-        QPoint m_widgetGlobalCenter;
-        QPointF m_widgetSceneCenter;
-        QList<float> m_hLines0;
-        QList<float> m_vLines0;
-
-        void snapLines(QList<float> *hLines, QList<float> *vLines);
-        float calculateAngle(QPoint point);
-        void bringToFront();
-        bool eventFilter(QObject *watched, QEvent *event);
-        bool resendMouseEvent(QMouseEvent *event);
+        int m_nParts;
+        int m_snappingPT;
+        int m_snappingRT;
+        QString m_buttonText;
+        QString m_buttonIcon;
+        QString m_buttonStyleSheet;
+        QMap<QString, QGraphicsProxyWidget *> m_proxySpaces;
+        QGraphicsScene m_graphicsScene;
 
     protected:
-        void mouseDoubleClickEvent(QMouseEvent *event);
-        void mousePressEvent(QMouseEvent *event);
-        void mouseReleaseEvent(QMouseEvent *event);
-        void mouseMoveEvent(QMouseEvent *event);
+        void resizeEvent(QResizeEvent *event);
 
     public slots:
+        void addSpace(QString spaceId);
+        void removeSpace(QString spaceId);
         void setEditMode(bool editable);
         void setSnapping(bool enable);
         void setNParts(int nParts);
@@ -100,6 +83,9 @@ class Space: public QWidget, public Ui::Space
         void resetButtonText();
         void resetButtonIcon();
         void resetButtonStyleSheet();
+
+    private slots:
+        void on_changed(const QList<QRectF> &region);
 };
 
-#endif // SPACE_H
+#endif // SPACESWIDGET_H
