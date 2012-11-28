@@ -255,57 +255,26 @@ void ParticleFallElement::resetInc()
     this->setInc(0.01);
 }
 
-QImage ParticleFallElement::byteArrayToImage(QByteArray *ba)
+void ParticleFallElement::iStream(const void *data, int datalen, QString dataType)
 {
-    if (!ba)
-        return QImage();
+    Q_UNUSED(datalen)
 
-    QDataStream iDataStream(ba, QIODevice::ReadOnly);
-    int type;
-
-    iDataStream >> type;
-
-    if (type != ARGB32)
-        return QImage();
-
-    int width;
-    int height;
-
-    iDataStream >> width >> height;
-
-    QByteArray pixels(4 * width * height, 0);
-    iDataStream.readRawData(pixels.data(), pixels.size());
-
-    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
-}
-
-void ParticleFallElement::imageToByteArray(QImage *image, QByteArray *ba)
-{
-    if (!image || !ba)
+    if (dataType != "QImage")
         return;
 
-    QDataStream oDataStream(ba, QIODevice::WriteOnly);
-
-    oDataStream << ARGB32 << image->width() << image->height();
-    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
-}
-
-void ParticleFallElement::iStream(QByteArray *data)
-{
-    QImage iFrame = this->byteArrayToImage(data);
-
-    if (iFrame.isNull())
-        return;
+    QImage *iFrame = (QImage *) data;
 
     QSize oldFrameSize = this->m_curFrameSize;
-    this->m_curFrameSize = iFrame.size();
+    this->m_curFrameSize = iFrame->size();
 
     if (this->m_curFrameSize != oldFrameSize)
         this->setPadding(this->padding());
 
+    this->m_oFrame = *iFrame;
+
     QPainter painter;
 
-    painter.begin(&iFrame);
+    painter.begin(&this->m_oFrame);
 
     for (int particle = 0; particle < this->m_particles.length(); particle++)
         painter.drawImage(this->m_particles[particle].pos(),
@@ -313,18 +282,18 @@ void ParticleFallElement::iStream(QByteArray *data)
 
     painter.end();
 
-    this->imageToByteArray(&iFrame, &this->m_bCurFrame);
-
-    emit(oStream(&this->m_bCurFrame));
+    emit(this->oStream((const void *) &this->m_oFrame, 0, dataType));
 
     for (int particle = 0; particle < this->m_particles.length(); particle++)
         this->m_particles[particle]++;
 }
 
-void ParticleFallElement::iEvent(QEvent *event)
+bool ParticleFallElement::event(QEvent *event)
 {
-    foreach (Element *element, this->m_srcs)
-        element->iEvent(event);
+    foreach (Element *src, this->m_srcs)
+        QCoreApplication::sendEvent(src, event);
+
+    return false;
 }
 
 void ParticleFallElement::setPipeline(Pipeline *pipeline)

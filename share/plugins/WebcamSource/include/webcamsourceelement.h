@@ -20,6 +20,7 @@
 #ifndef WEBCAMSOURCEELEMENT_H
 #define WEBCAMSOURCEELEMENT_H
 
+#include <QtGui>
 #include <opencv2/opencv.hpp>
 
 #include "element.h"
@@ -47,17 +48,14 @@ class WebcamSourceElement: public Element
         int m_fps;
         cv::VideoCapture m_webcam;
         QTimer m_timer;
-        QByteArray m_curFrame;
-
-        void imageToByteArray(QImage *image, QByteArray *ba);
+        QImage m_oFrame;
 
     signals:
         void fail();
 
     public slots:
         // Input Channels
-        void iStream(QByteArray *data);
-        void iEvent(QEvent *event);
+        void iStream(const void *data, int datalen, QString dataType);
         void setPipeline(Pipeline *pipeline);
         void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 

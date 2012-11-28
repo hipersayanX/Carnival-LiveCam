@@ -17,77 +17,75 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include <cmath>
-
 #include "spaceselement.h"
 
 SpacesElement::SpacesElement(): Element()
 {
-    this->resetSpaces();
     this->resetEditMode();
     this->resetSnapping();
     this->resetNParts();
     this->resetSnappingPT();
     this->resetSnappingRT();
-    this->resetRotateButtonStyleSheet();
-    this->resetRotateButtonText();
+    this->resetButtonText();
+    this->resetButtonIcon();
+    this->resetButtonStyleSheet();
 
     this->m_move = false;
     this->m_scaleAndRotate = false;
-    this->mainSpace.setBackgroundBrush(Qt::black);
-    this->oldReceiver = NULL;
+    this->m_spacesWidget.setBackgroundBrush(Qt::black);
 
-    QObject::connect(&this->m_spaceWidget, SIGNAL(spaceMoved(qint32, qint32)), this, SLOT(onSpaceMoved(qint32, qint32)));
+    QObject::connect(&this->m_spacesWidget, SIGNAL(spaceMoved(int, int)), this, SIGNAL(spaceMoved(int, int)));
 }
 
 SpacesElement::~SpacesElement()
 {
-    foreach(QString spaceId, this->spacesWidgets.keys())
-        this->removeSpace(spaceId);
-}
-
-QStringList SpacesElement::spaces()
-{
-    return this->m_spaces;
+    this->m_spacesWidget.resetSpaces();
 }
 
 bool SpacesElement::editMode()
 {
-    return this->m_editMode;
+    return this->m_spacesWidget.editMode();
 }
 
 bool SpacesElement::snapping()
 {
-    return this->m_snapping;
+    return this->m_spacesWidget.snapping();
 }
 
 int SpacesElement::nParts()
 {
-    return this->m_nParts;
+    return this->m_spacesWidget.nParts();
 }
 
 float SpacesElement::snappingPT()
 {
-    return this->m_snappingPT;
+    return this->m_spacesWidget.snappingPT();
 }
 
 float SpacesElement::snappingRT()
 {
-    return this->m_snappingRT;
+    return this->m_spacesWidget.snappingRT();
 }
 
-QString SpacesElement::rotateButtonStyleSheet()
+QString SpacesElement::buttonText()
 {
-    return this->m_rotateButtonStyleSheet;
+    return this->m_spacesWidget.buttonText();
 }
 
-QString SpacesElement::rotateButtonText()
+QString SpacesElement::buttonIcon()
 {
-    return this->m_rotateButtonText;
+    return this->m_spacesWidget.buttonIcon();
+}
+
+QString SpacesElement::buttonStyleSheet()
+{
+    return this->m_spacesWidget.buttonStyleSheet();
 }
 
 bool SpacesElement::start()
 {
+    emit(this->oStream((const void *) &this->m_spacesWidget, 0, "QWidget"));
+
     return true;
 }
 
@@ -96,329 +94,18 @@ bool SpacesElement::stop()
     return true;
 }
 
-QPointF SpacesElement::mapViewPortToModel(const QPoint &pos, const QSize &viewportSize)
+void SpacesElement::iStream(const void *data, int datalen, QString dataType)
 {
-    QPointF posSpace(pos.x() * (this->m_spaceWidget.rect().right() - this->m_spaceWidget.rect().left()) /
-                    viewportSize.width() + this->m_spaceWidget.rect().left(),
-                    pos.y() * (this->m_spaceWidget.rect().bottom() - this->m_spaceWidget.rect().top()) /
-                    viewportSize.height() + this->m_spaceWidget.rect().top());
+    Q_UNUSED(datalen)
 
-    return posSpace;
-}
+    QString spaceId = this->sender()->objectName();
 
-QStringList SpacesElement::activeSpaces()
-{
-    QStringList spaces;
-
-    foreach (Space space, this->m_spaceWidget.spaces())
-        spaces << space.spaceId();
-
-    return spaces;
-}
-
-QImage SpacesElement::byteArrayToImage(QByteArray *ba)
-{
-    if (!ba)
-        return QImage();
-
-    QDataStream iDataStream(ba, QIODevice::ReadOnly);
-    int type;
-
-    iDataStream >> type;
-
-    if (type != ARGB32)
-        return QImage();
-
-    int width;
-    int height;
-
-    iDataStream >> width >> height;
-
-    QByteArray pixels(4 * width * height, 0);
-    iDataStream.readRawData(pixels.data(), pixels.size());
-
-    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
-}
-
-void SpacesElement::imageToByteArray(QImage *image, QByteArray *ba)
-{
-    if (!image || !ba)
+    if (dataType != "QImage")
         return;
 
-    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+    QImage *iFrame = (QImage *) data;
 
-    oDataStream << ARGB32 << image->width() << image->height();
-    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
-}
-
-void SpacesElement::updateButtonsSize()
-{
-    QRectF spaceModelRect = this->m_spaceWidget.rect();
-
-    for (qint32 space =0; space < this->m_spaceWidget.spaces().count(); space++)
-    {
-        Space spaceItem = this->m_spaceWidget.spaces()[space];
-
-        this->spacesWidgets[spaceItem.spaceId()]->rescaleButtons(spaceModelRect.size(),
-                                                     this->m_viewPortSize,
-                                                     spaceItem.scale());
-    }
-}
-
-void SpacesElement::sendHoverEvent(QWidget *receiver, const QPoint &position)
-{
-    if (receiver != this->oldReceiver)
-    {
-        if (this->oldReceiver)
-        {
-            QHoverEvent hoverLeaveEvent(QEvent::Leave,
-                                        QPoint(-1, -1),
-                                        position);
-
-            QApplication::sendEvent(this->oldReceiver, &hoverLeaveEvent);
-        }
-
-        if (receiver)
-        {
-            QHoverEvent hoverEnterEvent(QEvent::Enter,
-                                        position,
-                                        QPoint(-1, -1));
-
-            QApplication::sendEvent(receiver, &hoverEnterEvent);
-        }
-
-        this->oldReceiver = receiver;
-    }
-}
-
-QWidget *SpacesElement::sendMouseEvent(QEvent::Type type,
-                                      const QPointF &position,
-                                      Qt::MouseButton button,
-                                      Qt::MouseButtons buttons,
-                                      Qt::KeyboardModifiers modifiers)
-{
-    QGraphicsProxyWidget *proxyWidget = qgraphicsitem_cast<QGraphicsProxyWidget *>(this->mainSpace.itemAt(position, QTransform()));
-
-    if (proxyWidget == NULL)
-    {
-        this->oldReceiver = NULL;
-
-        return NULL;
-    }
-
-    QPoint proxyWidgetLocalPoint = proxyWidget->mapFromScene(position).toPoint();
-    QWidget *widget = proxyWidget->widget();
-    QWidget *controlWidget = widget->childAt(proxyWidgetLocalPoint);
-
-    if (!controlWidget)
-    {
-        this->oldReceiver = widget;
-
-        return widget;
-    }
-
-    QPoint controlWidgetLocalPoint = controlWidget->mapFromParent(proxyWidgetLocalPoint);
-
-    this->sendHoverEvent(controlWidget, controlWidgetLocalPoint);
-
-    QMouseEvent mouseEvent(type,
-                           controlWidgetLocalPoint,
-                           button,
-                           buttons,
-                           modifiers);
-
-    QApplication::sendEvent(controlWidget, &mouseEvent);
-
-    return controlWidget;
-}
-
-void SpacesElement::onSpaceMoved(qint32 from, qint32 to)
-{
-    emit spaceMoved(from, to);
-}
-
-void SpacesElement::iStream(QByteArray *data)
-{
-    QString spaceId = this->sender()->objectName();
-    QImage frame(this->byteArrayToImage(data));
-
-    if (this->spacesWidgets.contains(spaceId))
-    {
-        this->m_spaceWidget.setSpace(spaceId, frame.size());
-        this->spacesWidgets[spaceId]->setFrame(frame);
-        this->m_spaceWidget.updateRect();
-
-        QRectF modelRect = this->m_spaceWidget.rect();
-
-        if (!modelRect.isValid())
-        {
-            QImage nullImg(1, 1, QImage::Format_ARGB32);
-            nullImg.fill(0);
-            this->imageToByteArray(&nullImg, &this->m_bFrame);
-            emit(oStream(&this->m_bFrame));
-        }
-
-        QImage mainFrame(modelRect.size().toSize(), QImage::Format_ARGB32);
-        mainFrame.fill(0);
-        QPainter mainPainter(&mainFrame);
-
-        for (qint32 space = 0; space < this->m_spaceWidget.spaces().count(); space++)
-        {
-            Space spaceItem = this->m_spaceWidget.spaces()[space];
-
-            this->proxySpacesWidgets[spaceItem.spaceId()]->setZValue(space);
-            this->proxySpacesWidgets[spaceItem.spaceId()]->setTransformOriginPoint(this->proxySpacesWidgets[spaceItem.spaceId()]->rect().center());
-            this->proxySpacesWidgets[spaceItem.spaceId()]->setRotation(180.0 * spaceItem.rotation() / M_PI);
-            this->proxySpacesWidgets[spaceItem.spaceId()]->setScale(spaceItem.scale());
-            this->proxySpacesWidgets[spaceItem.spaceId()]->setPos(spaceItem.pos());
-        }
-
-        this->mainSpace.render(&mainPainter, QRectF(), modelRect);
-        this->imageToByteArray(&mainFrame, &this->m_bFrame);
-        emit(oStream(&this->m_bFrame));
-    }
-}
-
-void SpacesElement::iEvent(QEvent *event)
-{
-    // bool QGraphicsScene::sendEvent ( QGraphicsItem * item, QEvent * event )
-    switch (event->type())
-    {
-        case QEvent::MouseMove:
-            QPointF modelMousePos = this->mapViewPortToModel(event->pos(), this->m_viewPortSize);
-
-            if (!this->m_editMode)
-            {
-                QString spaceId;
-                QPointF pos = this->m_spaceWidget.mapToLocal(modelMousePos, &spaceId);
-
-                if (spaceId != "")
-                {
-                    QSizeF size = this->m_spaceWidget.spaceSize(spaceId);
-                    QPointF npos = pos + QPointF(size.width(), size.height()) / 2;
-
-                    QMouseEvent mouseEvent(QEvent::MouseMove,
-                                           npos.toPoint(),
-                                           event->button(),
-                                           event->buttons(),
-                                           Qt::NoModifier);
-
-                    emit mouseMove(spaceId, &mouseEvent);
-                }
-            }
-            else
-            {
-                this->sendMouseEvent(QEvent::MouseMove,
-                                     modelMousePos,
-                                     event->button(),
-                                     event->buttons(),
-                                     Qt::NoModifier);
-
-                if (this->m_scaleAndRotate)
-                {
-                    this->m_spaceWidget.scaleAndRotateSpace(modelMousePos);
-                    this->updateButtonsSize();
-                }
-
-                if (this->m_move)
-                    this->m_spaceWidget.moveSpace(modelMousePos);
-            }
-
-            delete event;
-        break;
-
-        case QEvent::MouseButtonPress:
-            QPointF modelMousePos = this->mapViewPortToModel(event->pos(), this->m_viewPortSize);
-
-            if (!this->m_editMode)
-            {
-                QString spaceId;
-                QPointF pos = this->m_spaceWidget.mapToLocal(modelMousePos, &spaceId);
-
-                if (spaceId != "")
-                {
-                    QSizeF size = this->m_spaceWidget.spaceSize(spaceId);
-                    QPointF npos = pos + QPointF(size.width(), size.height()) / 2;
-
-                    QMouseEvent mouseEvent(QEvent::MouseButtonPress,
-                                           npos.toPoint(),
-                                           event->button(),
-                                           event->buttons(),
-                                           Qt::NoModifier);
-
-                    emit mousePress(spaceId, &mouseEvent);
-                }
-            }
-            else
-            {
-                this->m_spaceWidget.selectSpace(modelMousePos);
-
-                QWidget *widget = this->sendMouseEvent(QEvent::MouseButtonPress,
-                                                       modelMousePos,
-                                                       event->button(),
-                                                       event->buttons(),
-                                                       Qt::NoModifier);
-
-                if (widget && widget->objectName() == "btnScaleAndRotate" && event->button() == Qt::LeftButton)
-                    this->m_scaleAndRotate = true;
-                else if (this->m_spaceWidget.currentSelectedSpace() != "")
-                    this->m_move = true;
-            }
-
-            delete event;
-        break;
-
-        case QEvent::MouseButtonRelease:
-            QPointF modelMousePos = this->mapViewPortToModel(event->pos(), this->m_viewPortSize);
-
-            if (!this->m_editMode)
-            {
-                QString spaceId;
-                QPointF pos = this->m_spaceWidget.mapToLocal(modelMousePos, &spaceId);
-
-                if (spaceId != "")
-                {
-                    QSizeF size = this->m_spaceWidget.spaceSize(spaceId);
-                    QPointF npos = pos + QPointF(size.width(), size.height()) / 2;
-
-                    QMouseEvent mouseEvent(QEvent::MouseButtonRelease,
-                                           npos.toPoint(),
-                                           event->button(),
-                                           event->buttons(),
-                                           Qt::NoModifier);
-
-                    emit mouseRelease(spaceId, &mouseEvent);
-                }
-            }
-            else
-            {
-                this->sendMouseEvent(QEvent::MouseButtonRelease,
-                                     modelMousePos,
-                                     event->button(),
-                                     event->buttons(),
-                                     Qt::NoModifier);
-
-                if (event->button() == Qt::LeftButton)
-                {
-                    this->m_move = false;
-                    this->m_scaleAndRotate = false;
-                }
-            }
-
-            delete event;
-        break;
-
-        case QEvent::HoverEnter:
-        break;
-
-        case QEvent::HoverLeave:
-        break;
-
-        default:
-            foreach (Element *element, this->m_srcs)
-                element->iEvent(event);
-        break;
-    }
+    this->m_spacesWidget.setFrame(spaceId, *iFrame);
 }
 
 void SpacesElement::setPipeline(Pipeline *pipeline)
@@ -431,76 +118,57 @@ void SpacesElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
     this->m_srcs = srcs;
     this->m_sinks = sinks;
 
-    if (this->spacesWidgets.contains(spaceId))
-    {
-        this->m_spaceWidget.setSpace(spaceId, frame.size());
-        this->spacesWidgets[spaceId]->setFrame(frame);
-    }
-    else
-    {
-        this->m_spaceWidget.setSpace(spaceId, frame.size());
-        this->spacesWidgets[spaceId] = new SpaceWidget(frame);
-        this->spacesWidgets[spaceId]->setEditMode(this->m_editMode);
+    QStringList spaces;
 
-        this->spacesWidgets[spaceId]->setControlButtons(this->m_toggleMaximizedButton, this->m_scaleAndRotateButton);
-        this->proxySpacesWidgets[spaceId] = this->mainSpace.addWidget(this->spacesWidgets[spaceId]);
-    }
+    foreach (Element *spaceId, srcs)
+        spaces << spaceId->objectName();
+
+    this->m_spacesWidget.setSpaces(spaces);
 }
 
-void SpacesElement::setSpaces(QStringList spaces)
+void SpacesElement::setEditMode(bool editMode)
 {
-    this->m_spaces = spaces;
-}
-
-void SpacesElement::setEditMode(bool value)
-{
-    this->m_editMode = value;
-
-    foreach (SpaceWidget *spaceWidget, this->spacesWidgets)
-        spaceWidget->setEditMode(value);
+    this->m_spacesWidget.setEditMode(editMode);
 }
 
 void SpacesElement::setSnapping(bool snapping)
 {
-    this->m_snapping = snapping;
+    this->m_spacesWidget.setSnapping(snapping);
 }
 
 void SpacesElement::setNParts(int nParts)
 {
-    this->m_nParts = nParts;
+    this->m_spacesWidget.setNParts(nParts);
 }
 
 void SpacesElement::setSnappingPT(float snappingPT)
 {
-    this->m_snappingPT = snappingPT;
+    this->m_spacesWidget.setSnappingPT(snappingPT);
 }
 
 void SpacesElement::setSnappingRT(float snappingRT)
 {
-    this->m_snappingRT = snappingRT;
+    this->m_spacesWidget.setSnappingRT(snappingRT);
 }
 
-void SpacesElement::setRotateButtonStyleSheet(QString rotateButtonStyleSheet)
+void SpacesElement::setButtonText(QString buttonText)
 {
-    this->m_rotateButtonStyleSheet = rotateButtonStyleSheet;
+    this->m_spacesWidget.setButtonText(buttonText);
 }
 
-void SpacesElement::setRotateButtonText(QString rotateButtonText)
+void SpacesElement::setButtonIcon(QString buttonIcon)
 {
-    this->m_rotateButtonText = rotateButtonText;
+    this->m_spacesWidget.setButtonIcon(buttonIcon);
 }
 
-void SpacesElement::resetSpaces()
+void SpacesElement::setButtonStyleSheet(QString buttonStyleSheet)
 {
-    this->setSpaces(QStringList());
+    this->m_spacesWidget.setButtonStyleSheet(buttonStyleSheet);
 }
 
 void SpacesElement::resetEditMode()
 {
     this->setEditMode(false);
-
-    foreach (SpaceWidget *spaceWidget, this->spacesWidgets)
-        spaceWidget->setEditMode(false);
 }
 
 void SpacesElement::resetSnapping()
@@ -523,53 +191,17 @@ void SpacesElement::resetSnappingRT()
     this->setSnappingRT(3.0 * M_PI / 180.0);
 }
 
-void SpacesElement::resetRotateButtonStyleSheet()
+void SpacesElement::resetButtonText()
 {
-    this->setRotateButtonStyleSheet("");
+    this->setButtonText("");
 }
 
-void SpacesElement::resetRotateButtonText()
+void SpacesElement::resetButtonIcon()
 {
-    this->setRotateButtonText("");
+    this->setButtonIcon("");
 }
 
-void SpacesElement::removeSpace(QString spaceId)
+void SpacesElement::resetButtonStyleSheet()
 {
-    if (this->spacesWidgets.contains(spaceId))
-    {
-        this->oldReceiver = NULL;
-        this->m_spaceWidget.removeSpace(spaceId);
-        this->mainSpace.removeItem(this->proxySpacesWidgets[spaceId]);
-        delete this->spacesWidgets[spaceId];
-        this->spacesWidgets.remove(spaceId);
-        this->proxySpacesWidgets.remove(spaceId);
-    }
-}
-
-void SpacesElement::updateSpaces(const QList<QVariant> &devices)
-{
-    QStringList devicesId;
-    QStringList orphanDevices;
-
-    this->oldReceiver = NULL;
-
-    foreach (QVariant device, devices)
-        devicesId << device.toMap()["deviceId"].toString();
-
-    foreach (Space space, this->m_spaceWidget.spaces())
-        if (!devicesId.contains(space.spaceId()))
-            orphanDevices << space.spaceId();
-
-    foreach (QString orphanDevice, orphanDevices)
-        this->removeSpace(orphanDevice);
-}
-
-void SpacesElement::moveSpace(qint32 from, qint32 to)
-{
-    this->m_spaceWidget.moveSpace(from, to);
-}
-
-void SpacesElement::selectSpace(QString spaceId)
-{
-    this->m_spaceWidget.selectSpace(spaceId);
+    this->setButtonStyleSheet("");
 }

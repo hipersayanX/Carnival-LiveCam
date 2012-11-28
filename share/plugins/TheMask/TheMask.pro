@@ -55,6 +55,9 @@ OTHER_FILES += \
 
 QT += core gui
 
+RESOURCES += \
+    TheMask.qrc
+
 SOURCES += \
     src/themask.cpp \
     src/themaskelement.cpp
@@ -71,6 +74,3 @@ target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
 
 data.files = share/*
 data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share
-
-RESOURCES += \
-    TheMask.qrc

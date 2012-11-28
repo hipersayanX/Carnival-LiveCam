@@ -51,76 +51,50 @@ bool CubeElement::stop()
     return true;
 }
 
-QImage CubeElement::byteArrayToImage(QByteArray *ba)
+void CubeElement::iStream(const void *data, int datalen, QString dataType)
 {
-    if (!ba)
-        return QImage();
+    Q_UNUSED(datalen)
 
-    QDataStream iDataStream(ba, QIODevice::ReadOnly);
-    int type;
-
-    iDataStream >> type;
-
-    if (type != ARGB32)
-        return QImage();
-
-    int width;
-    int height;
-
-    iDataStream >> width >> height;
-
-    QByteArray pixels(4 * width * height, 0);
-    iDataStream.readRawData(pixels.data(), pixels.size());
-
-    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
-}
-
-void CubeElement::imageToByteArray(QImage *image, QByteArray *ba)
-{
-    if (!image || !ba)
+    if (dataType != "QImage")
         return;
 
-    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+    QImage *iFrame = (QImage *) data;
 
-    oDataStream << ARGB32 << image->width() << image->height();
-    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
+    this->m_ogl.resize(iFrame->size());
+    this->m_ogl.setImage(*iFrame);
+
+    this->m_oFrame = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
+
+    emit(this->oStream((const void *) &this->m_oFrame, 0, dataType));
 }
 
-void CubeElement::iStream(QByteArray *data)
-{
-    QImage iFrame = this->byteArrayToImage(data);
-
-    if (iFrame.isNull())
-        return;
-
-    this->m_ogl.resize(iFrame.size());
-    this->m_ogl.setImage(iFrame);
-
-    QImage image = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
-
-    this->imageToByteArray(&image, &this->m_bImage);
-
-    emit(oStream(&this->m_bImage));
-}
-
-void CubeElement::iEvent(QEvent *event)
+bool CubeElement::event(QEvent *event)
 {
     switch (event->type())
     {
         case QEvent::MouseMove:
             this->m_ogl.mouseMove(static_cast<QMouseEvent *>(event));
+
+            return true;
         break;
 
         case QEvent::MouseButtonPress:
             this->m_ogl.mousePress(static_cast<QMouseEvent *>(event));
+
+            return true;
         break;
 
         case QEvent::MouseButtonRelease:
             this->m_ogl.mouseRelease(static_cast<QMouseEvent *>(event));
+
+            return true;
         break;
 
         default:
-        break;
+            foreach (Element *src, this->m_srcs)
+                QCoreApplication::sendEvent(src, event);
+
+            return false;
     }
 }
 
@@ -131,8 +105,8 @@ void CubeElement::setPipeline(Pipeline *pipeline)
 
 void CubeElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
 {
-    Q_UNUSED(srcs)
-    Q_UNUSED(sinks)
+    this->m_srcs = srcs;
+    this->m_sinks = sinks;
 }
 
 void CubeElement::setXrot(float xrot)

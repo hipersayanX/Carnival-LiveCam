@@ -47,41 +47,6 @@ bool TheMaskElement::stop()
     return true;
 }
 
-QImage TheMaskElement::byteArrayToImage(QByteArray *ba)
-{
-    if (!ba)
-        return QImage();
-
-    QDataStream iDataStream(ba, QIODevice::ReadOnly);
-    int type;
-
-    iDataStream >> type;
-
-    if (type != ARGB32)
-        return QImage();
-
-    int width;
-    int height;
-
-    iDataStream >> width >> height;
-
-    QByteArray pixels(4 * width * height, 0);
-    iDataStream.readRawData(pixels.data(), pixels.size());
-
-    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
-}
-
-void TheMaskElement::imageToByteArray(QImage *image, QByteArray *ba)
-{
-    if (!image || !ba)
-        return;
-
-    QDataStream oDataStream(ba, QIODevice::WriteOnly);
-
-    oDataStream << ARGB32 << image->width() << image->height();
-    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
-}
-
 void TheMaskElement::setHaarCascadeFile(QString haarCascadeFile)
 {
     this->m_haarCascadeFile = haarCascadeFile;
@@ -104,23 +69,23 @@ void TheMaskElement::resetSprite()
     this->setSprite(":/share/masks/cow.png");
 }
 
-void TheMaskElement::iStream(QByteArray *data)
+void TheMaskElement::iStream(const void *data, int datalen, QString dataType)
 {
-    QImage iFrame = this->byteArrayToImage(data);
-
-    if (iFrame.isNull())
+    if (dataType != "QImage")
         return;
+
+    QImage *iFrame = (QImage *) data;
 
     if (this->m_maskImage.isNull() || this->m_cascadeClassifier.empty())
     {
-        emit(oStream(data));
+        emit(this->oStream(data, datalen, dataType));
 
         return;
     }
 
     float scale = 4;
 
-    QImage smallFrame(iFrame.scaled(iFrame.size() / scale));
+    QImage smallFrame(iFrame->scaled(iFrame->size() / scale));
 
     cv::Mat matFrame(smallFrame.height(),
                      smallFrame.width(),
@@ -136,14 +101,16 @@ void TheMaskElement::iStream(QByteArray *data)
 
     if (vecFaces.size() < 1)
     {
-        emit(oStream(data));
+        emit(this->oStream(data, datalen, dataType));
 
         return;
     }
 
+    this->m_oFrame = *iFrame;
+
     QPainter painter;
 
-    painter.begin(&iFrame);
+    painter.begin(&this->m_oFrame);
 
     for (std::vector<cv::Rect>::const_iterator face = vecFaces.begin(); face != vecFaces.end(); face++)
         painter.drawImage(QRect(face->x * scale,
@@ -154,15 +121,15 @@ void TheMaskElement::iStream(QByteArray *data)
 
     painter.end();
 
-    this->imageToByteArray(&iFrame, &this->m_curFrame);
-
-    emit(oStream(&this->m_curFrame));
+    emit(this->oStream((const void *) &this->m_oFrame, 0, dataType));
 }
 
-void TheMaskElement::iEvent(QEvent *event)
+bool TheMaskElement::event(QEvent *event)
 {
-    foreach (Element *element, this->m_srcs)
-        element->iEvent(event);
+    foreach (Element *src, this->m_srcs)
+        QCoreApplication::sendEvent(src, event);
+
+    return false;
 }
 
 void TheMaskElement::setPipeline(Pipeline *pipeline)

@@ -37,32 +37,18 @@ int VideoSourceElement::fps()
     return this->m_fps;
 }
 
-void VideoSourceElement::imageToByteArray(QImage *image, QByteArray *ba)
-{
-    if (!image || !ba)
-        return;
-
-    QDataStream oDataStream(ba, QIODevice::WriteOnly);
-
-    oDataStream << ARGB32 << image->width() << image->height();
-    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
-}
-
-void VideoSourceElement::iStream(QByteArray *data)
+void VideoSourceElement::iStream(const void *data, int datalen, QString dataType)
 {
     Q_UNUSED(data)
-}
-
-void VideoSourceElement::iEvent(QEvent *event)
-{
-    Q_UNUSED(event)
+    Q_UNUSED(datalen)
+    Q_UNUSED(dataType)
 }
 
 bool VideoSourceElement::start()
 {
     if (!this->m_video.open(this->m_fileName.toUtf8().constData()))
     {
-        emit(fail());
+        emit(this->fail());
 
         return false;
     }
@@ -135,12 +121,10 @@ void VideoSourceElement::timeout()
     this->m_video >> matFrame;
 
     // and convert it to QImage.
-    QImage image = QImage((const uchar *) matFrame.data,
-                           matFrame.cols,
-                           matFrame.rows,
-                           QImage::Format_RGB888).rgbSwapped().convertToFormat(QImage::Format_ARGB32);
+    this->m_oFrame = QImage((const uchar *) matFrame.data,
+                            matFrame.cols,
+                            matFrame.rows,
+                            QImage::Format_RGB888).rgbSwapped();
 
-    this->imageToByteArray(&image, &this->m_curFrame);
-
-    emit(oStream(&this->m_curFrame));
+    emit(this->oStream((const void *) &this->m_oFrame, 0, "QImage"));
 }

@@ -16,12 +16,18 @@
 #
 # Email   : hipersayan DOT x AT gmail DOT com
 # Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
-#
-# QML shell plugin
+
+exists(commons.pri) {
+    include(commons.pri)
+} else {
+    exists(../../../commons.pri) {
+        include(../../../commons.pri)
+    } else {
+        error("commons.pri file not found.")
+    }
+}
 
 CONFIG += plugin
-
-DESTDIR += $$PWD
 
 HEADERS += \
     include/plugin.h \
@@ -31,53 +37,27 @@ HEADERS += \
     include/webcamimageprovider.h \
     include/gui.h
 
-MOC_DIR += $$PWD/build
-
-OBJECTS_DIR += $$PWD/build
-
-OTHER_FILES += \
-    share/images/icons/about.svg \
-    share/images/icons/author.svg \
-    share/images/icons/category.svg \
-    share/images/icons/close.svg \
-    share/images/icons/configure.svg \
-    share/images/icons/effects.svg \
-    share/images/icons/fullscreen.svg \
-    share/images/icons/license.svg \
-    share/images/icons/mail.svg \
-    share/images/icons/maximize.svg \
-    share/images/icons/micoff.svg \
-    share/images/icons/micon.svg \
-    share/images/icons/minimize.svg \
-    share/images/icons/move.svg \
-    share/images/icons/nostayontop.svg \
-    share/images/icons/picture.svg \
-    share/images/icons/sound.svg \
-    share/images/icons/stayontop.svg \
-    share/images/icons/stoprec.svg \
-    share/images/icons/video.svg \
-    share/images/icons/web.svg \
-    share/images/icons/webcam.svg \
-    share/images/icons/windowed.svg \
-    share/images/pixmaps/thumbnail-128x96.png \
-    share/images/pixmaps/windowcontrols.svg \
+OTHER_FILES = \
+    QmlShell.json \
+    share/qml/main.qml \
+    share/qml/About.qml \
     share/qml/Button.qml \
-    share/qml/Effects.qml \
     share/qml/ComboBox.qml \
     share/qml/Device.qml \
     share/qml/Devices.qml \
     share/qml/DialogBox.qml \
+    share/qml/Effects.qml \
     share/qml/IconBar.qml \
     share/qml/ListWidget.qml \
     share/qml/Slider.qml \
+    share/qml/Spaces.qml \
     share/qml/Window.qml \
-    share/qml/WindowControls.qml \
-    share/qml/main.qml \
-    share/qml/About.qml
+    share/qml/WindowControls.qml
 
 QT += core gui declarative
 
-RCC_DIR += $$PWD/build
+RESOURCES += \
+    QmlShell.qrc
 
 SOURCES += \
     src/defaultshell.cpp \
@@ -87,4 +67,13 @@ SOURCES += \
 
 TEMPLATE = lib
 
-UI_DIR += $$PWD/build
+# Install rules
+
+INSTALLS += target \
+            data
+
+target.files = $$TARGET
+target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
+
+data.files = share/*
+data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share

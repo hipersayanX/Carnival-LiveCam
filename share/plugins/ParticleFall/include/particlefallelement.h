@@ -52,6 +52,8 @@ class ParticleFallElement: public Element
         QStringList sprites();
         float inc();
 
+        bool event(QEvent *event);
+
         Q_INVOKABLE bool start();
         Q_INVOKABLE bool stop();
 
@@ -68,13 +70,10 @@ class ParticleFallElement: public Element
         float m_inc;
         QList<QImage> m_pixmaps;
         QList<Particle> m_particles;
-        QByteArray m_bCurFrame;
+        QImage m_oFrame;
         QSize m_curFrameSize;
         QList<Element *> m_srcs;
         QList<Element *> m_sinks;
-
-        QImage byteArrayToImage(QByteArray *ba);
-        void imageToByteArray(QImage *image, QByteArray *ba);
 
     public slots:
         void setNParticles(int nParticles);
@@ -98,8 +97,7 @@ class ParticleFallElement: public Element
         void resetSprites();
         void resetInc();
 
-        void iStream(QByteArray *data);
-        void iEvent(QEvent *event);
+        void iStream(const void *data, int datalen, QString dataType);
         void setPipeline(Pipeline *pipeline);
         void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 };

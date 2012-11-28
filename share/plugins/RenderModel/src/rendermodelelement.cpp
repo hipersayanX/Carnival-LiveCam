@@ -39,62 +39,29 @@ bool RenderModelElement::stop()
     return true;
 }
 
-QImage RenderModelElement::byteArrayToImage(QByteArray *ba)
+void RenderModelElement::iStream(const void *data, int datalen, QString dataType)
 {
-    if (!ba)
-        return QImage();
+    Q_UNUSED(datalen)
 
-    QDataStream iDataStream(ba, QIODevice::ReadOnly);
-    int type;
-
-    iDataStream >> type;
-
-    if (type != ARGB32)
-        return QImage();
-
-    int width;
-    int height;
-
-    iDataStream >> width >> height;
-
-    QByteArray pixels(4 * width * height, 0);
-    iDataStream.readRawData(pixels.data(), pixels.size());
-
-    return QImage((const uchar *) pixels.constData(), width, height, QImage::Format_ARGB32);
-}
-
-void RenderModelElement::imageToByteArray(QImage *image, QByteArray *ba)
-{
-    if (!image || !ba)
+    if (dataType != "QImage")
         return;
 
-    QDataStream oDataStream(ba, QIODevice::WriteOnly);
+    QImage *iFrame = (QImage *) data;
 
-    oDataStream << ARGB32 << image->width() << image->height();
-    oDataStream.writeRawData((const char *) image->constBits(), image->byteCount());
+    this->m_ogl.resize(iFrame->size());
+    this->m_ogl.setImage(*iFrame);
+
+    this->m_oFrame = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
+
+    emit(this->oStream((const void *) &this->m_oFrame, 0, dataType));
 }
 
-void RenderModelElement::iStream(QByteArray *data)
+bool RenderModelElement::event(QEvent *event)
 {
-    QImage iFrame = this->byteArrayToImage(data);
+    foreach (Element *src, this->m_srcs)
+        QCoreApplication::sendEvent(src, event);
 
-    if (iFrame.isNull())
-        return;
-
-    this->m_ogl.resize(iFrame.size());
-    this->m_ogl.setImage(iFrame);
-
-    QImage image = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
-
-    this->imageToByteArray(&image, &this->m_bImage);
-
-    emit(oStream(&this->m_bImage));
-}
-
-void RenderModelElement::iEvent(QEvent *event)
-{
-    foreach (Element *element, this->m_srcs)
-        element->iEvent(event);
+    return false;
 }
 
 void RenderModelElement::setPipeline(Pipeline *pipeline)

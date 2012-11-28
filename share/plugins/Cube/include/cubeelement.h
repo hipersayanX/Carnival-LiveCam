@@ -34,22 +34,23 @@ class CubeElement: public Element
         float xrot();
         float yrot();
 
+        bool event(QEvent *event);
+
         Q_INVOKABLE bool start();
         Q_INVOKABLE bool stop();
 
     private:
         CubeGL m_ogl;
-        QByteArray m_bImage;
+        QImage m_oFrame;
         GLfloat m_xrot;
         GLfloat m_yrot;
 
-        QImage byteArrayToImage(QByteArray *ba);
-        void imageToByteArray(QImage *image, QByteArray *ba);
+        QList<Element *> m_srcs;
+        QList<Element *> m_sinks;
 
     public slots:
         // Input Channels
-        void iStream(QByteArray *data);
-        void iEvent(QEvent *event);
+        void iStream(const void *data, int datalen, QString dataType);
         void setPipeline(Pipeline *pipeline);
         void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 

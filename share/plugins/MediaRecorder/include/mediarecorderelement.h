@@ -20,6 +20,8 @@
 #ifndef MEDIARECORDERELEMENT_H
 #define MEDIARECORDERELEMENT_H
 
+#include <QtGui>
+
 #include "element.h"
 
 class MediaRecorderElement: public Element
@@ -61,15 +63,12 @@ class MediaRecorderElement: public Element
         QString m_videoPipeFilename;
         QProcess m_ffmpeg;
 
-        QImage byteArrayToImage(QByteArray *ba);
-
     signals:
         void fail();
 
     public slots:
         // Input Channels
-        void iStream(QByteArray *data);
-        void iEvent(QEvent *event);
+        void iStream(const void *data, int datalen, QString dataType);
         void setPipeline(Pipeline *pipeline);
         void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 

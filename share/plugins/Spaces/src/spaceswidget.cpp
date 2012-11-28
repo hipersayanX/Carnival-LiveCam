@@ -22,6 +22,7 @@
 
 SpacesWidget::SpacesWidget(QWidget *parent): QGraphicsView(parent)
 {
+    this->resetSpaces();
     this->resetEditMode();
     this->resetSnapping();
     this->resetNParts();
@@ -35,6 +36,11 @@ SpacesWidget::SpacesWidget(QWidget *parent): QGraphicsView(parent)
     this->setScene(&this->m_graphicsScene);
 
     QObject::connect(&this->m_graphicsScene, &QGraphicsScene::changed, this, &SpacesWidget::on_changed);
+}
+
+QStringList SpacesWidget::spaces()
+{
+    return this->m_proxySpaces.keys();
 }
 
 bool SpacesWidget::editMode()
@@ -52,12 +58,12 @@ int SpacesWidget::nParts()
     return this->m_nParts;
 }
 
-int SpacesWidget::snappingPT()
+float SpacesWidget::snappingPT()
 {
     return this->m_snappingPT;
 }
 
-int SpacesWidget::snappingRT()
+float SpacesWidget::snappingRT()
 {
     return this->m_snappingRT;
 }
@@ -92,7 +98,17 @@ void SpacesWidget::resizeEvent(QResizeEvent *event)
     this->scene()->setSceneRect(boundingRect);
     this->fitInView(boundingRect, Qt::KeepAspectRatio);
 
-    event->accept();
+    foreach (QString spaceId, this->m_proxySpaces.keys())
+    {
+        Space *space = qobject_cast<Space *>(this->m_proxySpaces[spaceId]->widget());
+
+        float factor = sqrt(pow(event->size().width(), 2) +
+                            pow(event->size().height(), 2)) /
+                       sqrt(pow(event->oldSize().width(), 2) +
+                            pow(event->oldSize().height(), 2));
+
+        space->rescaleButton(factor);
+    }
 }
 
 void SpacesWidget::addSpace(QString spaceId)
@@ -100,6 +116,7 @@ void SpacesWidget::addSpace(QString spaceId)
     Space *space = new Space();
 
     this->m_proxySpaces[spaceId] = this->m_graphicsScene.addWidget(space);
+    this->m_proxySpaces[spaceId]->setZValue(this->m_proxySpaces.size() - 1);
     space->setSpaceId(spaceId);
     space->setProxy(this->m_proxySpaces[spaceId]);
     space->setEditMode(this->m_editMode);
@@ -110,12 +127,29 @@ void SpacesWidget::addSpace(QString spaceId)
     space->setButtonText(this->m_buttonText);
     space->setButtonIcon(this->m_buttonIcon);
     space->setButtonStyleSheet(this->m_buttonStyleSheet);
+
+    QObject::connect(space, SIGNAL(spaceMoved(int, int)), this, SIGNAL(spaceMoved(int, int)));
 }
 
 void SpacesWidget::removeSpace(QString spaceId)
 {
+    QObject::disconnect(this->m_proxySpaces[spaceId]->widget(), SIGNAL(spaceMoved(int, int)), this, SIGNAL(spaceMoved(int, int)));
+
     this->m_graphicsScene.removeItem(this->m_proxySpaces[spaceId]);
     this->m_proxySpaces.remove(spaceId);
+}
+
+void SpacesWidget::setSpaces(QStringList spaces)
+{
+    foreach (QString spaceId, spaces)
+        if (!this->m_proxySpaces.contains(spaceId))
+            this->addSpace(spaceId);
+
+    QStringList mSpaces = this->m_proxySpaces.keys();
+
+    foreach (QString spaceId, mSpaces)
+        if (!spaces.contains(spaceId))
+            this->removeSpace(spaceId);
 }
 
 void SpacesWidget::setEditMode(bool editable)
@@ -212,6 +246,11 @@ void SpacesWidget::setButtonStyleSheet(QString styleSheet)
 
         space->setButtonStyleSheet(styleSheet);
     }
+}
+
+void SpacesWidget::resetSpaces()
+{
+    this->setSpaces(QStringList());
 }
 
 void SpacesWidget::resetEditMode()

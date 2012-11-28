@@ -26,7 +26,7 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
-#include <QtGui>
+#include <QtCore>
 
 #include "pipeline.h"
 
@@ -37,12 +37,6 @@ class Element: public QObject
     Q_ENUMS(StreamFormats)
 
     public:
-        enum StreamFormats
-        {
-            ARGB32, // This is a image frame stored in 32-bit ARGB format (0xAARRGGBB).
-            S16LE   // This is a PCM audio frame stored in signed 16-bit little-endian format.
-        };
-
         enum ElementState
         {
             Null,
@@ -59,18 +53,17 @@ class Element: public QObject
         /// This method executes the finalization code for the plugin.
         Q_INVOKABLE virtual bool stop() = 0;
 /*
-        Q_INVOKABLE virtual bool state(ElementState state) = 0;
-        Q_INVOKABLE virtual ElementState setState() = 0;
+        Q_INVOKABLE virtual ElementState state() = 0;
+        Q_INVOKABLE virtual bool setState(ElementState state) = 0;
 */
     signals:
         // Output Channel
-        void oStream(QByteArray *data);
+        void oStream(const void *data, int datalen, QString dataType);
         void requestPipeline();
 
     public slots:
         // Input Channel
-        virtual void iStream(QByteArray *data) = 0;
-        virtual void iEvent(QEvent *event) = 0;
+        virtual void iStream(const void *data, int datalen, QString dataType) = 0;
         virtual void setPipeline(Pipeline *pipeline) = 0;
         virtual void setPeers(QList<Element *> srcs, QList<Element *> sinks) = 0;
 };

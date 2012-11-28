@@ -29,102 +29,64 @@ class SpacesElement: public Element
 {
     Q_OBJECT
 
-    Q_PROPERTY(QStringList spaces READ spaces WRITE setSpaces RESET resetSpaces)
     Q_PROPERTY(bool editMode READ editMode WRITE setEditMode RESET resetEditMode)
     Q_PROPERTY(bool snapping READ snapping WRITE setSnapping RESET resetSnapping)
     Q_PROPERTY(int nParts READ nParts WRITE setNParts RESET resetNParts)
     Q_PROPERTY(float snappingPT READ snappingPT WRITE setSnappingPT RESET resetSnappingPT)
     Q_PROPERTY(float snappingRT READ snappingRT WRITE setSnappingRT RESET resetSnappingRT)
-
-    Q_PROPERTY(QString rotateButtonStyleSheet
-               READ rotateButtonStyleSheet
-               WRITE setRotateButtonStyleSheet
-               RESET resetRotateButtonStyleSheet)
-
-    Q_PROPERTY(QString rotateButtonText
-               READ rotateButtonText
-               WRITE setRotateButtonText
-               RESET resetRotateButtonText)
+    Q_PROPERTY(QString buttonText READ buttonText WRITE setButtonText RESET resetButtonText)
+    Q_PROPERTY(QString buttonIcon READ buttonIcon WRITE setButtonIcon RESET resetButtonIcon)
+    Q_PROPERTY(QString buttonStyleSheet READ buttonStyleSheet WRITE setButtonStyleSheet RESET resetButtonStyleSheet)
 
     public:
         explicit SpacesElement();
         ~SpacesElement();
 
-        QStringList spaces();
         bool editMode();
         bool snapping();
         int nParts();
         float snappingPT();
         float snappingRT();
-        QString rotateButtonStyleSheet();
-        QString rotateButtonText();
+        QString buttonText();
+        QString buttonIcon();
+        QString buttonStyleSheet();
 
         Q_INVOKABLE bool start();
         Q_INVOKABLE bool stop();
 
     private:
-        QStringList m_spaces;
-        bool m_editMode;
-        bool m_snapping;
-        qint32 m_nParts;
-        qreal m_snappingPT;
-        qreal m_snappingRT;
-        QString m_rotateButtonStyleSheet;
-        QString m_rotateButtonText;
-
         bool m_move;
         bool m_scaleAndRotate;
-        SpacesWidget m_spaceWidget;
+        SpacesWidget m_spacesWidget;
         QList<Element *> m_srcs;
         QList<Element *> m_sinks;
         QByteArray m_bFrame;
 
-        QImage byteArrayToImage(QByteArray *ba);
-        void imageToByteArray(QImage *image, QByteArray *ba);
-
-        void updateButtonsSize();
-        void sendHoverEvent(QWidget *receiver, const QPoint &position);
-
-        QWidget *sendMouseEvent(QEvent::Type type,
-                                const QPointF &position,
-                                Qt::MouseButton button,
-                                Qt::MouseButtons buttons,
-                                Qt::KeyboardModifiers modifiers);
-
-        QPointF mapViewPortToModel(const QPoint &pos, const QSize &viewportSize);
-        QStringList activeSpaces();
-
-    private slots:
-        void onSpaceMoved(qint32 from, qint32 to);
+    signals:
+        void spaceMoved(int from, int to);
 
     public slots:
         // Input Channels
-        void iStream(QByteArray *data);
-        void iEvent(QEvent *event);
+        void iStream(const void *data, int datalen, QString dataType);
         void setPipeline(Pipeline *pipeline);
         void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 
-        void setSpaces(QStringList spaces);
-        void setEditMode(bool value);
+        void setEditMode(bool editMode);
         void setSnapping(bool snapping);
         void setNParts(int nParts);
         void setSnappingPT(float snappingPT);
         void setSnappingRT(float snappingRT);
-        void setRotateButtonStyleSheet(QString rotateButtonStyleSheet);
-        void setRotateButtonText(QString rotateButtonText);
-        void resetSpaces();
+        void setButtonText(QString buttonText);
+        void setButtonIcon(QString buttonIcon);
+        void setButtonStyleSheet(QString buttonStyleSheet);
         void resetEditMode();
         void resetSnapping();
         void resetNParts();
         void resetSnappingPT();
         void resetSnappingRT();
-        void resetRotateButtonStyleSheet();
-        void resetRotateButtonText();
-
-        void removeSpace(QString spaceId);
-        void updateSpaces(const QList<QVariant> &devices);
-        void moveSpace(qint32 from, qint32 to);
-        void selectSpace(QString spaceId);
+        void resetButtonText();
+        void resetButtonIcon();
+        void resetButtonStyleSheet();
 };
 
 #endif // SPACESELEMENT_H

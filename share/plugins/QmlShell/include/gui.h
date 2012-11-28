@@ -17,6 +17,9 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
+// https://qt-project.org/doc/qt-5.0/qtquick-module.html
+// https://qt-project.org/doc/qt-5.0/qquickwindow.html
+
 #ifndef GUI_H
 #define GUI_H
 

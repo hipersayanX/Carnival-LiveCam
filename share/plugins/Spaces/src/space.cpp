@@ -198,9 +198,20 @@ void Space::bringToFront()
 
     foreach (QGraphicsItem *space, spaces)
         if (space != this->m_proxy && space->zValue() > this->m_proxy->zValue())
-            space->setZValue(space->zValue() - 1);
+        {
+            int from = space->zValue();
+            int to = space->zValue() - 1;
 
-    this->m_proxy->setZValue(spaces.length() - 1);
+            space->setZValue(to);
+
+            emit(static_cast<Space *>(static_cast<QGraphicsProxyWidget *>(space)->widget())->spaceMoved(from, to));
+        }
+
+    int from = this->m_proxy->zValue();
+    int to = spaces.length() - 1;
+
+    this->m_proxy->setZValue(to);
+    emit(this->spaceMoved(from, to));
 }
 
 bool Space::eventFilter(QObject *watched, QEvent *event)
@@ -264,6 +275,14 @@ bool Space::resendMouseEvent(QMouseEvent *event)
     QMouseEvent mEvent(event->type(), QPoint(x, y), event->button(), event->button(), event->modifiers());
 
     return QCoreApplication::sendEvent(element, &mEvent);
+}
+
+void Space::rescaleButton(float factor)
+{
+    this->btnScaleAndRotate->resize(factor * this->btnScaleAndRotate->size());
+    this->btnScaleAndRotate->setIconSize(factor * this->btnScaleAndRotate->iconSize());
+    this->btnScaleAndRotate->setMaximumSize(factor * this->btnScaleAndRotate->maximumSize());
+    this->btnScaleAndRotate->setMinimumSize(factor * this->btnScaleAndRotate->minimumSize());
 }
 
 void Space::mouseDoubleClickEvent(QMouseEvent *event)

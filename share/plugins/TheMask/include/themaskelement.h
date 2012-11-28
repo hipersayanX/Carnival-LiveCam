@@ -20,6 +20,7 @@
 #ifndef THEMASKELEMENT_H
 #define THEMASKELEMENT_H
 
+#include <QtGui>
 #include <opencv2/opencv.hpp>
 
 #include "element.h"
@@ -37,20 +38,19 @@ class TheMaskElement: public Element
         QString haarCascadeFile();
         QString sprite();
 
+        bool event(QEvent *event);
+
         Q_INVOKABLE bool start();
         Q_INVOKABLE bool stop();
 
     private:
         QString m_haarCascadeFile;
         QString m_sprite;
-        QByteArray m_curFrame;
+        QImage m_oFrame;
         QImage m_maskImage;
         cv::CascadeClassifier m_cascadeClassifier;
         QList<Element *> m_srcs;
         QList<Element *> m_sinks;
-
-        QImage byteArrayToImage(QByteArray *ba);
-        void imageToByteArray(QImage *image, QByteArray *ba);
 
     public slots:
         void setHaarCascadeFile(QString haarCascadeFile);
@@ -58,8 +58,7 @@ class TheMaskElement: public Element
         void resetHaarCascadeFile();
         void resetSprite();
 
-        void iStream(QByteArray *data);
-        void iEvent(QEvent *event);
+        void iStream(const void *data, int datalen, QString dataType);
         void setPipeline(Pipeline *pipeline);
         void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 };

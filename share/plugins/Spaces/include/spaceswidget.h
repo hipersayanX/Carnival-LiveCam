@@ -26,11 +26,12 @@ class SpacesWidget: public QGraphicsView
 {
     Q_OBJECT
 
+    Q_PROPERTY(QStringList spaces READ spaces WRITE setSpaces RESET resetSpaces)
     Q_PROPERTY(bool editMode READ editMode WRITE setEditMode RESET resetEditMode)
     Q_PROPERTY(bool snapping READ snapping WRITE setSnapping RESET resetSnapping)
     Q_PROPERTY(int nParts READ nParts WRITE setNParts RESET resetNParts)
-    Q_PROPERTY(int snappingPT READ snappingPT WRITE setSnappingPT RESET resetSnappingPT)
-    Q_PROPERTY(int snappingRT READ snappingRT WRITE setSnappingRT RESET resetSnappingRT)
+    Q_PROPERTY(float snappingPT READ snappingPT WRITE setSnappingPT RESET resetSnappingPT)
+    Q_PROPERTY(float snappingRT READ snappingRT WRITE setSnappingRT RESET resetSnappingRT)
     Q_PROPERTY(QString buttonText READ buttonText WRITE setButtonText RESET resetButtonText)
     Q_PROPERTY(QString buttonIcon READ buttonIcon WRITE setButtonIcon RESET resetButtonIcon)
     Q_PROPERTY(QString buttonStyleSheet READ buttonStyleSheet WRITE setButtonStyleSheet RESET resetButtonStyleSheet)
@@ -38,11 +39,12 @@ class SpacesWidget: public QGraphicsView
     public:
         explicit SpacesWidget(QWidget *parent = 0);
 
+        QStringList spaces();
         bool editMode();
         bool snapping();
         int nParts();
-        int snappingPT();
-        int snappingRT();
+        float snappingPT();
+        float snappingRT();
         QString buttonText();
         QString buttonIcon();
         QString buttonStyleSheet();
@@ -64,9 +66,13 @@ class SpacesWidget: public QGraphicsView
     protected:
         void resizeEvent(QResizeEvent *event);
 
+    signals:
+        void spaceMoved(int from, int to);
+
     public slots:
         void addSpace(QString spaceId);
         void removeSpace(QString spaceId);
+        void setSpaces(QStringList spaces);
         void setEditMode(bool editable);
         void setSnapping(bool enable);
         void setNParts(int nParts);
@@ -75,6 +81,7 @@ class SpacesWidget: public QGraphicsView
         void setButtonText(QString text);
         void setButtonIcon(QString icon);
         void setButtonStyleSheet(QString styleSheet);
+        void resetSpaces();
         void resetEditMode();
         void resetSnapping();
         void resetNParts();

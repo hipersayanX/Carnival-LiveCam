@@ -20,6 +20,8 @@
 #ifndef IMAGESOURCEELEMENT_H
 #define IMAGESOURCEELEMENT_H
 
+#include <QtGui>
+
 #include "element.h"
 
 class ImageSourceElement: public Element
@@ -37,14 +39,11 @@ class ImageSourceElement: public Element
 
     private:
         QString m_fileName;
-        QByteArray m_bImage;
-
-        void imageToByteArray(QImage *image, QByteArray *ba);
+        QImage m_oFrame;
 
     public slots:
         // Input Channels
-        void iStream(QByteArray *data);
-        void iEvent(QEvent *event);
+        void iStream(const void *data, int datalen, QString dataType);
         void setPipeline(Pipeline *pipeline);
         void setPeers(QList<Element *> srcs, QList<Element *> sinks);
 

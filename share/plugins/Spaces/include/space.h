@@ -52,6 +52,7 @@ class Space: public QWidget, public Ui::Space
         Q_INVOKABLE void setSpaceId(QString spaceId);
         Q_INVOKABLE void setProxy(QGraphicsProxyWidget *proxy);
         Q_INVOKABLE void setFrame(const QImage &frame);
+        Q_INVOKABLE void rescaleButton(float factor);
 
     private:
         bool m_editMode;
@@ -82,6 +83,9 @@ class Space: public QWidget, public Ui::Space
         void mousePressEvent(QMouseEvent *event);
         void mouseReleaseEvent(QMouseEvent *event);
         void mouseMoveEvent(QMouseEvent *event);
+
+    signals:
+        void spaceMoved(int from, int to);
 
     public slots:
         void setEditMode(bool editable);

@@ -21,17 +21,15 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-#SUBDIRS += \
-#           DefaultShell
-
 SUBDIRS += \
-           Cube \
-           ImageSource \
-           MediaRecorder \
-           ParticleFall \
-           RenderModel \
-           Spaces \
-           TheMask \
-           VideoSource \
-           WebcamDetect \
-           WebcamSource
+        Cube \
+        ImageSource \
+        MediaRecorder \
+        ParticleFall \
+        QmlShell \
+        RenderModel \
+        Spaces \
+        TheMask \
+        VideoSource \
+        WebcamDetect \
+        WebcamSource

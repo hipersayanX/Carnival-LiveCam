@@ -64,14 +64,11 @@ QList<QStringList> WebcamDetectElement::webcams(QString dir)
     return webcams;
 }
 
-void WebcamDetectElement::iStream(QByteArray *data)
+void WebcamDetectElement::iStream(const void *data, int datalen, QString dataType)
 {
     Q_UNUSED(data)
-}
-
-void WebcamDetectElement::iEvent(QEvent *event)
-{
-    Q_UNUSED(event)
+    Q_UNUSED(datalen)
+    Q_UNUSED(dataType)
 }
 
 bool WebcamDetectElement::start()
@@ -127,16 +124,16 @@ void WebcamDetectElement::devicesChanged(QString path)
     if (!this->m_fsWatcher->directories().isEmpty() && webcams == this->m_webcams)
         return;
 
-    emit(webcamsUpdated(webcams));
+    emit(this->webcamsUpdated(webcams));
 
     QList<QStringList> removed = this->substractList(this->m_webcams, webcams);
     QList<QStringList> added = this->substractList(webcams, this->m_webcams);
 
     if (!added.isEmpty())
-        emit(webcamsAdded(added));
+        emit(this->webcamsAdded(added));
 
     if (!removed.isEmpty())
-        emit(webcamsRemoved(removed));
+        emit(this->webcamsRemoved(removed));
 
     this->m_webcams = webcams;
 }

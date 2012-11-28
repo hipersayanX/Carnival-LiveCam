@@ -382,9 +382,9 @@ bool MainPipeline::connectElements(QString senderId, QString receiverId)
         return false;
 
     QObject::connect(this->m_elements[senderId],
-                     SIGNAL(oStream(QByteArray *)),
+                     SIGNAL(oStream(const void *, int, QString)),
                      this->m_elements[receiverId],
-                     SLOT(iStream(QByteArray *)));
+                     SLOT(iStream(const void *, int, QString)));
 
     this->m_connections1 << (QStringList() << senderId << receiverId);
 
@@ -397,7 +397,7 @@ bool MainPipeline::connectElements(QString senderId, const QObject *receiver, co
         return false;
 
     QObject::connect(this->m_elements[senderId],
-                     SIGNAL(oStream(QByteArray *)),
+                     SIGNAL(oStream(const void *, int, QString)),
                      receiver,
                      slot);
 
@@ -412,7 +412,7 @@ bool MainPipeline::connectElements(const QObject *sender, const char *signal, QS
     QObject::connect(sender,
                      signal,
                      this->m_elements[receiverId],
-                     SLOT(iStream(QByteArray *)));
+                     SLOT(iStream(const void *, int, QString)));
 
     return true;
 }
@@ -423,9 +423,9 @@ bool MainPipeline::disconnectElements(QString senderId, QString receiverId)
         return false;
 
     QObject::disconnect(this->m_elements[senderId],
-                        SIGNAL(oStream(QByteArray *)),
+                        SIGNAL(oStream(const void *, int, QString)),
                         this->m_elements[receiverId],
-                        SLOT(iStream(QByteArray *)));
+                        SLOT(iStream(const void *, int, QString)));
 
     this->m_connections1.removeAll(QStringList() << senderId << receiverId);
 
@@ -438,7 +438,7 @@ bool MainPipeline::disconnectElements(QString senderId, const QObject *receiver,
         return false;
 
     QObject::disconnect(this->m_elements[senderId],
-                        SIGNAL(oStream(QByteArray *)),
+                        SIGNAL(oStream(const void *, int, QString)),
                         receiver,
                         slot);
 
@@ -453,7 +453,7 @@ bool MainPipeline::disconnectElements(const QObject *sender, const char *signal,
     QObject::disconnect(sender,
                         signal,
                         this->m_elements[receiverId],
-                        SLOT(iStream(QByteArray *)));
+                        SLOT(iStream(const void *, int, QString)));
 
     return true;
 }
@@ -579,55 +579,6 @@ QVariant MainPipeline::parseValue(QString value)
     // Bool
     if (QRegExp(this->m_regexpDict["bool"]).exactMatch(value))
         return (value == "true")? true: false;
-    // Qt::GlobalColor
-    else if (QRegExp(this->m_regexpDict["qColor"]).exactMatch(value))
-    {
-        QStringList r = this->regexpFindAll(this->m_regexpDict["colorConst"],
-                                            value);
-/*
-        if (r[0] == "white")
-            return Qt::white;
-        else if (r[0] == "black")
-            return Qt::black;
-        else if (r[0] == "red")
-            return Qt::red;
-        else if (r[0] == "darkRed")
-            return Qt::darkRed;
-        else if (r[0] == "green")
-            return Qt::green;
-        else if (r[0] == "darkGreen")
-            return Qt::darkGreen;
-        else if (r[0] == "blue")
-            return Qt::blue;
-        else if (r[0] == "darkBlue")
-            return Qt::darkBlue;
-        else if (r[0] == "cyan")
-            return Qt::cyan;
-        else if (r[0] == "darkCyan")
-            return Qt::darkCyan;
-        else if (r[0] == "magenta")
-            return Qt::magenta;
-        else if (r[0] == "darkMagenta")
-            return Qt::darkMagenta;
-        else if (r[0] == "yellow")
-            return Qt::yellow;
-        else if (r[0] == "darkYellow")
-            return Qt::darkYellow;
-        else if (r[0] == "gray")
-            return Qt::gray;
-        else if (r[0] == "darkGray")
-            return Qt::darkGray;
-        else if (r[0] == "lightGray")
-            return Qt::lightGray;
-        else if (r[0] == "transparent")
-            return Qt::transparent;
-        else if (r[0] == "color0")
-            return Qt::color0;
-        else if (r[0] == "color1")
-            return Qt::color1;
-        else
-            return Qt::color0;*/
-    }
     // Size
     else if (QRegExp(this->m_regexpDict["size"]).exactMatch(value))
     {
@@ -1368,31 +1319,6 @@ void MainPipeline::resetRegexpDict()
 
     this->m_regexpDict["string"] = "'(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\"";
 
-    this->m_regexpDict["colorConst"] = "white|" \
-                                       "black|" \
-                                       "red|" \
-                                       "darkRed|" \
-                                       "green|" \
-                                       "darkGreen|" \
-                                       "blue|" \
-                                       "darkBlue|" \
-                                       "cyan|" \
-                                       "darkCyan|" \
-                                       "magenta|" \
-                                       "darkMagenta|" \
-                                       "yellow|" \
-                                       "darkYellow|" \
-                                       "gray|" \
-                                       "darkGray|" \
-                                       "lightGray|" \
-                                       "transparent|" \
-                                       "color0|" \
-                                       "color1";
-
-    this->m_regexpDict["qColor"] = "qColor\\s*\\(\\s*(?:" +
-                                   this->m_regexpDict["colorConst"] +
-                                   ")?\\s*\\)";
-
     this->m_regexpDict["size"] = "(?:size|sizeF)\\s*\\(\\s*(?:(?:" +
                                  this->m_regexpDict["number"] +
                                  ")\\s*,\\s*(?:" +
@@ -1462,8 +1388,6 @@ void MainPipeline::resetRegexpDict()
                                          this->m_regexpDict["number"] +
                                          ")|(?:" +
                                          this->m_regexpDict["string"] +
-                                         ")|(?:" +
-                                         this->m_regexpDict["qColor"] +
                                          ")|(?:" +
                                          this->m_regexpDict["size"] +
                                          ")|(?:" +

@@ -1,0 +1,42 @@
+<RCC>
+    <qresource prefix="/">
+        <file>share/images/icons/about.svg</file>
+        <file>share/images/icons/author.svg</file>
+        <file>share/images/icons/category.svg</file>
+        <file>share/images/icons/close.svg</file>
+        <file>share/images/icons/configure.svg</file>
+        <file>share/images/icons/effects.svg</file>
+        <file>share/images/icons/fullscreen.svg</file>
+        <file>share/images/icons/license.svg</file>
+        <file>share/images/icons/mail.svg</file>
+        <file>share/images/icons/maximize.svg</file>
+        <file>share/images/icons/micoff.svg</file>
+        <file>share/images/icons/micon.svg</file>
+        <file>share/images/icons/minimize.svg</file>
+        <file>share/images/icons/move.svg</file>
+        <file>share/images/icons/nostayontop.svg</file>
+        <file>share/images/icons/picture.svg</file>
+        <file>share/images/icons/sound.svg</file>
+        <file>share/images/icons/stayontop.svg</file>
+        <file>share/images/icons/stoprec.svg</file>
+        <file>share/images/icons/video.svg</file>
+        <file>share/images/icons/web.svg</file>
+        <file>share/images/icons/webcam.svg</file>
+        <file>share/images/icons/windowed.svg</file>
+        <file>share/images/pixmaps/windowcontrols.svg</file>
+        <file>share/qml/About.qml</file>
+        <file>share/qml/Button.qml</file>
+        <file>share/qml/ComboBox.qml</file>
+        <file>share/qml/Device.qml</file>
+        <file>share/qml/Devices.qml</file>
+        <file>share/qml/DialogBox.qml</file>
+        <file>share/qml/Effects.qml</file>
+        <file>share/qml/IconBar.qml</file>
+        <file>share/qml/ListWidget.qml</file>
+        <file>share/qml/Slider.qml</file>
+        <file>share/qml/Spaces.qml</file>
+        <file>share/qml/Window.qml</file>
+        <file>share/qml/WindowControls.qml</file>
+        <file>share/qml/main.qml</file>
+    </qresource>
+</RCC>
