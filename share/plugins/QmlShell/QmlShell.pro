@@ -30,12 +30,16 @@ exists(commons.pri) {
 CONFIG += plugin
 
 HEADERS += \
-    include/plugin.h \
     include/element.h \
-    include/defaultshell.h \
-    include/defaultshellfactory.h \
-    include/webcamimageprovider.h \
-    include/gui.h
+    include/pipeline.h \
+    include/plugin.h \
+    include/qmlshellelement.h \
+    include/qmlshell.h \
+    include/qmlshellgui.h \
+    include/imageprovider.h
+
+
+INCLUDEPATH += include
 
 OTHER_FILES = \
     QmlShell.json \
@@ -54,16 +58,16 @@ OTHER_FILES = \
     share/qml/Window.qml \
     share/qml/WindowControls.qml
 
-QT += core gui declarative
+QT += core gui quick
 
 RESOURCES += \
     QmlShell.qrc
 
 SOURCES += \
-    src/defaultshell.cpp \
-    src/defaultshellfactory.cpp \
-    src/webcamimageprovider.cpp \
-    src/gui.cpp
+    src/qmlshellelement.cpp \
+    src/qmlshell.cpp \
+    src/qmlshellgui.cpp \
+    src/imageprovider.cpp
 
 TEMPLATE = lib
 

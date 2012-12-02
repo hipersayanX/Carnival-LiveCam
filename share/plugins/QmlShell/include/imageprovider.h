@@ -17,18 +17,28 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef DEFAULTSHELLFACTORY_H
-#define DEFAULTSHELLFACTORY_H
+#ifndef IMAGEPROVIDER_H
+#define IMAGEPROVIDER_H
 
-#include "shellfactory.h"
+#include <QtQuick>
 
-class DefaultShellFactory: public QObject, public ShellFactory
+class ImageProvider: public QObject, public QQuickImageProvider
 {
     Q_OBJECT
-    Q_INTERFACES(ShellFactory)
 
     public:
-        Shell* shell();
+        ImageProvider(QQuickImageProvider::ImageType type=QQuickImageProvider::Image,
+                      QQuickImageProvider::Flags flags=QQmlImageProviderBase::ForceAsynchronousImageLoading);
+
+        ~ImageProvider();
+
+        QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+
+    private:
+        QImage m_frame;
+
+    public slots:
+        void setFrame(const QImage &frame);
 };
 
-#endif // DEFAULTSHELLFACTORY_H
+#endif // IMAGEPROVIDER_H

@@ -78,7 +78,7 @@ void TheMaskElement::iStream(const void *data, int datalen, QString dataType)
 
     if (this->m_maskImage.isNull() || this->m_cascadeClassifier.empty())
     {
-        emit(this->oStream(data, datalen, dataType));
+        emit this->oStream(data, datalen, dataType);
 
         return;
     }
@@ -101,7 +101,7 @@ void TheMaskElement::iStream(const void *data, int datalen, QString dataType)
 
     if (vecFaces.size() < 1)
     {
-        emit(this->oStream(data, datalen, dataType));
+        emit this->oStream(data, datalen, dataType);
 
         return;
     }
@@ -121,7 +121,7 @@ void TheMaskElement::iStream(const void *data, int datalen, QString dataType)
 
     painter.end();
 
-    emit(this->oStream((const void *) &this->m_oFrame, 0, dataType));
+    emit this->oStream((const void *) &this->m_oFrame, 0, dataType);
 }
 
 bool TheMaskElement::event(QEvent *event)

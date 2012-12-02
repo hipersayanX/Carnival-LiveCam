@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/TheMask">
         <file>share/haars/aGest.xml</file>
         <file>share/haars/haarcascade_eye_tree_eyeglasses.xml</file>
         <file>share/haars/haarcascade_frontalface_alt_tree.xml</file>

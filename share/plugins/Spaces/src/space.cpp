@@ -204,14 +204,14 @@ void Space::bringToFront()
 
             space->setZValue(to);
 
-            emit(static_cast<Space *>(static_cast<QGraphicsProxyWidget *>(space)->widget())->spaceMoved(from, to));
+            emit static_cast<Space *>(static_cast<QGraphicsProxyWidget *>(space)->widget())->spaceMoved(from, to);
         }
 
     int from = this->m_proxy->zValue();
     int to = spaces.length() - 1;
 
     this->m_proxy->setZValue(to);
-    emit(this->spaceMoved(from, to));
+    emit this->spaceMoved(from, to);
 }
 
 bool Space::eventFilter(QObject *watched, QEvent *event)

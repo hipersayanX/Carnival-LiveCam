@@ -97,3 +97,37 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+
+/*
+    QString style = "QPushButton"
+                    "{"
+                    "    background-color: rgb(0, 0, 0);"
+                    "    border: 1px solid none;"
+                    "    border-radius: 6px;"
+                    "}"
+                    "QPushButton:hover"
+                    "{"
+                    "    background-color: rgb(15, 15, 15);"
+                    "    border: 1px solid rgb(127, 127, 255);"
+                    "}"
+                    "QPushButton:pressed"
+                    "{"
+                    "    background-color: rgb(31, 31, 31);"
+                    "    border: 1px solid rgb(255, 255, 255);"
+                    "}";
+
+    toggleMaximizedButton->setHidden(false);
+    toggleMaximizedButton->setHidden(false);
+    toggleMaximizedButton->setIcon(QIcon("share/shells/DefaultShell/share/images/icons/maxizespace.svg"));
+    toggleMaximizedButton->setIconSize(QSize(32, 32));
+    toggleMaximizedButton->setMaximumSize(QSize(48, 48));
+    toggleMaximizedButton->setMinimumSize(QSize(48, 48));
+    toggleMaximizedButton->setStyleSheet(style);
+
+    scaleAndRotateButton->setHidden(false);
+    scaleAndRotateButton->setIcon(QIcon("share/shells/DefaultShell/share/images/icons/scalerotate.svg"));
+    scaleAndRotateButton->setIconSize(QSize(32, 32));
+    scaleAndRotateButton->setMaximumSize(QSize(48, 48));
+    scaleAndRotateButton->setMinimumSize(QSize(48, 48));
+    scaleAndRotateButton->setStyleSheet(style);
+*/

@@ -20,35 +20,33 @@
 // https://qt-project.org/doc/qt-5.0/qtquick-module.html
 // https://qt-project.org/doc/qt-5.0/qquickwindow.html
 
-#ifndef GUI_H
-#define GUI_H
+#ifndef QMLSHELLGUI_H
+#define QMLSHELLGUI_H
 
-#include <QDeclarativeView>
-#include <QDeclarativeItem>
-#include <QMouseEvent>
+#include <QtQuick>
 
-#include "webcamimageprovider.h"
+#include "imageprovider.h"
 
-class Gui: public QDeclarativeView
+class QmlShellGui: public QQuickView
 {
     Q_OBJECT
 
     public:
-        explicit Gui(QWidget *parent=0);
+        explicit QmlShellGui(QWidget *parent=0);
         QString showPreview();
 
     private:
-        WebcamImageProvider *webcamImageProvider;
-        QObject *root;
-        QDeclarativeItem *devices;
-        QDeclarativeItem *iconBar;
-        QDeclarativeItem *effects;
-        QDeclarativeItem *windowControls;
-        QDeclarativeItem *windowBackground;
-        QPoint windowPos0;
-        QPoint mousePos0;
-        QSize windowSize0;
-        uchar currentFrame;
+        ImageProvider *m_imageProvider;
+        QObject *m_root;
+        QQuickItem *m_devices;
+        QQuickItem *m_iconBar;
+        QQuickItem *m_effects;
+        QQuickItem *m_windowControls;
+        QQuickItem *m_windowBackground;
+        QPoint m_windowPos0;
+        QPoint m_mousePos0;
+        QSize m_windowSize0;
+        uchar m_currentFrame;
 
     signals:
         void viewPortSizeChanged(QSize size);
@@ -73,7 +71,7 @@ class Gui: public QDeclarativeView
         void setFrame(const QImage &frame);
         void setPreview(const QImage &frame);
         void moveDevice(qint32 from, qint32 to);
-        void updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces);
+        void updateDevices(const QList<QVariant> &m_devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
 
     private slots:
@@ -129,4 +127,4 @@ class Gui: public QDeclarativeView
         void onExitedResizeBottom();
 };
 
-#endif // GUI_H
+#endif // QMLSHELLGUI_H

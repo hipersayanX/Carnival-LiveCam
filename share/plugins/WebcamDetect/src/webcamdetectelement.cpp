@@ -124,16 +124,16 @@ void WebcamDetectElement::devicesChanged(QString path)
     if (!this->m_fsWatcher->directories().isEmpty() && webcams == this->m_webcams)
         return;
 
-    emit(this->webcamsUpdated(webcams));
+    emit this->webcamsUpdated(webcams);
 
     QList<QStringList> removed = this->substractList(this->m_webcams, webcams);
     QList<QStringList> added = this->substractList(webcams, this->m_webcams);
 
     if (!added.isEmpty())
-        emit(this->webcamsAdded(added));
+        emit this->webcamsAdded(added);
 
     if (!removed.isEmpty())
-        emit(this->webcamsRemoved(removed));
+        emit this->webcamsRemoved(removed);
 
     this->m_webcams = webcams;
 }

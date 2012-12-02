@@ -17,31 +17,33 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/webcamimageprovider.h"
+#include "imageprovider.h"
 
-WebcamImageProvider::WebcamImageProvider(QDeclarativeImageProvider::ImageType type): QDeclarativeImageProvider(type)
+ImageProvider::ImageProvider(QQuickImageProvider::ImageType type,
+                             QQuickImageProvider::Flags flags):
+    QQuickImageProvider(type, flags)
 {
-    this->frame = QImage(1, 1, QImage::Format_RGB888);
-    this->frame.fill(0);
+    this->m_frame = QImage(1, 1, QImage::Format_RGB888);
+    this->m_frame.fill(0);
 }
 
-WebcamImageProvider::~WebcamImageProvider()
+ImageProvider::~ImageProvider()
 {
 }
 
-QImage WebcamImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+QImage ImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     Q_UNUSED(id)
 
-    *size = this->frame.size();
+    *size = this->m_frame.size();
 
     if (requestedSize.isValid())
-        return this->frame.scaled(requestedSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+        return this->m_frame.scaled(requestedSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
     else
-        return this->frame;
+        return this->m_frame;
 }
 
-void WebcamImageProvider::setFrame(const QImage &image)
+void ImageProvider::setFrame(const QImage &frame)
 {
-    this->frame = image;
+    this->m_frame = frame;
 }

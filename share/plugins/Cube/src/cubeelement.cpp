@@ -65,7 +65,7 @@ void CubeElement::iStream(const void *data, int datalen, QString dataType)
 
     this->m_oFrame = this->m_ogl.renderPixmap(this->m_ogl.width(),this->m_ogl.height()).toImage();
 
-    emit(this->oStream((const void *) &this->m_oFrame, 0, dataType));
+    emit this->oStream((const void *) &this->m_oFrame, 0, dataType);
 }
 
 bool CubeElement::event(QEvent *event)

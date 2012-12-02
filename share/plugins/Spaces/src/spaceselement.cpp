@@ -84,7 +84,7 @@ QString SpacesElement::buttonStyleSheet()
 
 bool SpacesElement::start()
 {
-    emit(this->oStream((const void *) &this->m_spacesWidget, 0, "QWidget"));
+    emit this->oStream((const void *) &this->m_spacesWidget, 0, "QWidget");
 
     return true;
 }

@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/RenderModel">
         <file>share/data/cow.osg</file>
     </qresource>
 </RCC>

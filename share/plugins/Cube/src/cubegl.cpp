@@ -135,13 +135,13 @@ void CubeGL::setImage(const QImage &image)
 void CubeGL::setXrot(float xrot)
 {
     this->m_xrot = xrot;
-    emit(this->xrotChanged(xrot));
+    emit this->xrotChanged(xrot);
 }
 
 void CubeGL::setYrot(float yrot)
 {
     this->m_yrot = yrot;
-    emit(this->yrotChanged(yrot));
+    emit this->yrotChanged(yrot);
 }
 
 void CubeGL::resetImage()

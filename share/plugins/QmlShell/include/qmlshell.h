@@ -17,21 +17,20 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#ifndef WEBCAMIMAGEPROVIDER_H
-#define WEBCAMIMAGEPROVIDER_H
+#ifndef QMLSHELL_H
+#define QMLSHELL_H
 
-#include <QDeclarativeImageProvider>
+#include "plugin.h"
+#include "qmlshellelement.h"
 
-class WebcamImageProvider: public QDeclarativeImageProvider
+class QmlShell: public QObject, public Plugin
 {
-    public:
-        WebcamImageProvider(QDeclarativeImageProvider::ImageType type=QDeclarativeImageProvider::Image);
-        ~WebcamImageProvider();
-        QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
-        void setFrame(const QImage &image);
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "CarnivalLiveCam.Plugin" FILE "QmlShell.json")
+    Q_INTERFACES(Plugin)
 
-    private:
-        QImage frame;
+    public:
+        Element* newElement();
 };
 
-#endif // WEBCAMIMAGEPROVIDER_H
+#endif // QMLSHELL_H

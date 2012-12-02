@@ -282,7 +282,7 @@ void ParticleFallElement::iStream(const void *data, int datalen, QString dataTyp
 
     painter.end();
 
-    emit(this->oStream((const void *) &this->m_oFrame, 0, dataType));
+    emit this->oStream((const void *) &this->m_oFrame, 0, dataType);
 
     for (int particle = 0; particle < this->m_particles.length(); particle++)
         this->m_particles[particle]++;

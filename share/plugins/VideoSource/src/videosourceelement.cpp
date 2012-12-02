@@ -48,7 +48,7 @@ bool VideoSourceElement::start()
 {
     if (!this->m_video.open(this->m_fileName.toUtf8().constData()))
     {
-        emit(this->fail());
+        emit this->fail();
 
         return false;
     }
@@ -126,5 +126,5 @@ void VideoSourceElement::timeout()
                             matFrame.rows,
                             QImage::Format_RGB888).rgbSwapped();
 
-    emit(this->oStream((const void *) &this->m_oFrame, 0, "QImage"));
+    emit this->oStream((const void *) &this->m_oFrame, 0, "QImage");
 }

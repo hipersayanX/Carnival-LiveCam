@@ -17,12 +17,9 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
-#include "../include/defaultshell.h"
-#include "../include/defaultshellfactory.h"
+#include "qmlshell.h"
 
-Shell* DefaultShellFactory::shell()
+Element *QmlShell::newElement()
 {
-    return new DefaultShell();
+    return new QmlShellElement();
 }
-
-Q_EXPORT_PLUGIN2(DefaultShell, DefaultShellFactory)

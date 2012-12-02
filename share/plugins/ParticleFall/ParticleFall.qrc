@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/ParticleFall">
         <file>share/sprites/flake0.png</file>
         <file>share/sprites/flake1.png</file>
         <file>share/sprites/flake2.png</file>

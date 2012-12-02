@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/QmlShell">
         <file>share/images/icons/about.svg</file>
         <file>share/images/icons/author.svg</file>
         <file>share/images/icons/category.svg</file>

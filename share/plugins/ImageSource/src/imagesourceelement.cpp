@@ -33,7 +33,7 @@ void ImageSourceElement::iStream(const void *data, int datalen, QString dataType
 
 bool ImageSourceElement::start()
 {
-    emit(this->oStream((const void *) &this->m_oFrame, 0, "QImage"));
+    emit this->oStream((const void *) &this->m_oFrame, 0, "QImage");
 
     return true;
 }

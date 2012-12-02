@@ -49,6 +49,9 @@ OTHER_FILES += \
 
 QT += core gui
 
+RESOURCES += \
+    ParticleFall.qrc
+
 SOURCES += \
     src/particle.cpp \
     src/particlefall.cpp \
@@ -66,6 +69,3 @@ target.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET
 
 data.files = share/*
 data.path = $${COMMONS_PLUGINS_INSTALL_PATH}/$$TARGET/share
-
-RESOURCES += \
-    ParticleFall.qrc

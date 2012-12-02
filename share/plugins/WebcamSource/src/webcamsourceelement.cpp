@@ -55,7 +55,7 @@ bool WebcamSourceElement::start()
     // Try to open webcam device,
     if (!this->m_webcam.open(QString(this->m_device).remove("/dev/video").toInt()))
     {
-        emit(this->fail());
+        emit this->fail();
 
         return false;
     }
@@ -153,5 +153,5 @@ void WebcamSourceElement::timeout()
                             matFrame.rows,
                             QImage::Format_RGB888).rgbSwapped();
 
-    emit(this->oStream((const void *) &this->m_oFrame, 0, "QImage"));
+    emit this->oStream((const void *) &this->m_oFrame, 0, "QImage");
 }
