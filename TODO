@@ -1,1 +1,5 @@
 - Carnival core will be renamed to "QbQal Multimedia Framework" in the future.
+- Allow different versions of Carnival LiveCam to be installed all together.
+- Add QXmpp support.
+- Add QtScript, Python and Cling scripting.
+- Port to Windows and Mac.

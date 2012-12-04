@@ -36,48 +36,71 @@ QString QmlShellElement::spacePreview()
 }
 
 bool QmlShellElement::start()
-{/*
-    connect(this->m_qmlShellGui, SIGNAL(viewPortSizeChanged(QSize)), this, SLOT(onViewPortSizeChanged(QSize)));
-    connect(this->m_qmlShellGui, SIGNAL(sMouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
-    connect(this->m_qmlShellGui, SIGNAL(sMousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
-    connect(this->m_qmlShellGui, SIGNAL(sMousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
-    connect(this->m_qmlShellGui, SIGNAL(sMouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
-    connect(this->m_qmlShellGui, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
-    connect(this->m_qmlShellGui, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
-    connect(this->m_qmlShellGui, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
-    connect(this->m_qmlShellGui, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
-    connect(this->m_qmlShellGui, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
-    connect(this->m_qmlShellGui, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
-    connect(this->m_qmlShellGui, SIGNAL(setEffect(QString, QString)), this, SLOT(onSetEffect(QString, QString)));
-    connect(this->m_qmlShellGui, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
-    connect(this->m_qmlShellGui, SIGNAL(pluginMoved(QString, qint32, qint32)), this, SLOT(onPluginMoved(QString, qint32, qint32)));
-    connect(this->m_qmlShellGui, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
-    connect(this->m_qmlShellGui, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
-    connect(this->m_qmlShellGui, SIGNAL(closed()), this, SLOT(onClosed()));*/
+{
+    // Simple actions signals.
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::closed, this, &QmlShellElement::closed);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::streamStateChanged, this, &QmlShellElement::streamStateChanged);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::takePicture, this, &QmlShellElement::takePicture);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::startVideoRecord, this, &QmlShellElement::startVideoRecord);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::stopVideoRecord, this, &QmlShellElement::stopVideoRecord);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::editModeChanged, this, &QmlShellElement::editModeChanged);
+
+    // Spaces related signals.
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::addSpace, this, &QmlShellElement::addSpace);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::removeSpace, this, &QmlShellElement::removeSpace);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::spaceZIndexChanged, this, &QmlShellElement::spaceZIndexChanged);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::requestSpaceControls, this, &QmlShellElement::requestSpaceControls);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::setupSpaceControls, this, &QmlShellElement::setupSpaceControls);
+
+    // Effects related signals.
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::addFx, this, &QmlShellElement::addFx);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::removeFx, this, &QmlShellElement::removeFx);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::fxIndexChanged, this, &QmlShellElement::fxIndexChanged);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::requestFxInfo, this, &QmlShellElement::requestFxInfo);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::openURL, this, &QmlShellElement::openURL);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::mailTo, this, &QmlShellElement::mailTo);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::requestFxUpdate, this, &QmlShellElement::requestFxUpdate);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::fxPreviewStateChanged, this, &QmlShellElement::fxPreviewStateChanged);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::requestFxControls, this, &QmlShellElement::requestFxControls);
+    QObject::connect(&this->m_qmlShellGui, &QmlShellGui::setupFxControls, this, &QmlShellElement::setupFxControls);
+
+    this->m_qmlShellGui.show();
+
+    return true;
 }
 
 bool QmlShellElement::stop()
-{/*
-    disconnect(this->m_qmlShellGui, SIGNAL(viewPortSizeChanged(QSize)), this, SLOT(onViewPortSizeChanged(QSize)));
-    disconnect(this->m_qmlShellGui, SIGNAL(sMouseDoubleClicked(QMouseEvent *)), this, SLOT(onMouseDoubleClicked(QMouseEvent *)));
-    disconnect(this->m_qmlShellGui, SIGNAL(sMousePositionChanged(QMouseEvent *)), this, SLOT(onMousePositionChanged(QMouseEvent *)));
-    disconnect(this->m_qmlShellGui, SIGNAL(sMousePressed(QMouseEvent *)), this, SLOT(onMousePressed(QMouseEvent *)));
-    disconnect(this->m_qmlShellGui, SIGNAL(sMouseReleased(QMouseEvent *)), this, SLOT(onMouseReleased(QMouseEvent *)));
-    disconnect(this->m_qmlShellGui, SIGNAL(toggleEditMode()), this, SLOT(onToggleEditMode()));
-    disconnect(this->m_qmlShellGui, SIGNAL(takePicture()), this, SLOT(onTakePicture()));
-    disconnect(this->m_qmlShellGui, SIGNAL(startStopRecord()), this, SLOT(onStartStopRecord()));
-    disconnect(this->m_qmlShellGui, SIGNAL(enabledDeviceMoved(qint32, qint32)), this, SLOT(onEnabledDeviceMoved(qint32, qint32)));
-    disconnect(this->m_qmlShellGui, SIGNAL(deviceEnable(QString)), this, SLOT(onDeviceEnable(QString)));
-    disconnect(this->m_qmlShellGui, SIGNAL(deviceDisable(QString)), this, SLOT(onDeviceDisable(QString)));
-    disconnect(this->m_qmlShellGui, SIGNAL(setEffect(QString, QString)), this, SLOT(onSetEffect(QString, QString)));
-    disconnect(this->m_qmlShellGui, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
-    disconnect(this->m_qmlShellGui, SIGNAL(pluginMoved(QString, qint32, qint32)), this, SLOT(onPluginMoved(QString, qint32, qint32)));
-    disconnect(this->m_qmlShellGui, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
-    disconnect(this->m_qmlShellGui, SIGNAL(deviceConfigureClicked(QString)), this, SLOT(onDeviceConfigureClicked(QString)));
-    disconnect(this->m_qmlShellGui, SIGNAL(closed()), this, SLOT(onClosed()));
+{
+    this->m_qmlShellGui.hide();
 
-    delete this->m_qmlShellGui;
-    this->m_qmlShellGui = NULL;*/
+    // Simple actions signals.
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::closed, this, &QmlShellElement::closed);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::streamStateChanged, this, &QmlShellElement::streamStateChanged);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::takePicture, this, &QmlShellElement::takePicture);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::startVideoRecord, this, &QmlShellElement::startVideoRecord);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::stopVideoRecord, this, &QmlShellElement::stopVideoRecord);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::editModeChanged, this, &QmlShellElement::editModeChanged);
+
+    // Spaces related signals.
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::addSpace, this, &QmlShellElement::addSpace);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::removeSpace, this, &QmlShellElement::removeSpace);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::spaceZIndexChanged, this, &QmlShellElement::spaceZIndexChanged);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::requestSpaceControls, this, &QmlShellElement::requestSpaceControls);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::setupSpaceControls, this, &QmlShellElement::setupSpaceControls);
+
+    // Effects related signals.
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::addFx, this, &QmlShellElement::addFx);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::removeFx, this, &QmlShellElement::removeFx);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::fxIndexChanged, this, &QmlShellElement::fxIndexChanged);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::requestFxInfo, this, &QmlShellElement::requestFxInfo);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::openURL, this, &QmlShellElement::openURL);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::mailTo, this, &QmlShellElement::mailTo);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::requestFxUpdate, this, &QmlShellElement::requestFxUpdate);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::fxPreviewStateChanged, this, &QmlShellElement::fxPreviewStateChanged);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::requestFxControls, this, &QmlShellElement::requestFxControls);
+    QObject::disconnect(&this->m_qmlShellGui, &QmlShellGui::setupFxControls, this, &QmlShellElement::setupFxControls);
+
+    return true;
 }
 
 void QmlShellElement::setSpacesBoard(QString spacesBoard)
@@ -102,99 +125,88 @@ void QmlShellElement::resetSpacePreview()
 
 void QmlShellElement::showError(QString message)
 {
+    this->m_qmlShellGui.showError(message);
 }
 
 void QmlShellElement::setStreamState(ElementState state)
 {
+    this->m_qmlShellGui.setStreamState(state);
 }
 
 void QmlShellElement::setEditMode(bool enabled)
 {
+    this->m_qmlShellGui.setEditMode(enabled);
 }
 
 void QmlShellElement::setRecordingState(bool recording)
 {
+    this->m_qmlShellGui.setRecordingState(recording);
 }
 
 void QmlShellElement::setAvailableSpaceTypes(QStringList spaceTypes)
 {
+    this->m_qmlShellGui.setAvailableSpaceTypes(spaceTypes);
 }
 
 void QmlShellElement::setSpaces(QStringList spaces)
 {
+    this->m_qmlShellGui.setSpaces(spaces);
 }
 
 void QmlShellElement::setSpaceIndex(QString spaceId, int index)
 {
+    this->m_qmlShellGui.setSpaceIndex(spaceId, index);
 }
 
 void QmlShellElement::setSpaceControls(QString spaceId, QVariantList controls)
 {
+    this->m_qmlShellGui.setSpaceControls(spaceId, controls);
 }
 
 void QmlShellElement::setAvailableFxCategories(QStringList categories)
 {
+    this->m_qmlShellGui.setAvailableFxCategories(categories);
 }
 
 void QmlShellElement::setAvailableFx(QStringList fxs)
 {
+    this->m_qmlShellGui.setAvailableFx(fxs);
 }
 
 void QmlShellElement::setFxs(QStringList fxs)
 {
+    this->m_qmlShellGui.setFxs(fxs);
 }
 
 void QmlShellElement::setFxIndex(QString fxId, int index)
 {
+    this->m_qmlShellGui.setFxIndex(fxId, index);
 }
 
 void QmlShellElement::setFxInfo(QString fxId, QVariantList controls)
 {
+    this->m_qmlShellGui.setFxInfo(fxId, controls);
 }
 
 void QmlShellElement::setFxControls(QString fxId, QVariantList controls)
 {
+    this->m_qmlShellGui.setFxControls(fxId, controls);
 }
 
 void QmlShellElement::iStream(const void *data, int datalen, QString dataType)
-{
+{/*
+    this->m_qmlShellGui->setFrame(frame);
+    this->m_qmlShellGui->setPreview(frame);
+    return this->m_qmlShellGui->showPreview();*/
 }
 
 void QmlShellElement::setPipeline(Pipeline *pipeline)
 {
+    Q_UNUSED(pipeline)
 }
 
 void QmlShellElement::setPeers(QList<Element *> srcs, QList<Element *> sinks)
 {
+    this->m_srcs = srcs;
+    this->m_sinks = sinks;
 }
-/*
-QString QmlShellElement::showPreview()
-{
-    return this->m_qmlShellGui->showPreview();
-}
-
-void QmlShellElement::setFrame(const QImage &frame)
-{
-    this->m_qmlShellGui->setFrame(frame);
-}
-
-void QmlShellElement::setPreview(const QImage &frame)
-{
-    this->m_qmlShellGui->setPreview(frame);
-}
-
-void QmlShellElement::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
-{
-    this->m_qmlShellGui->updateDevices(devices, activeSpaces);
-}
-
-void QmlShellElement::updatePlugins(const QList<QVariant> &plugins)
-{
-    this->m_qmlShellGui->updatePlugins(plugins);
-}
-
-void QmlShellElement::moveDevice(qint32 from, qint32 to)
-{
-    this->m_qmlShellGui->moveDevice(from, to);
-}
-*/

@@ -44,6 +44,8 @@ class QmlShellElement: public Element
         QString m_spacePreview;
 
         QmlShellGui m_qmlShellGui;
+        QList<Element *> m_srcs;
+        QList<Element *> m_sinks;
 
     signals:
         // Simple actions signals.

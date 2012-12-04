@@ -25,6 +25,7 @@
 
 #include <QtQuick>
 
+#include "element.h"
 #include "imageprovider.h"
 
 class QmlShellGui: public QQuickView
@@ -32,7 +33,7 @@ class QmlShellGui: public QQuickView
     Q_OBJECT
 
     public:
-        explicit QmlShellGui(QWidget *parent=0);
+        explicit QmlShellGui(QWindow *parent=0);
         QString showPreview();
 
     private:
@@ -49,34 +50,63 @@ class QmlShellGui: public QQuickView
         uchar m_currentFrame;
 
     signals:
-        void viewPortSizeChanged(QSize size);
-        void sMouseDoubleClicked(QMouseEvent *event);
-        void sMousePositionChanged(QMouseEvent *event);
-        void sMousePressed(QMouseEvent *event);
-        void sMouseReleased(QMouseEvent *event);
-        void toggleEditMode();
-        void takePicture();
-        void startStopRecord();
-        void enabledDeviceMoved(qint32 from, qint32 to);
-        void deviceEnable(QString deviceId);
-        void deviceDisable(QString deviceId);
-        void setEffect(QString pluginId, QString spaceId);
-        void unsetEffect(QString pluginId, QString spaceId);
-        void pluginMoved(QString spaceId, qint32 from, qint32 to);
-        void pluginConfigureClicked(QString pluginId);
-        void deviceConfigureClicked(QString deviceId);
+        // Simple actions signals.
         void closed();
+        void streamStateChanged(Element::ElementState state);
+        void takePicture(QString fileName);
+        void startVideoRecord(QString fileName);
+        void stopVideoRecord();
+        void editModeChanged(bool enabled);
+
+        // Spaces related signals.
+        void addSpace(QString spaceTypeId);
+        void removeSpace(QString spaceId);
+        void spaceZIndexChanged(QString spaceId, int index);
+        void requestSpaceControls(QString spaceId);
+        void setupSpaceControls(QString spaceId, QVariantList controls);
+
+        // Effects related signals.
+        void addFx(QString fxTypeId);
+        void removeFx(QString fxId);
+        void fxIndexChanged(QString fxId, int index);
+        void requestFxInfo(QString fxId);
+        void openURL(QUrl url);
+        void mailTo(QUrl mail);
+        void requestFxUpdate(QString fxId);
+        void fxPreviewStateChanged(QString fxId, Element::ElementState state);
+        void requestFxControls(QString fxId);
+        void setupFxControls(QString fxId, QVariantList controls);
 
     public slots:
+        // Simple actions slots.
+        void showError(QString message);
+        void setStreamState(Element::ElementState state);
+        void setEditMode(bool enabled);
+        void setRecordingState(bool recording);
+
+        // Spaces related slots.
+        void setAvailableSpaceTypes(QStringList spaceTypes);
+        void setSpaces(QStringList spaces);
+        void setSpaceIndex(QString spaceId, int index);
+        void setSpaceControls(QString spaceId, QVariantList controls);
+
+        // Effects related slots.
+        void setAvailableFxCategories(QStringList categories);
+        void setAvailableFx(QStringList fxs);
+        void setFxs(QStringList fxs);
+        void setFxIndex(QString fxId, int index);
+        void setFxInfo(QString fxId, QVariantList controls);
+        void setFxControls(QString fxId, QVariantList controls);
+
         void setFrame(const QImage &frame);
         void setPreview(const QImage &frame);
         void moveDevice(qint32 from, qint32 to);
-        void updateDevices(const QList<QVariant> &m_devices, const QStringList &activeSpaces);
+        void updateDevices(const QList<QVariant> devices, const QStringList &activeSpaces);
         void updatePlugins(const QList<QVariant> &plugins);
 
     private slots:
-        void onViewPortSizeChanged(int width, int height);
         void iconClicked(int index=0);
+        void onViewPortSizeChanged(int width, int height);
         void onEnabledDeviceMoved(int from, int to);
         void onDeviceEnable(QString deviceId);
         void onDeviceDisable(QString deviceId);

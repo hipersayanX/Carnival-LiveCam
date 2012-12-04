@@ -17,29 +17,36 @@
 // Email   : hipersayan DOT x AT gmail DOT com
 // Web-Site: https://github.com/hipersayanX/Carnival-LiveCam
 
+#include  <QtWidgets>
+
 #include "qmlshellgui.h"
 
-QmlShellGui::QmlShellGui(QWidget *parent): QQuickView(parent)
+// http://doc.qt.digia.com/qt/declarative-cppextensions-qwidgets.html
+// http://www.qtcentre.org/threads/39409-qwidget-into-QML
+// http://blog.qt.digia.com/blog/2011/08/26/toplevel-windows-and-menus-with-qt-quick/
+// https://qt.gitorious.org/qtplayground/qtdesktopcomponents
+
+QmlShellGui::QmlShellGui(QWindow *parent): QQuickView(parent)
 {
     this->m_currentFrame = 0;
     this->m_imageProvider = new ImageProvider;
     this->engine()->addImageProvider("webcam", this->m_imageProvider);
 
-    this->setSource(QUrl::fromLocalFile(":/QmlShell/share/qml/main.qml"));
+    this->setSource(QUrl("qrc:///QmlShell/share/qml/main.qml"));
     this->setResizeMode(QQuickView::SizeRootObjectToView);
     this->setWindowFlags(Qt::FramelessWindowHint);
-    this->setAttribute(Qt::WA_TranslucentBackground, true);
-    this->setStyleSheet("background:transparent;");
+    this->setOpacity(0);
+    this->setColor(QColor(0, 0, 0, 0));
     this->setMinimumSize(QSize(320, 240));
 
     QRect frect = this->frameGeometry();
     QDesktopWidget desktop_widget;
 
     frect.moveCenter(desktop_widget.availableGeometry().center());
-    this->move(frect.topLeft());
+    this->setPosition(frect.topLeft());
 
     this->m_root = (QObject *)this->rootObject();
-
+/*
     this->m_windowControls = this->m_root->findChild<QQuickItem *>("WindowControls");
     this->m_windowBackground = this->m_root->findChild<QQuickItem *>("WindowBackground");
 
@@ -112,6 +119,63 @@ QmlShellGui::QmlShellGui(QWidget *parent): QQuickView(parent)
     connect(this->m_effects, SIGNAL(unsetEffect(QString, QString)), this, SLOT(onUnsetEffect(QString, QString)));
     connect(this->m_effects, SIGNAL(pluginMoved(QString, int, int)), this, SLOT(onPluginMoved(QString, int, int)));
     connect(this->m_effects, SIGNAL(pluginConfigureClicked(QString)), this, SLOT(onPluginConfigureClicked(QString)));
+    */
+}
+
+void QmlShellGui::showError(QString message)
+{
+}
+
+void QmlShellGui::setStreamState(Element::ElementState state)
+{
+}
+
+void QmlShellGui::setEditMode(bool enabled)
+{
+}
+
+void QmlShellGui::setRecordingState(bool recording)
+{
+}
+
+void QmlShellGui::setAvailableSpaceTypes(QStringList spaceTypes)
+{
+}
+
+void QmlShellGui::setSpaces(QStringList spaces)
+{
+}
+
+void QmlShellGui::setSpaceIndex(QString spaceId, int index)
+{
+}
+
+void QmlShellGui::setSpaceControls(QString spaceId, QVariantList controls)
+{
+}
+
+void QmlShellGui::setAvailableFxCategories(QStringList categories)
+{
+}
+
+void QmlShellGui::setAvailableFx(QStringList fxs)
+{
+}
+
+void QmlShellGui::setFxs(QStringList fxs)
+{
+}
+
+void QmlShellGui::setFxIndex(QString fxId, int index)
+{
+}
+
+void QmlShellGui::setFxInfo(QString fxId, QVariantList controls)
+{
+}
+
+void QmlShellGui::setFxControls(QString fxId, QVariantList controls)
+{
 }
 
 QString QmlShellGui::showPreview()
@@ -120,7 +184,7 @@ QString QmlShellGui::showPreview()
 }
 
 void QmlShellGui::iconClicked(int index)
-{
+{/*
     switch (index)
     {
         case 1:
@@ -136,55 +200,55 @@ void QmlShellGui::iconClicked(int index)
         break;
 
         case 5:
-            if (this->isFullScreen())
+            if (this->windowState() == Qt::WindowFullScreen)
                 this->showNormal();
             else
                 this->showFullScreen();
         break;
-    }
+    }*/
 }
 
 void QmlShellGui::onEnabledDeviceMoved(int from, int to)
 {
-    emit enabledDeviceMoved(from, to);
+//    emit enabledDeviceMoved(from, to);
 }
 
 void QmlShellGui::onDeviceEnable(QString deviceId)
 {
-    emit deviceEnable(deviceId);
+//    emit deviceEnable(deviceId);
 }
 
 void QmlShellGui::onDeviceDisable(QString deviceId)
 {
-    emit deviceDisable(deviceId);
+//    emit deviceDisable(deviceId);
 }
 
 void QmlShellGui::onSetEffect(QString pluginId, QString spaceId)
 {
-    emit setEffect(pluginId, spaceId);
+//    emit setEffect(pluginId, spaceId);
 }
 
 void QmlShellGui::onUnsetEffect(QString pluginId, QString spaceId)
 {
-    emit unsetEffect(pluginId, spaceId);
+//    emit unsetEffect(pluginId, spaceId);
 }
 
 void QmlShellGui::onPluginMoved(QString spaceId, int from, int to)
 {
-    emit pluginMoved(spaceId, from, to);
+//    emit pluginMoved(spaceId, from, to);
 }
 
 void QmlShellGui::onPluginConfigureClicked(QString pluginId)
 {
-    emit pluginConfigureClicked(pluginId);
+//    emit pluginConfigureClicked(pluginId);
 }
 
 void QmlShellGui::onDeviceConfigureClicked(QString deviceId)
 {
-    emit deviceConfigureClicked(deviceId);
+//    emit deviceConfigureClicked(deviceId);
 }
 
-void QmlShellGui::updateDevices(const QList<QVariant> &devices, const QStringList &activeSpaces)
+void QmlShellGui::updateDevices(const QList<QVariant> devices, const QStringList &activeSpaces)
 {
     this->m_devices->setProperty("activeDevices", activeSpaces);
     this->m_devices->setProperty("devices", devices);
@@ -216,51 +280,51 @@ void QmlShellGui::moveDevice(qint32 from, qint32 to)
 
 void QmlShellGui::onViewPortSizeChanged(int width, int height)
 {
-    emit viewPortSizeChanged(QSize(width, height));
+//    emit viewPortSizeChanged(QSize(width, height));
 }
 
 void QmlShellGui::onMouseDoubleClicked(qreal mouseX, qreal mouseY, QVariant pressedButtons)
-{
+{/*
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonDblClick,
                                          QPoint(mouseX, mouseY),
                                          (Qt::MouseButton) pressedButtons.toInt(),
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit sMouseDoubleClicked(event);
+    emit sMouseDoubleClicked(event);*/
 }
 
 void QmlShellGui::onMousePositionChanged(qreal mouseX, qreal mouseY, QVariant pressedButtons)
-{
+{/*
     QMouseEvent *event = new QMouseEvent(QEvent::MouseMove,
                                          QPoint(mouseX, mouseY),
                                          (Qt::MouseButton) pressedButtons.toInt(),
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit sMousePositionChanged(event);
+    emit sMousePositionChanged(event);*/
 }
 
 void QmlShellGui::onMousePressed(qreal mouseX, qreal mouseY, QVariant pressedButtons)
-{
+{/*
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress,
                                          QPoint(mouseX, mouseY),
                                          (Qt::MouseButton) pressedButtons.toInt(),
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit sMousePressed(event);
+    emit sMousePressed(event);*/
 }
 
 void QmlShellGui::onMouseReleased(qreal mouseX, qreal mouseY, QVariant pressedButtons)
-{
+{/*
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonRelease,
                                          QPoint(mouseX, mouseY),
                                          (Qt::MouseButton) pressedButtons.toInt(),
                                          (Qt::MouseButtons) pressedButtons.toInt(),
                                          Qt::NoModifier);
 
-    emit sMouseReleased(event);
+    emit sMouseReleased(event);*/
 }
 
 void QmlShellGui::onEnteredMove()
@@ -270,13 +334,13 @@ void QmlShellGui::onEnteredMove()
 
 void QmlShellGui::onBeginMove()
 {
-    this->m_windowPos0 = this->pos();
+    this->m_windowPos0 = this->position();;
     this->m_mousePos0 = QCursor::pos();
 }
 
 void QmlShellGui::onMove()
 {
-    this->move(this->m_windowPos0 + QCursor::pos() - this->m_mousePos0);
+    this->setPosition(this->m_windowPos0 + QCursor::pos() - this->m_mousePos0);
 }
 
 void QmlShellGui::onExitedMove()
@@ -301,7 +365,7 @@ void QmlShellGui::onStayOnTop()
 
 void QmlShellGui::onMaximize()
 {
-    if (this->isMaximized())
+    if (this->windowState() == Qt::WindowMaximized)
         this->showNormal();
     else
         this->showMaximized();
@@ -321,7 +385,7 @@ void QmlShellGui::onEnteredResizeTopLeft()
 
 void QmlShellGui::onBeginResizeTopLeft()
 {
-    this->m_windowPos0 = this->pos();
+    this->m_windowPos0 = this->position();
     this->m_windowSize0 = this->size();
     this->m_mousePos0 = QCursor::pos();
 }
@@ -357,7 +421,7 @@ void QmlShellGui::onEnteredResizeBottomLeft()
 
 void QmlShellGui::onBeginResizeBottomLeft()
 {
-    this->m_windowPos0 = this->pos();
+    this->m_windowPos0 = this->position();
     this->m_windowSize0 = this->size();
     this->m_mousePos0 = QCursor::pos();
 }
@@ -389,7 +453,7 @@ void QmlShellGui::onEnteredResizeBottomRight()
 
 void QmlShellGui::onBeginResizeBottomRight()
 {
-    this->m_windowPos0 = this->pos();
+    this->m_windowPos0 = this->position();
     this->m_windowSize0 = this->size();
     this->m_mousePos0 = QCursor::pos();
 }
@@ -417,7 +481,7 @@ void QmlShellGui::onEnteredResizeLeft()
 
 void QmlShellGui::onBeginResizeLeft()
 {
-    this->m_windowPos0 = this->pos();
+    this->m_windowPos0 = this->position();
     this->m_windowSize0 = this->size();
     this->m_mousePos0 = QCursor::pos();
 }
@@ -469,7 +533,7 @@ void QmlShellGui::onEnteredResizeTop()
 
 void QmlShellGui::onBeginResizeTop()
 {
-    this->m_windowPos0 = this->pos();
+    this->m_windowPos0 = this->position();
     this->m_windowSize0 = this->size();
     this->m_mousePos0 = QCursor::pos();
 }
@@ -513,3 +577,4 @@ void QmlShellGui::onExitedResizeBottom()
 {
     this->unsetCursor();
 }
+

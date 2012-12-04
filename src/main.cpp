@@ -91,9 +91,8 @@ int main(int argc, char *argv[])
     mainPipeline.setPluginsPaths(QStringList() << "share/plugins");
     mainPipeline.loadPlugins();
 
-    mainPipeline.setPipeline("WebcamDetect ! " \
-                             "WebcamSource device=/dev/video0 size=size(640, 480) fps=30 ! " \
-                             "MediaRecorder");
+    mainPipeline.setPipeline("WebcamSource objectName=webcam device=/dev/video0 size=size(640, 480) fps=30 ! " \
+                             "QmlShell spacesBoard=webcam");
 
     return app.exec();
 }

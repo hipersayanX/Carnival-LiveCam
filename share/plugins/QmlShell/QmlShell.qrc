@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/QmlShell">
         <file>share/images/icons/about.svg</file>
+        <file>share/images/icons/arrow-left.svg</file>
+        <file>share/images/icons/arrow-right.svg</file>
         <file>share/images/icons/author.svg</file>
         <file>share/images/icons/category.svg</file>
         <file>share/images/icons/close.svg</file>
@@ -10,13 +12,16 @@
         <file>share/images/icons/license.svg</file>
         <file>share/images/icons/mail.svg</file>
         <file>share/images/icons/maximize.svg</file>
+        <file>share/images/icons/maxizespace.svg</file>
         <file>share/images/icons/micoff.svg</file>
         <file>share/images/icons/micon.svg</file>
         <file>share/images/icons/minimize.svg</file>
         <file>share/images/icons/move.svg</file>
         <file>share/images/icons/nostayontop.svg</file>
         <file>share/images/icons/picture.svg</file>
+        <file>share/images/icons/scalerotate.svg</file>
         <file>share/images/icons/sound.svg</file>
+        <file>share/images/icons/spaces.svg</file>
         <file>share/images/icons/stayontop.svg</file>
         <file>share/images/icons/stoprec.svg</file>
         <file>share/images/icons/video.svg</file>

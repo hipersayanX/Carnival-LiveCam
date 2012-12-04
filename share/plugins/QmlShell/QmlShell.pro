@@ -58,7 +58,7 @@ OTHER_FILES = \
     share/qml/Window.qml \
     share/qml/WindowControls.qml
 
-QT += core gui quick
+QT += core gui widgets quick
 
 RESOURCES += \
     QmlShell.qrc

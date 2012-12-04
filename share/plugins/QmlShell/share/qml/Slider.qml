@@ -85,7 +85,7 @@ Rectangle
         btnSlider.y = Math.round(k * (recSlider.value - recSlider.minValue))
     }
 
-    signal valueChanged(int value)
+//    signal valueChanged(int value)
 
     Timer
     {
