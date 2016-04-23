@@ -1,3 +1,7 @@
+# This project is deprecated. Please, check my new project: [Webcamoid](https://github.com/webcamoid/webcamoid) #
+
+<hr/>
+
 # Carnival LiveCam, augmented reality made easy #
 
 ![Example of the snow plugin](https://github.com/hipersayanX/Carnival-LiveCam/raw/master/share/images/mainscreen.png)
